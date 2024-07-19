@@ -1,0 +1,41 @@
+# Halshow settings
+# This file is generated automatically.
+wm geometry . 1920x962+0+31
+placeFrames 0.3
+set ::ratio 0.3
+set ::old_w_leftf 160
+set ::watchlist {
+    pin+lcec.m0.0501_EK1101.slave-online
+    pin+lcec.m0.0501_EK1101.slave-oper
+    pin+lcec.m0.0501_EK1101.slave-state-op
+    pin+lcec.m0.2001_FC302.opmode
+    pin+lcec.m0.2001_FC302.slave-online
+    pin+lcec.m0.2001_FC302.slave-oper
+    pin+lcec.m0.2001_FC302.slave-state-init
+    pin+lcec.m0.2001_FC302.slave-state-op
+    pin+lcec.m0.2001_FC302.slave-state-preop
+    pin+lcec.m0.2001_FC302.target-position
+    pin+lcec.m0.2001_FC302.slave-state-safeop
+    pin+lcec.m0.all-op
+    pin+lcec.m0.slaves-responding
+    pin+lcec.m0.state-op
+    pin+lcec.m0.0501_EM7004.slave-online
+    pin+lcec.m0.0501_EM7004.slave-oper
+    pin+lcec.m0.0501_EM7004.slave-state-init
+    pin+lcec.m0.0501_EM7004.slave-state-op
+    pin+lcec.m0.0501_EM7004.slave-state-preop
+    pin+lcec.m0.0501_EM7004.slave-state-safeop
+    pin+lcec.link-up
+    pin+lcec.all-op
+    pin+lcec.state-init
+    pin+lcec.state-op
+    pin+lcec.state-preop
+    pin+lcec.state-safeop
+}
+set ::workmode watchhal
+set ::watchInterval 100
+set ::col1_width 100
+set ::ffmts 
+set ::ifmts 
+set ::alwaysOnTop 0
+set ::autoSaveWatchlist 1
