@@ -1,0 +1,3 @@
+0  0:0  OP     +  EK1100 EtherCAT-Koppler (2A E-Bus)
+1  0:1  OP     +  EM7004 4-Achs Interface
+2  0:2  PREOP  E  FC-302
