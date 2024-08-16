@@ -1,0 +1,179 @@
+/* Master 0, Slave 1, "EM7004"
+ * Vendor ID:       0x00000002
+ * Product code:    0x1b5c3452
+ * Revision number: 0x00110000
+ */
+
+ec_pdo_entry_info_t slave_1_pdo_entries[] = {
+    {0x7010, 0x01, 1}, /* Output 0 */
+    {0x7010, 0x02, 1}, /* Output 1 */
+    {0x7010, 0x03, 1}, /* Output 2 */
+    {0x7010, 0x04, 1}, /* Output 3 */
+    {0x7010, 0x05, 1}, /* Output 4 */
+    {0x7010, 0x06, 1}, /* Output 5 */
+    {0x7010, 0x07, 1}, /* Output 6 */
+    {0x7010, 0x08, 1}, /* Output 7 */
+    {0x7010, 0x09, 1}, /* Output 8 */
+    {0x7010, 0x0a, 1}, /* Output 9 */
+    {0x7010, 0x0b, 1}, /* Output 10 */
+    {0x7010, 0x0c, 1}, /* Output 11 */
+    {0x7010, 0x0d, 1}, /* Output 12 */
+    {0x7010, 0x0e, 1}, /* Output 13 */
+    {0x7010, 0x0f, 1}, /* Output 14 */
+    {0x7010, 0x10, 1}, /* Output 15 */
+    {0x7020, 0x11, 16}, /* Analog output */
+    {0x7030, 0x11, 16}, /* Analog output */
+    {0x7040, 0x11, 16}, /* Analog output */
+    {0x7050, 0x11, 16}, /* Analog output */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x7060, 0x02, 1}, /* Enable latch extern on positive edge */
+    {0x7060, 0x03, 1}, /* Set counter */
+    {0x7060, 0x04, 1}, /* Enable latch extern on negative edge */
+    {0x0000, 0x00, 12}, /* Gap */
+    {0x7060, 0x11, 16}, /* Set counter value */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x7070, 0x02, 1}, /* Enable latch extern on positive edge */
+    {0x7070, 0x03, 1}, /* Set counter */
+    {0x7070, 0x04, 1}, /* Enable latch extern on negative edge */
+    {0x0000, 0x00, 12}, /* Gap */
+    {0x7070, 0x11, 16}, /* Set counter value */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x7080, 0x02, 1}, /* Enable latch extern on positive edge */
+    {0x7080, 0x03, 1}, /* Set counter */
+    {0x7080, 0x04, 1}, /* Enable latch extern on negative edge */
+    {0x0000, 0x00, 12}, /* Gap */
+    {0x7080, 0x11, 16}, /* Set counter value */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x7090, 0x02, 1}, /* Enable latch extern on positive edge */
+    {0x7090, 0x03, 1}, /* Set counter */
+    {0x7090, 0x04, 1}, /* Enable latch extern on negative edge */
+    {0x0000, 0x00, 12}, /* Gap */
+    {0x7090, 0x11, 16}, /* Set counter value */
+    {0x70a0, 0x01, 1}, /* Enable PLS */
+    {0x0000, 0x00, 15}, /* Gap */
+    {0x6000, 0x01, 1}, /* Input 0 */
+    {0x6000, 0x02, 1}, /* Input 1 */
+    {0x6000, 0x03, 1}, /* Input 2 */
+    {0x6000, 0x04, 1}, /* Input 3 */
+    {0x6000, 0x05, 1}, /* Input 4 */
+    {0x6000, 0x06, 1}, /* Input 5 */
+    {0x6000, 0x07, 1}, /* Input 6 */
+    {0x6000, 0x08, 1}, /* Input 7 */
+    {0x6000, 0x09, 1}, /* Input 8 */
+    {0x6000, 0x0a, 1}, /* Input 9 */
+    {0x6000, 0x0b, 1}, /* Input 10 */
+    {0x6000, 0x0c, 1}, /* Input 11 */
+    {0x6000, 0x0d, 1}, /* Input 12 */
+    {0x6000, 0x0e, 1}, /* Input 13 */
+    {0x6000, 0x0f, 1}, /* Input 14 */
+    {0x6000, 0x10, 1}, /* Input 15 */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x6060, 0x02, 1}, /* Latch extern valid */
+    {0x6060, 0x03, 1}, /* Set counter done */
+    {0x0000, 0x00, 5}, /* Gap */
+    {0x6060, 0x09, 1}, /* Status of input A */
+    {0x6060, 0x0a, 1}, /* Status of input B */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x6060, 0x0c, 1}, /* Status of input gate */
+    {0x6060, 0x0d, 1}, /* Status of extern latch */
+    {0x0000, 0x00, 2}, /* Gap */
+    {0x1806, 0x09, 1},
+    {0x6060, 0x11, 16}, /* Counter value */
+    {0x6060, 0x12, 16}, /* Latch value */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x6070, 0x02, 1}, /* Latch extern valid */
+    {0x6070, 0x03, 1}, /* Set counter done */
+    {0x0000, 0x00, 5}, /* Gap */
+    {0x6070, 0x09, 1}, /* Status of input A */
+    {0x6070, 0x0a, 1}, /* Status of input B */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x6070, 0x0c, 1}, /* Status of input gate */
+    {0x6070, 0x0d, 1}, /* Status of extern latch */
+    {0x0000, 0x00, 2}, /* Gap */
+    {0x1807, 0x09, 1},
+    {0x6070, 0x11, 16}, /* Counter value */
+    {0x6070, 0x12, 16}, /* Latch value */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x6080, 0x02, 1}, /* Latch extern valid */
+    {0x6080, 0x03, 1}, /* Set counter done */
+    {0x0000, 0x00, 5}, /* Gap */
+    {0x6080, 0x09, 1}, /* Status of input A */
+    {0x6080, 0x0a, 1}, /* Status of input B */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x6080, 0x0c, 1}, /* Status of input gate */
+    {0x6080, 0x0d, 1}, /* Status of extern latch */
+    {0x0000, 0x00, 2}, /* Gap */
+    {0x1808, 0x09, 1},
+    {0x6080, 0x11, 16}, /* Counter value */
+    {0x6080, 0x12, 16}, /* Latch value */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x6090, 0x02, 1}, /* Latch extern valid */
+    {0x6090, 0x03, 1}, /* Set counter done */
+    {0x0000, 0x00, 5}, /* Gap */
+    {0x6090, 0x09, 1}, /* Status of input A */
+    {0x6090, 0x0a, 1}, /* Status of input B */
+    {0x0000, 0x00, 1}, /* Gap */
+    {0x6090, 0x0c, 1}, /* Status of input gate */
+    {0x6090, 0x0d, 1}, /* Status of extern latch */
+    {0x0000, 0x00, 2}, /* Gap */
+    {0x1809, 0x09, 1},
+    {0x6090, 0x11, 16}, /* Counter value */
+    {0x6090, 0x12, 16}, /* Latch value */
+    {0x60a0, 0x01, 1}, /* PLS Enabled */
+    {0x60a0, 0x02, 1}, /* Unequal SI:0 */
+    {0x0000, 0x00, 14}, /* Gap */
+};
+
+ec_pdo_info_t slave_1_pdos[] = {
+    {0x1601, 16, slave_1_pdo_entries + 0}, /* DO RxPDO-Map */
+    {0x1602, 1, slave_1_pdo_entries + 16}, /* AO RxPDO-Map Ch.1 */
+    {0x1603, 1, slave_1_pdo_entries + 17}, /* AO RxPDO-Map Ch.2 */
+    {0x1604, 1, slave_1_pdo_entries + 18}, /* AO RxPDO-Map Ch.3 */
+    {0x1605, 1, slave_1_pdo_entries + 19}, /* AO RxPDO-Map Ch.4 */
+    {0x1606, 6, slave_1_pdo_entries + 20}, /* ENC RxPDO-Map Ch.1 */
+    {0x1607, 6, slave_1_pdo_entries + 26}, /* ENC RxPDO-Map Ch.2 */
+    {0x1608, 6, slave_1_pdo_entries + 32}, /* ENC RxPDO-Map Ch.3 */
+    {0x1609, 6, slave_1_pdo_entries + 38}, /* ENC RxPDO-Map Ch.4 */
+    {0x160a, 2, slave_1_pdo_entries + 44}, /* PLS RxPDO-Map */
+    {0x1a00, 16, slave_1_pdo_entries + 46}, /* DI TxPDO-Map */
+    {0x1a06, 13, slave_1_pdo_entries + 62}, /* ENC TxPDO-Map Ch.1 */
+    {0x1a07, 13, slave_1_pdo_entries + 75}, /* ENC TxPDO-Map Ch.2 */
+    {0x1a08, 13, slave_1_pdo_entries + 88}, /* ENC TxPDO-Map Ch.3 */
+    {0x1a09, 13, slave_1_pdo_entries + 101}, /* ENC TxPDO-Map Ch.4 */
+    {0x1a0a, 3, slave_1_pdo_entries + 114}, /* PLS TxPDO-Map */
+};
+
+ec_sync_info_t slave_1_syncs[] = {
+    {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE},
+    {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE},
+    {2, EC_DIR_OUTPUT, 10, slave_1_pdos + 0, EC_WD_DISABLE},
+    {3, EC_DIR_INPUT, 6, slave_1_pdos + 10, EC_WD_DISABLE},
+    {0xff}
+};
+
+/* Master 0, Slave 2, "FC-302"
+ * Vendor ID:       0x0200008d
+ * Product code:    0x00000064
+ * Revision number: 0x00000005
+ */
+
+ec_pdo_entry_info_t slave_2_pdo_entries[] = {
+    {0x6040, 0x00, 16}, /* Control word */
+    {0x6042, 0x00, 16}, /* vl target velocity */
+    {0x6041, 0x00, 16}, /* Status word */
+    {0x6044, 0x00, 16}, /* vl velocity actual value */
+};
+
+ec_pdo_info_t slave_2_pdos[] = {
+    {0x1616, 2, slave_2_pdo_entries + 0}, /* Receive PDO Parameter */
+    {0x1a16, 2, slave_2_pdo_entries + 2}, /* Transmit PDO Parameter */
+};
+
+ec_sync_info_t slave_2_syncs[] = {
+    {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE},
+    {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE},
+    {2, EC_DIR_OUTPUT, 1, slave_2_pdos + 0, EC_WD_ENABLE},
+    {3, EC_DIR_INPUT, 1, slave_2_pdos + 1, EC_WD_DISABLE},
+    {0xff}
+};
+

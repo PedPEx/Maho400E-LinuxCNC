@@ -15,7 +15,7 @@
 				<pdo idx="1a16">
 					<pdoEntry idx="6041" subIdx="00" bitLen="16" halPin="StatusWord" halType="u32"/>
 					<pdoEntry idx="6044" subIdx="00" bitLen="16" halPin="ActualVelocity" halType="s32"/>
-					<pdoEntry idx="6061" subIdx="00" bitLen="8" halPin="ModeOfOperationDisplay" halType="u32"/>
+					<!-- <pdoEntry idx="6061" subIdx="00" bitLen="8" halPin="ModeOfOperationDisplay" halType="u32"/>-->
 				</pdo>
 			</syncManager>
 		</slave>

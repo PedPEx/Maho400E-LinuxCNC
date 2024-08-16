@@ -1,0 +1,32 @@
+[    6.035081] EtherCAT: Master driver 1.6.0 1.6.0.gcafd367-1+1.1
+[    6.036352] EtherCAT: 1 master waiting for devices.
+[    6.059127] ec_generic: EtherCAT master generic Ethernet device module 1.6.0 1.6.0.gcafd367-1+1.1
+[    6.059169] EtherCAT: Accepting F8:75:A4:86:9A:F4 as main device for master 0.
+[    6.077122] EtherCAT 0: Starting EtherCAT-IDLE thread.
+[    9.057012] EtherCAT 0: Link state of ecm0 changed to UP.
+[    9.073060] EtherCAT 0: 3 slave(s) responding on main device.
+[    9.073065] EtherCAT 0: Slave states on main device: PREOP.
+[    9.073804] EtherCAT 0: Scanning bus.
+[    9.526854] EtherCAT WARNING 0-2: Received mailbox protocol 0x02 as response.
+[    9.526858] EtherCAT ERROR 0-2: Failed to read number of assigned PDOs for SM2.
+[    9.536120] EtherCAT ERROR 0-2: Received upload response for wrong SDO (0x1C12:00, requested: 0x1C13:00).
+[    9.536124] EtherCAT DEBUG: 00 30 4F 12 1C 00 01 00 00 00 
+[    9.699361] EtherCAT 0: Bus scanning completed in 624 ms.
+[    9.699364] EtherCAT 0: Using slave 0 as DC reference clock.
+[    9.699367] EtherCAT 0: Starting EoE thread.
+[    9.808639] EtherCAT ERROR 0-2: Failed to set SAFEOP state, slave refused state change (PREOP + ERROR).
+[    9.808954] EtherCAT ERROR 0-2: AL status message 0x001E: "Invalid input configuration".
+[    9.818281] EtherCAT 0-2: Acknowledged state PREOP.
+[   39.259294] EtherCAT: Requesting master 0...
+[   39.259300] EtherCAT: Successfully requested master 0.
+[   39.261405] EtherCAT 0: Domain0: Logical address 0x00000000, 64 byte, expected working counter 6.
+[   39.261410] EtherCAT 0:   Datagram domain0-0-main: Logical offset 0x00000000, 64 byte, type LRW.
+[   39.261430] EtherCAT 0: Master thread exited.
+[   39.261433] EtherCAT 0: Stopping EoE thread.
+[   39.261446] EtherCAT 0: EoE thread exited.
+[   39.261448] EtherCAT 0: Starting EoE thread.
+[   39.261490] EtherCAT 0: Starting EtherCAT-OP thread.
+[   39.261532] EtherCAT WARNING 0: 1 datagram TIMED OUT!
+[   39.762150] EtherCAT WARNING 0-2: Slave seems not to support distributed clocks!
+[   39.763157] EtherCAT ERROR 0-2: Failed to set DC cycle times: No response.
+[   39.772956] EtherCAT 0: Slave states on main device: PREOP, OP.
