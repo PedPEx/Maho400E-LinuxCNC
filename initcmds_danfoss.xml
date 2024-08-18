@@ -1,0 +1,7 @@
+<InitCmd>
+    <Transition>PS</Transition>
+    <Index>#x232A</Index>
+    <SubIndex>0</SubIndex>
+    <Data>00</Data>
+    <Comment>download Control Word Profile (p8-10)</Comment>
+</InitCmd>

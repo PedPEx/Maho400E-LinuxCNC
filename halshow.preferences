@@ -31,9 +31,13 @@ set ::watchlist {
     pin+lcec.state-safeop
     pin+lcec.m0.2001_FC302.ActualVelocity
     pin+lcec.m0.2001_FC302.ControlWord
-    pin+lcec.m0.2001_FC302.ModeOfOperationDisplay
     pin+lcec.m0.2001_FC302.StatusWord
     pin+lcec.m0.2001_FC302.TargetVelocity
+    pin+lcec.m0.0501_EM7004.dout-1
+    pin+lcec.m0.0501_EM7004.din-0
+    pin+lcec.m0.0501_EM7004.din-1
+    pin+lcec.m0.0501_EM7004.din-2
+    pin+lcec.m0.0501_EM7004.din-3
 }
 set ::workmode watchhal
 set ::watchInterval 100

@@ -1,0 +1,18 @@
+[    6.000379] EtherCAT: Master driver 1.6.0 1.6.0.gcafd367-1+1.1
+[    6.000547] EtherCAT: 1 master waiting for devices.
+[    6.017068] ec_generic: EtherCAT master generic Ethernet device module 1.6.0 1.6.0.gcafd367-1+1.1
+[    6.017098] EtherCAT: Accepting F8:75:A4:86:9A:F4 as main device for master 0.
+[    6.049008] EtherCAT 0: Starting EtherCAT-IDLE thread.
+[    8.996978] EtherCAT 0: Link state of ecm0 changed to UP.
+[    9.005037] EtherCAT 0: 2 slave(s) responding on main device.
+[    9.005044] EtherCAT 0: Slave states on main device: PREOP.
+[    9.005688] EtherCAT 0: Scanning bus.
+[    9.384158] EtherCAT 0: Bus scanning completed in 376 ms.
+[    9.384162] EtherCAT 0: Using slave 0 as DC reference clock.
+[  166.902376] EtherCAT: Requesting master 0...
+[  166.902381] EtherCAT: Successfully requested master 0.
+[  166.904098] EtherCAT 0: Domain0: Logical address 0x00000000, 56 byte, expected working counter 3.
+[  166.904101] EtherCAT 0:   Datagram domain0-0-main: Logical offset 0x00000000, 56 byte, type LRW.
+[  166.904124] EtherCAT 0: Master thread exited.
+[  166.904127] EtherCAT 0: Starting EtherCAT-OP thread.
+[  167.016951] EtherCAT 0: Slave states on main device: OP.

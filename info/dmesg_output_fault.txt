@@ -1,32 +1,271 @@
-[    6.035081] EtherCAT: Master driver 1.6.0 1.6.0.gcafd367-1+1.1
-[    6.036352] EtherCAT: 1 master waiting for devices.
-[    6.059127] ec_generic: EtherCAT master generic Ethernet device module 1.6.0 1.6.0.gcafd367-1+1.1
-[    6.059169] EtherCAT: Accepting F8:75:A4:86:9A:F4 as main device for master 0.
-[    6.077122] EtherCAT 0: Starting EtherCAT-IDLE thread.
-[    9.057012] EtherCAT 0: Link state of ecm0 changed to UP.
-[    9.073060] EtherCAT 0: 3 slave(s) responding on main device.
-[    9.073065] EtherCAT 0: Slave states on main device: PREOP.
-[    9.073804] EtherCAT 0: Scanning bus.
-[    9.526854] EtherCAT WARNING 0-2: Received mailbox protocol 0x02 as response.
-[    9.526858] EtherCAT ERROR 0-2: Failed to read number of assigned PDOs for SM2.
-[    9.536120] EtherCAT ERROR 0-2: Received upload response for wrong SDO (0x1C12:00, requested: 0x1C13:00).
-[    9.536124] EtherCAT DEBUG: 00 30 4F 12 1C 00 01 00 00 00 
-[    9.699361] EtherCAT 0: Bus scanning completed in 624 ms.
-[    9.699364] EtherCAT 0: Using slave 0 as DC reference clock.
-[    9.699367] EtherCAT 0: Starting EoE thread.
-[    9.808639] EtherCAT ERROR 0-2: Failed to set SAFEOP state, slave refused state change (PREOP + ERROR).
-[    9.808954] EtherCAT ERROR 0-2: AL status message 0x001E: "Invalid input configuration".
-[    9.818281] EtherCAT 0-2: Acknowledged state PREOP.
-[   39.259294] EtherCAT: Requesting master 0...
-[   39.259300] EtherCAT: Successfully requested master 0.
-[   39.261405] EtherCAT 0: Domain0: Logical address 0x00000000, 64 byte, expected working counter 6.
-[   39.261410] EtherCAT 0:   Datagram domain0-0-main: Logical offset 0x00000000, 64 byte, type LRW.
-[   39.261430] EtherCAT 0: Master thread exited.
-[   39.261433] EtherCAT 0: Stopping EoE thread.
-[   39.261446] EtherCAT 0: EoE thread exited.
-[   39.261448] EtherCAT 0: Starting EoE thread.
-[   39.261490] EtherCAT 0: Starting EtherCAT-OP thread.
-[   39.261532] EtherCAT WARNING 0: 1 datagram TIMED OUT!
-[   39.762150] EtherCAT WARNING 0-2: Slave seems not to support distributed clocks!
-[   39.763157] EtherCAT ERROR 0-2: Failed to set DC cycle times: No response.
-[   39.772956] EtherCAT 0: Slave states on main device: PREOP, OP.
+[    6.025950] EtherCAT: Master driver 1.6.0 1.6.0.gcafd367-1+1.1
+[    6.026320] EtherCAT: 1 master waiting for devices.
+[    6.043511] ec_generic: EtherCAT master generic Ethernet device module 1.6.0 1.6.0.gcafd367-1+1.1
+[    6.043540] EtherCAT: Accepting F8:75:A4:86:9A:F4 as main device for master 0.
+[    6.072979] EtherCAT 0: Starting EtherCAT-IDLE thread.
+[    9.152980] EtherCAT 0: Link state of ecm0 changed to UP.
+[    9.161067] EtherCAT 0: 3 slave(s) responding on main device.
+[    9.161074] EtherCAT 0: Slave states on main device: PREOP.
+[    9.161509] EtherCAT 0: Scanning bus.
+[    9.614496] EtherCAT WARNING 0-2: Received mailbox protocol 0x02 as response.
+[    9.614500] EtherCAT ERROR 0-2: Failed to read number of assigned PDOs for SM2.
+[    9.620427] EtherCAT ERROR 0-2: Received upload response for wrong SDO (0x1C12:00, requested: 0x1C13:00).
+[    9.620430] EtherCAT DEBUG: 00 30 4F 12 1C 00 00 00 00 00 
+[    9.806722] EtherCAT 0: Bus scanning completed in 644 ms.
+[    9.806726] EtherCAT 0: Using slave 0 as DC reference clock.
+[    9.806729] EtherCAT 0: Starting EoE thread.
+[    9.915914] EtherCAT ERROR 0-2: Failed to set SAFEOP state, slave refused state change (PREOP + ERROR).
+[    9.916215] EtherCAT ERROR 0-2: AL status message 0x001E: "Invalid input configuration".
+[    9.925758] EtherCAT 0-2: Acknowledged state PREOP.
+[   25.192192] EtherCAT: Requesting master 0...
+[   25.192198] EtherCAT: Successfully requested master 0.
+[   25.194703] EtherCAT 0: Domain0: Logical address 0x00000000, 64 byte, expected working counter 6.
+[   25.194707] EtherCAT 0:   Datagram domain0-0-main: Logical offset 0x00000000, 64 byte, type LRW.
+[   25.194760] EtherCAT 0: Master thread exited.
+[   25.194762] EtherCAT 0: Stopping EoE thread.
+[   25.194778] EtherCAT 0: EoE thread exited.
+[   25.194779] EtherCAT 0: Starting EoE thread.
+[   25.194821] EtherCAT 0: Starting EtherCAT-OP thread.
+[   25.341450] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   25.341456] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   25.461451] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   25.461457] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   25.637458] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   25.637464] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   25.717483] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   25.717489] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   25.737465] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   25.737472] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   25.757457] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   25.757463] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   25.777476] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   25.777481] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   25.937444] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   25.937450] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   25.957444] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   25.957449] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   26.081457] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   26.081463] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   26.097467] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   26.097472] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   26.417443] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   26.417448] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   26.441459] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   26.441464] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   26.461434] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   26.461440] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   26.537434] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   26.537439] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   26.701440] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   26.701445] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   26.877436] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   26.877441] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   27.477446] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   27.477452] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   27.641472] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   27.641479] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   27.657462] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   27.657467] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   27.877466] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   27.877472] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   28.221481] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   28.221487] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   28.577449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   28.577455] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   28.601450] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   28.601456] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   28.657468] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   28.657474] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   28.677464] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   28.677470] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   28.721457] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   28.721462] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   29.161468] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   29.161474] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   29.377463] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   29.377469] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   29.497466] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   29.497472] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   30.017443] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   30.017449] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   30.041446] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   30.041451] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   30.057460] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   30.057465] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   30.337453] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   30.337459] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   30.477449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   30.477454] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   30.637449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   30.637454] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   30.657465] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   30.657471] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   31.021466] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   31.021472] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   31.037467] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   31.037472] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   31.061448] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   31.061452] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   31.781466] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   31.781471] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   31.821467] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   31.821472] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.061465] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.061471] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.077489] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.077493] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.097476] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.097481] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.117465] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.117471] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.137463] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.137467] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.157459] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.157465] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.181469] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.181474] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.217494] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.217500] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.361464] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.361469] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.417449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.417454] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.537463] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.537468] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.681490] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.681496] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.701502] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.701508] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.721477] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.721482] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.737449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.737453] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.757471] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.757477] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.837448] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.837454] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.857465] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.857470] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.897451] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.897456] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   32.917450] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   32.917455] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   33.077462] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   33.077467] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   33.277462] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   33.277468] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   33.537450] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   33.537456] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   33.721461] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   33.721466] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   33.737481] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   33.737486] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   33.817449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   33.817455] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   33.837450] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   33.837456] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   33.941464] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   33.941470] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   33.957456] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   33.957461] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   33.977447] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   33.977452] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.061463] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.061468] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.081483] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.081488] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.121472] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.121477] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.137476] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.137481] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.157467] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.157472] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.337464] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.337469] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.357477] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.357483] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.437458] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.437463] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.517450] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.517456] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.677448] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.677453] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.697469] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.697474] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.721483] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.721489] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.737449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.737453] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   34.757448] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   34.757453] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   35.117449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   35.117455] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   35.337491] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   35.337496] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   35.517449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   35.517455] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   35.537455] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   35.537461] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   35.717450] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   35.717456] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   35.837482] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   35.837487] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   35.857465] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   35.857470] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   35.901466] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   35.901472] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   35.957460] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   35.957465] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.101463] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.101468] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.121466] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.121471] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.137449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.137454] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.157462] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.157468] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.297483] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.297489] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.357471] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.357477] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.377452] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.377457] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.397485] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.397490] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.441472] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.441477] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.777451] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.777456] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.817450] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.817455] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.837448] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.837453] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.937463] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.937469] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   36.957467] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   36.957473] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   37.197442] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   37.197448] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   37.257442] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   37.257447] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   37.281455] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   37.281460] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   37.357455] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   37.357461] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   37.497465] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   37.497470] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   37.517449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   37.517454] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   37.717465] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   37.717472] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   37.877449] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   37.877454] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   37.897463] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   37.897467] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   37.917451] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   37.917457] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   38.677464] EtherCAT ERROR 0-2: Mailbox error response received - Unknown error reply code 0x0000.
+[   38.677470] EtherCAT WARNING 0-2: Invalid mailbox response for eoe0s2.
+[   38.692885] EtherCAT WARNING 0-2: Slave seems not to support distributed clocks!
+[   38.693886] EtherCAT ERROR 0-2: Failed to set DC cycle times: No response.
+[   38.704936] EtherCAT 0: Slave states on main device: PREOP, OP.
