@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Maho400E-LinuxCNC (WIP!)
 LinuxCNC Maho400E configuration (EtherCAT IO)
 
