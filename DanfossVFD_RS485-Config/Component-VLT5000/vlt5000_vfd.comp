@@ -1,0 +1,393 @@
+component vlt5000_vfd "Danfoss VLT5000 VFD driver";
+param rw unsigned devslaveaddr=10	"Device slave address. Valid numbers are 1-31";
+param rw float speedscale=1.0		"Speed scale. VFD frequency in Hz is speedscale times commanded_speed";
+pin in float commanded_speed  		"Commanded speed of the vfd. when the VLT is in speed open loop mode, this value times the speedscale the frequency in Hz";
+pin in bit reverse					"set to 1 for reverse running, 0 for normal rotation direction. If this bit is set while running the motor, the behaviour is defined by the VFD settings.";
+pin in bit run						"Set to TRUE to start the motor using the VLT-programmed rampup. Set to FALSE to stop the motor using the programmed ramp-down";
+pin out bit comm_error				"0 when communication with the VFD is normal, 1 when communication has failed";
+pin out bit is_running				"this bit is TRUE when the motor is running normally";
+pin out bit is_at_speed				"TRUE when the motor has reached programmed speed";
+pin out bit is_ready				"TRUE when VFD is ready to run";
+pin out bit is_alarm				"TRUE when a VFD alarm is set. This is a logical or of overtorque/temp/etc. fault bits";
+pin out bit error_overtorque		"TRUE when the VFD has encountered an overtorque.";
+pin out bit error_overvolt			"TRUE when the VFD has encountered an overvoltage.";
+pin out bit error_overtemp			"TRUE when the VFD has encountered an overtemperature.";
+pin out bit watchdog_out			"Alternates between 1 and 0 after every update cycle. Feed into a watchdog component to ensure vfd driver is communicating with the vfd properly.";
+pin out float refmin				"Minimum reference frequency read from the VLT5000";
+pin out float refmax				"Maximum reference frequency read from the VLT5000";
+pin out float motorcurrent			"Current RMS motor current in Amps";
+pin out float torquepercent			"Current percentage of maximum torque";
+pin out float motorpower			"Current motor power in kW";
+pin out float heatsinktemp			"Heatsink temperature in degrees C";
+variable float reffreq_min;
+variable float reffreq_max;
+option userspace;
+option userinit yes;
+option extra_cleanup yes;           
+author "Bart van Hest";
+description """
+This component is designed as an interface between LinuxCNC and a Danfoss VLT5000 variable frequency drive using
+the standard RS485 bus on terminals 68 and 69 and the VLT set to FC protocol. It assumes standard communication settings, which are
+9600 baud, 8 databits, even parity, 1 stopbit.
+
+.SH SYNOPSIS
+(ignore the auto-generated SYNOPSIS above)
+.SH
+.HP
+.B loadusr -W vlt5000-vfd --device=/dev/ttyUSB0\\fB
+Multiple instances of this component for multiple VFDs on the same bus are allowed.
+.SH Assumptions about VFD setup
+This component assumes that the VFD is setup for remote control (parameter 002), LCP+digital control (parameter 013) and open loop speed
+control (parameter 100). also make sure paramater 500 (bus address) is set to a value of 1-31, 501 (baud rate) is set to 9600, 
+512 (telegram profile) is set to FC Drive and 561 (Protocol) is set to FC Protocol.
+It might also be wise to set a bus timeout and corresponding action in parameters 513 and 514
+
+""";
+license "GPLv2 or greater";
+;;
+/*
+  Userspace HAL component to control a Danfoss VLT5000 series VFD using the Danfoss FC Protocol.
+
+  Copyright (C) 2014 Bart van Hest
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation, version 2.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
+
+  see 'man vlt5000_vfd' and the VLT5000 user manual.
+*/
+
+#include <termios.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/signal.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <math.h>
+#include <getopt.h>
+
+/* Internal constants */
+#define SERCOMM_TIMEOUT 15				/* Number of 10ms blocks to wait for bytes on the line (50=500ms) */
+
+/* Various useful controlwords */
+#define CTRL_NOOP 		0x0000			/* no operation. Useful when we want status only */
+#define CTRL_STOP 		0x043c			/* Stop running */
+#define CTRL_STARTFWD 	0x047c			/* Start VFD in forward mode */
+#define CTRL_STARTREV 	0x847c			/* Start VFD in reverse mode */
+
+/* Interesting VFD status bits */
+#define VFDSTAT_TORQUE_ABOVE_LIMIT		0x4000
+#define VFDSTAT_VOLTAGE_ABOVE_LIMIT		0x2000
+#define VFDSTAT_OVERTEMP				0x1000
+#define VFDSTAT_ISRUNNING				0x0800
+#define VFDSTAT_FREQOK					0x0400
+#define VFDSTAT_BUSCONTROL				0x0200
+#define VFDSTAT_SPEEDISREF				0x0100
+#define VFDSTAT_WARNING					0x0080
+#define VFDSTAT_TRIPPED					0x0008
+#define VFDSTAT_ISENABLED				0x0004
+#define VFDSTAT_VLTISREADY				0x0002
+#define VFDSTAT_CTRLISREADY				0x0001
+
+/* VFD parameter numbers */
+#define VLT_PARAM_MIN_REFERENCE			204
+#define VLT_PARAM_MAX_REFERENCE			205
+#define VLT_PARAM_MOTORCURRENT			520
+#define VLT_PARAM_TORQUEPERCENT			521
+#define VLT_PARAM_POWERKW				522
+#define VLT_PARAM_HEATSINKTEMP			537
+#define VLT_PARAM_INPUTS				528
+#define VLT_PARAM_AIN54					530
+
+
+/* Some useful parameter readout macros */
+#define READ_VLT_CURRENT ((float)ReadParameter(VLT_PARAM_MOTORCURRENT, devslaveaddr)*0.01f)
+#define READ_VLT_TORQUEPERCENT ((float)convS16(ReadParameter(VLT_PARAM_TORQUEPERCENT, devslaveaddr)*0.1f))
+#define READ_VLT_POWERKW ((float)ReadParameter(VLT_PARAM_POWERKW, devslaveaddr)*0.01f)
+#define READ_VLT_HEATSINKTEMP ((float)ReadParameter(VLT_PARAM_HEATSINKTEMP, devslaveaddr))
+
+#pragma pack(1)
+typedef struct {
+	uint8_t stx;				/* startbyte, always 0x02 */
+	uint8_t lge;				/* telegram length (nr databytes  plus address byte plus data contol byte) */
+	uint8_t adr;				/* VLT address (1-31 plus 0x80) */
+	uint16_t controlword;		/* FC protocol control word */
+	uint16_t reference;		/* reference (0-0x4000 = 0-100%) */
+	uint8_t bcc;				/* control byte */
+} ShortformTelegram;
+
+typedef struct {
+	uint8_t stx;				/* startbyte, always 0x02 */
+	uint8_t lge;				/* telegram length (nr databytes  plus address byte plus data contol byte) */
+	uint8_t adr;				/* VLT address (1-31 plus 0x80) */
+	uint16_t pke;
+	uint16_t ind;
+	int32_t pwe;
+	uint16_t controlword;		/* FC protocol control word */
+	uint16_t reference;		/* reference (0-0x4000 = 0-100%) */
+	uint8_t bcc;				/* control byte */
+} LongformTelegram;
+
+/* Some globals */
+static int debug_flag=0;	/* when true, print some extra debugging to the terminal */
+char serialdevice[128] = "/dev/ttyUSB1";
+int fd = -1;				/* Serial port file descriptor */
+struct termios oldtio;		/* Old terminal settings */
+
+/* Take the lower 16 bits of a 32-bit number, and return it as a 16-bit signed value */
+int16_t convS16(int32_t in)
+{
+	union _cs16 {
+		int32_t i32;
+		int16_t i16[2];
+	} cs16;
+	cs16.i32 = in;
+	return cs16.i16[0];
+}
+
+/* Calculate the data control byte of a shortform packet */
+void CalcShortBCC(ShortformTelegram *pkt)
+{
+	int i;
+	uint8_t *ptr = (uint8_t*)pkt;
+	uint8_t bcc = 0;
+	for (i=0;i<(sizeof(ShortformTelegram)-1);i++) 
+		bcc ^= *(ptr++);
+	pkt->bcc = bcc;
+}
+
+/* Calculate the data control byte of a longform packet */
+void CalcLongBCC(LongformTelegram *pkt)
+{
+	int i;
+	uint8_t *ptr = (uint8_t*)pkt;
+	uint8_t bcc = 0;
+	for (i=0;i<(sizeof(LongformTelegram)-1);i++) 
+		bcc ^= *(ptr++);
+	pkt->bcc = bcc;
+}
+
+/* Why is serial port access in Linux so #$#@$^% ?? 
+   Use nonblocking I/O, and do the timeouts ourselves */
+uint16_t SerialRead (int fdesc, void *data, int NrBytes)
+{
+	int i, bytectr=0, timeoutctr;
+	uint8_t *ptr = (uint8_t *)data;
+	for (i=0;i<NrBytes;i++) {
+		timeoutctr = SERCOMM_TIMEOUT;
+		while (1) {
+			if (read (fdesc, ptr, 1) == 1) {
+				bytectr++;
+				ptr++;
+				break;
+			} else {
+				if (--timeoutctr == 0)
+					return bytectr;
+				usleep (10000);
+			}
+		}
+	}
+	return bytectr;
+}
+
+/* Dump some data to the terminal */
+void DbgDump (uint8_t *data, int len)
+{
+	int i;
+	for (i=0;i<len;i++) {
+		fprintf(stderr,"0x%0x    (%d)\n", *data, (int)*data);
+		data++;
+	}
+}
+
+/* Send a short form FC protocol telegram to the VLT containing only the Control Word and reference. 
+   return the status word in sw, and return the number of bytes handled or -1 in case an error occurred */
+uint16_t TransmitShortformTelegram(uint16_t ControlWord, float Reference, uint8_t VLTAddress, uint16_t *sw)
+{
+	ShortformTelegram pkt;
+	ssize_t nrbytes;
+	/* Fill packet. See Danfoss doc for packet format */
+	Reference = (Reference < 0.0f) ? 0.0f : Reference;
+	Reference = (Reference > 1.0f) ? 1.0f : Reference;
+	pkt.stx = 0x02;
+	pkt.lge = 0x06;
+	pkt.adr = 0x80+VLTAddress;
+	pkt.controlword = htons(ControlWord);
+	pkt.reference = htons((uint16_t)(Reference*16383.0f));
+	CalcShortBCC (&pkt);
+	/* Transmit telegram to VLT, and try to receive a status telegram */
+	if (nrbytes=write (fd, &pkt, sizeof (ShortformTelegram)) != sizeof (ShortformTelegram)) {
+		fprintf(stderr,"Error in TransmitShortformTelegram(): only %d bytes of %d sent\n", (int)nrbytes, (int)sizeof(ShortformTelegram));
+		return 0;
+	}
+	memset (&pkt, 0xaa, sizeof (ShortformTelegram));
+	if (nrbytes=SerialRead(fd, &pkt, sizeof (ShortformTelegram)) != sizeof (ShortformTelegram)) {
+		fprintf(stderr,"Error in TransmitShortformTelegram(): only %d bytes of %d received\n", (int)nrbytes, (int)sizeof(ShortformTelegram));
+		return 0;
+	}
+	if (debug_flag) 
+		DbgDump ((uint8_t *)&pkt, sizeof (ShortformTelegram));
+	*sw=ntohs(pkt.controlword);
+	return (uint16_t)sizeof (ShortformTelegram);
+}
+
+/* Read a parameter of the VFD. Return 0x7fffffff on error */
+int32_t ReadParameter(uint16_t paramnr, uint8_t VLTAddress)
+{
+	LongformTelegram pkt;
+	ssize_t nrbytes;
+	/* Fill packet. See Danfoss doc for packet format */
+	pkt.stx = 0x02;
+	pkt.lge = 0x0e;
+	pkt.adr = 0x80+VLTAddress;
+	pkt.pke = htons(0x1000 | paramnr);
+	pkt.ind = 0;
+	pkt.pwe = 0;
+	pkt.controlword = 0x0000;
+	pkt.reference = 0x0000;
+	CalcLongBCC (&pkt);
+	/* Transmit telegram to VLT, and try to receive a status telegram */
+	if (nrbytes=write (fd, &pkt, sizeof (LongformTelegram)) != sizeof (LongformTelegram)) {
+		fprintf(stderr,"Error in ReadParameter(): only %d bytes of %d sent\n", (int)nrbytes, (int)sizeof(LongformTelegram));
+		return 0x7fffffff;
+	}
+	memset (&pkt, 0xaa, sizeof (LongformTelegram));
+	if (nrbytes=SerialRead(fd, &pkt, sizeof (LongformTelegram)) != sizeof (LongformTelegram)) {
+		fprintf(stderr,"Error in ReadParameter(): only %d bytes of %d received\n", (int)nrbytes, (int)sizeof(LongformTelegram));
+		return 0x7fffffff;
+	}
+	if (debug_flag)
+		DbgDump ((uint8_t *)&pkt, sizeof (LongformTelegram));
+	return (int32_t)ntohl(pkt.pwe);
+}
+
+void userinit(int argc, char **argv)
+{
+	int opt_index = 0;
+	int c = 0;
+
+	static struct option options[] = {
+		{"device",   required_argument, 0, 'd' },
+		{"debug", no_argument, &debug_flag, 1 },
+		{"silent", no_argument, &debug_flag, 0 },
+		{0, 0, 0, 0}
+	};
+	struct termios tios;    
+	/* Basic compiler sanity check */
+	if (sizeof (ShortformTelegram) != 8) { perror ("structure packing fails"); exit (-2); }
+	while(1) {
+		c = getopt_long(argc, argv, "", options, &opt_index);
+		/* Detect the end of the options. */
+		if (c == -1)
+			break;
+		/* parse option list */
+		switch (c)
+		{
+			case 'd':
+				memset (serialdevice, 0, sizeof(serialdevice));
+				strncpy (serialdevice, optarg, 127);
+				fprintf(stderr, "Device is set to %s\n", serialdevice);
+				break;
+			default:
+				break;
+		}
+	}
+	/* Open the serial port with device 'serialdevice', 9600 baud, 8 databits, 1 stopbit and even parity */
+	fd = open(serialdevice, O_RDWR | O_NOCTTY);
+	if (fd < 0)
+	{
+		perror(serialdevice);
+		exit(-1);  
+	}
+	tcgetattr(fd,&oldtio);
+	tios.c_cflag = B115200 | CS8 | PARENB | CLOCAL | CREAD;	/* 9600 baud, 8 databits, even parity, no modem control */
+	tios.c_iflag = IGNPAR;									/* ignore parity in received messages */
+	tios.c_oflag = 0;
+	tios.c_lflag = 0;       
+	tios.c_cc[VMIN]=0;										/* Use nonblocking reads */
+	tios.c_cc[VTIME]=0;
+	tcflush(fd, TCIFLUSH);
+	tcsetattr(fd,TCSANOW,&tios);
+}
+
+void user_mainloop(void) {
+	LongformTelegram longtelegram;
+	ShortformTelegram shorttelegram;
+	float freqHz, ref;
+	uint16_t sw, res;
+	while(1) {
+		FOR_ALL_INSTS() {			
+			/* See if we have a valid device address yet */
+			if(devslaveaddr == 0) {
+				sleep(1);
+				continue; 
+			}
+			/* Are we initialised yet? Check this by the value of reffreq_max. 
+			   If this is 0, read the reference min and max frequencies from the VFD
+			*/
+			if (reffreq_max == 0) {
+				reffreq_min = ((float)ReadParameter(VLT_PARAM_MIN_REFERENCE, devslaveaddr) * 0.001f);
+				reffreq_max = ((float)ReadParameter(VLT_PARAM_MAX_REFERENCE, devslaveaddr) * 0.001f);
+				if (debug_flag) 
+					fprintf (stderr, "ID %d RefMin=%3.1f RefMax=%3.1f\n", devslaveaddr, reffreq_min, reffreq_max);
+			}
+			refmin = reffreq_min;
+			refmax = reffreq_max;
+			/* Figure out at what frequency we want to run, and what the reference value should be */
+			freqHz = commanded_speed * speedscale;
+			ref=freqHz-reffreq_min;
+			if (ref < 0.0f || fabs(refmax-refmin)<1.0f) ref=0.0f;
+			else {
+				ref = ref/(refmax-refmin);
+				if (ref > 1.0f) ref=1.0f;
+			}
+			/* determine what command to send */
+			if (!run) res=TransmitShortformTelegram(CTRL_STOP, ref, devslaveaddr, &sw);
+			else if (reverse) res=TransmitShortformTelegram(CTRL_STARTREV, ref, devslaveaddr, &sw);
+			else res=TransmitShortformTelegram(CTRL_STARTFWD, ref, devslaveaddr, &sw);
+			/* Transmission was succesfull? */
+			if (res) {
+				/* Interpret status word */
+				is_alarm=0;
+				if (sw & VFDSTAT_TORQUE_ABOVE_LIMIT) { error_overtorque=1; is_alarm=1; } else error_overtorque=0;
+				if (sw & VFDSTAT_VOLTAGE_ABOVE_LIMIT) { error_overvolt=1; is_alarm=1; } else error_overvolt = 0;
+				if (sw & VFDSTAT_OVERTEMP) { error_overtemp=1; is_alarm=1; } else error_overtemp=0;
+				if (sw & VFDSTAT_TRIPPED) { is_alarm=1; }
+				if ((sw & VFDSTAT_VLTISREADY) && (sw & VFDSTAT_CTRLISREADY) && !is_alarm) { is_ready=1; } else is_ready=0;
+				if (sw & VFDSTAT_ISRUNNING) is_running=1; else is_running=0;
+				if (sw & VFDSTAT_SPEEDISREF) is_at_speed=1; else is_at_speed=0;
+				/* Fetch useful operational information. If this fails bogus is returned, but this is no operation critical information */
+				motorcurrent = READ_VLT_CURRENT;
+				torquepercent = READ_VLT_TORQUEPERCENT;
+				motorpower = READ_VLT_POWERKW;
+				heatsinktemp = READ_VLT_HEATSINKTEMP;
+				watchdog_out = !watchdog_out;
+				
+			} else {
+				comm_error = 1;
+			}
+		}
+		usleep (50000);
+		
+	}
+}
+
+/* Restore old terminal settings, close port */
+EXTRA_CLEANUP()
+{
+    tcsetattr(fd, TCSANOW, &oldtio);
+    close(fd);
+    fprintf(stderr,"Cleanup done.\n");
+}

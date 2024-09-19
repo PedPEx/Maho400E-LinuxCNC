@@ -1,24 +1,41 @@
 <masters>
 	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="5" name="m0">
-		<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl -->
-		<slave idx="0" type="generic" vid="0200008d" pid="00000064" configPdos="true" name="2001_FC302">
+	<!-- Beckhoff IO modules -->
+		<slave idx="0" type="EK1101" name="0501_EK1101"/>
+		<slave idx="1" type="EL1819" name="0511_EL1819"/>
+		<slave idx="2" type="EL1819" name="0512_EL1819"/>
+		<slave idx="3" type="EL2809" name="0521_EL2809"/>
+		<slave idx="4" type="EL2809" name="0522_EL2809"/>
+		<slave idx="5" type="EM7004" name="0531_EM7004"/>
+	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl 
+		<slave idx="6" type="basic_cia402" vid="0200008d" pid="00000064" name="2001_FC302">
 			<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
-			<syncManager idx="2" dir="out">
-				<pdo idx="1616">
-					<pdoEntry idx="6040" subIdx="00" bitLen="16" halPin="ControlWord" halType="u32"/>
-					<pdoEntry idx="6042" subIdx="00" bitLen="16" halPin="TargetVelocity" halType="s32"/>
-				</pdo>
-			</syncManager>
-			<syncManager idx="3" dir="in">
-				<pdo idx="1a16">
-					<pdoEntry idx="6041" subIdx="00" bitLen="16" halPin="StatusWord" halType="u32"/>
-					<pdoEntry idx="6044" subIdx="00" bitLen="16" halPin="ActualVelocity" halType="s32"/>
-					<!-- <pdoEntry idx="6061" subIdx="00" bitLen="8" halPin="ModeOfOperationDisplay" halType="u32"/>-->
-				</pdo>
-			</syncManager>
-		</slave>
-		<!-- Beckhoff IO modules -->
-		<slave idx="1" type="EK1100" name="0501_EK1101"/>
-		<slave idx="2" type="EM7004" name="0501_EM7004"/>
+		</slave> -->
+	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl -->
+		<slave idx="6" type="generic" vid="0200008d" pid="00000064" configPdos="true" name="2001_FC302">
+			<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+				<syncManager idx="2" dir="out">
+					<pdo idx="1600">
+						<pdoEntry idx="6040" subIdx="00" bitLen="16" halPin="srv-cia-controlword" halType="u32"/>
+						<pdoEntry idx="6042" subIdx="00" bitLen="16" halPin="srv-target-vl" halType="s32"/>
+						<pdoEntry idx="6060" subIdx="00" bitLen="8" halPin="srv-opmode" halType="s32"/>
+					</pdo>
+				</syncManager>
+				<syncManager idx="3" dir="in">
+					<pdo idx="1a00">
+						<pdoEntry idx="6041" subIdx="00" bitLen="16" halPin="srv-cia-statusword" halType="u32"/>
+						<pdoEntry idx="6043" subIdx="00" bitLen="16" halPin="srv-actual-vl" halType="s32"/>
+						<pdoEntry idx="6046" subIdx="01" bitLen="32" halPin="srv-vl-minimum" halType="s32"/>
+						<pdoEntry idx="6046" subIdx="02" bitLen="32" halPin="srv-vl-maximum" halType="s32"/>
+						<pdoEntry idx="6048" subIdx="01" bitLen="32" halPin="srv-vl-accel" halType="s32"/>
+						<pdoEntry idx="6049" subIdx="01" bitLen="32" halPin="srv-vl-decel" halType="s32"/>
+						<pdoEntry idx="6061" subIdx="00" bitLen="8" halPin="srv-opmode-display" halType="s32"/>
+						<pdoEntry idx="6064" subIdx="00" bitLen="8" halPin="srv-actual-position" halType="s32"/>
+						<pdoEntry idx="6502" subIdx="00" bitLen="32" halPin="srv-supported-modes" halType="u32"/>
+						<pdoEntry idx="6504" subIdx="00" bitLen="32" halPin="srv-manufacturer" halType="s32"/>
+					</pdo>
+				</syncManager>
+		</slave> 
+		
 	</master>
 </masters>

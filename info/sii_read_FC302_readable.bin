@@ -1,0 +1,116 @@
+First print preamble and config
+Preamble:
+PDI Control: ................ 0x0c80
+PDI Config: ................. 0x6604
+Sync Impulse Length: ........ 0 ns (raw: 0x0000)
+PDI Config 2: ............... 0x0000
+Configured Station Alias: ... 0x0000
+Checksum of Preamble: ....... 0x0006 (ok)
+Identity:
+  Vendor ID: ................ 0x0200008d
+  Product ID: ............... 0x00000064
+  Revision ID: .............. 0x00000005
+  Serial Number: ............ 0x00000000
+
+Default mailbox settings:
+  Bootstrap Mailbox:
+  Received Mailbox Offset: .. 0x1000
+  Received Mailbox Size: .... 1400
+  Send Mailbox Offset: ...... 0x1578
+  Send Mailbox Size: ........ 1400
+  Mailbox Settings:
+  Received Mailbox Offset: .. 0x1000
+  Received Mailbox Size: .... 1400
+  Send Mailbox Offset: ...... 0x1578
+  Send Mailbox Size: ........ 1400
+
+Supported Mailboxes:
+  CoE ....................... True
+  EoE ....................... True
+  FoE ....................... True
+  SoE ....................... False
+  VoE ....................... False
+
+EEPROM size: ................ 2048 bytes
+Version: .................... 1
+
+Print Categorie: Strings (0xa)
+  Size: 30 Bytes with 3 strings
+  ID   Size (Bytes)    String
+    1: (  6) ......... 'FC-302'
+    2: (  6) ......... 'Drives'
+    3: ( 14) ......... 'VLT® FC Series'
+
+Print Categorie: General (0x1e)
+  Size: 32 Bytes
+  Vendor Specific (Index of String)
+    Name  Index: 1: ............. FC-302
+    Group Index: 2: ............. Drives
+    Image Index: 0: ............. not set
+    Order Index: 1: ............. FC-302
+
+  CoE Details:
+    Enable SDO: .................. yes
+    Enable SDO Info: ............. yes
+    Enable PDO Assign: ........... yes
+    Enable PDO Configuration: .... yes
+    Enable Upload at Startup: .... no
+    Enable SDO complete access: .. yes
+  FoE Details: ................... enabled
+  EoE Details: ................... enabled
+
+  Flag SafeOp: ................... not enabled
+  Flag notLRW: ................... not enabled
+  Flag MBox Data Link Layer ...... enabled
+  Flag Ident AL Status ........... not enabled
+  Flag Ident Physical Memory ..... not enabled
+
+  CurrentOnEBus: ................. 0 mA
+  Physical Ports:
+     Port 0: ..................... MII
+     Port 1: ..................... MII
+     Port 2: ..................... not used
+     Port 3: ..................... not used
+
+  Physical Memory Address ........ 0x0000
+
+Print Categorie: FMMU (0x28)
+  Size: 4 Bytes
+  Number of FMMUs: 4
+    FMMU0: used for Inputs
+    FMMU1: used for Outputs
+    FMMU2: used for SyncM mailbox status (MBoxStat)
+    FMMU3: not used
+
+Print Categorie: SyncManager (0x29)
+  Size: 32 Bytes
+  Number of SyncManager: 4
+  SyncManager SM0
+    Physical Startaddress: ... 0x1000
+    Length: .................. 1400
+    Control Register: ........ 0x26
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Mailbox Out
+  SyncManager SM1
+    Physical Startaddress: ... 0x1578
+    Length: .................. 1400
+    Control Register: ........ 0x22
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Mailbox In
+  SyncManager SM2
+    Physical Startaddress: ... 0x1af0
+    Length: .................. 4
+    Control Register: ........ 0x64
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x00
+    SM Type: ................. Process Data Out
+  SyncManager SM3
+    Physical Startaddress: ... 0x1bf0
+    Length: .................. 4
+    Control Register: ........ 0x20
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x00
+    SM Type: ................. Process Data In
+

@@ -1,5 +1,8 @@
-sim_mm.var*
-sim.var*
-sim_mm.tbl*
+
 position_mm.txt
-halshow.preferences
+*.halshow
+*.halshow*
+*halshow.preferences
+*.var
+*.bak
+*.tbl
