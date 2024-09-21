@@ -1,19 +1,74 @@
 <masters>
 	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="5" name="m0">
 	<!-- Beckhoff IO modules -->
-		<slave idx="0" type="EK1101" name="0501_EK1101"/>
-		<!-- <slave idx="1" type="EL5002" name="2001_EL5002"/> -->
-		<slave idx="1" type="EL1819" name="0511_EL1819"/>
-		<slave idx="2" type="EL1819" name="0512_EL1819"/>
-		<slave idx="3" type="EL2809" name="0521_EL2809"/>
-		<slave idx="4" type="EL2809" name="0522_EL2809"/>
-		<slave idx="5" type="EM7004" name="0531_EM7004"/>
-	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl 
-		<slave idx="6" type="basic_cia402" vid="0200008d" pid="00000064" name="2001_FC302">
-			<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
-		</slave> -->
+		<!-- <slave idx="0" type="EK1101" name="0501_EK1101"/> -->
+		<slave idx="0" type="generic" vid="0x00000002" pid="0x044d2c52" configPdos="true" name="0501_EK1101">
+			<syncManager idx="0" dir="in">
+				<pdo idx="1a00">
+					<pdoEntry idx="6000" subIdx="01" bitLen="16" halPin="coupler-ID" halType="u32"/>
+				</pdo>
+			</syncManager>
+		</slave>
+    	<!-- SSI Encoder on EL5002 -->
+        <slave idx="1" type="EL5002" name="2001_EL5002"/>
+			<!-- <modParam name="ch0DisFrameErr" value="true"/> -->
+			<!-- <modParam name="ch0EnPwrFailChk" value="true"/> -->
+			<!-- <modParam name="ch0EnInhibitTime" value="true"/> -->
+			<!-- <modParam name="ch0Coding" value="0"/> -->
+			<!-- <modParam name="ch0Baudrate" value="0"/> -->
+			<!-- <modParam name="ch0ClkJitComp" value="0"/> -->
+			<!-- <modParam name="ch0FrameType" value="0"/> -->
+			<!-- <modParam name="ch0FrameSize" value="0"/> -->
+			<!-- <modParam name="ch0DataLen" value="0"/> -->
+			<!-- <modParam name="ch0MinInhibitTime" value="0"/> -->
+			<!-- <modParam name="ch0NoClkBursts" value="0"/> -->
+			<!-- <modParam name="ch1DisFrameErr" value="true"/> -->
+			<!-- <modParam name="ch1EnPwrFailChk" value="true"/> -->
+			<!-- <modParam name="ch1EnInhibitTime" value="true"/> -->
+			<!-- <modParam name="ch1Coding" value="0"/> -->
+			<!-- <modParam name="ch1Baudrate" value="0"/> -->
+			<!-- <modParam name="ch1ClkJitComp" value="0"/> -->
+			<!-- <modParam name="ch1FrameType" value="0"/> -->
+			<!-- <modParam name="ch1FrameSize" value="0"/> -->
+			<!-- <modParam name="ch1DataLen" value="0"/> -->
+			<!-- <modParam name="ch1MinInhibitTime" value="0"/> -->
+			<!-- <modParam name="ch1NoClkBursts" value="0"/> -->
+    	<!-- 32 Inputs, 10 µs (DB37) -->
+		<slave idx="2" type="EL1819" name="0511_EL1819"/>
+		<slave idx="3" type="EL1819" name="0512_EL1819"/>
+    	<!-- 32 Outputs, 0.5 A (DB37) -->
+		<slave idx="4" type="EL2809" name="0521_EL2809"/>
+		<slave idx="5" type="EL2809" name="0522_EL2809"/>
+    	<!-- 4 Axis driver -->
+		<slave idx="6" type="EM7004" name="0531_EM7004"/>
 	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl -->
-		<slave idx="6" type="generic" vid="0200008d" pid="00000064" configPdos="true" name="2001_FC302">
+		<slave idx="7" type="basic_cia402" vid="0200008d" pid="00000064" name="2001_FC302">
+		<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+			<modParam name="pdoAutoflow" value="true"/>
+			<modParam name="pdoEntryLimit" value="2"/>
+			<modParam name="pdoIncrement" value="1"/>
+			<modParam name="ciaRxPDOEntryLimit" value="8"/>
+			<modParam name="ciaTxPDOEntryLimit" value="8"/>
+			<modParam name="enableVL" value="true"/>
+			<modParam name="digitalInChannels" value="32"/>
+			<modParam name="digitalOutChannels" value="32"/>
+			<modParam name="enableErrorCode" value="true"/> 
+			<!-- <modParam name="ciaChannels" value="0"/> -->
+			<!-- <modParam name="pdoLimit" value="0"/> -->
+			<!-- <modParam name="pdoEntryLimit" value="0"/> -->
+			<!-- <modParam name="vlQuickStopRatio" value="asdf"/> -->
+			<!-- <modParam name="vlSetPoint" value="asdf"/> -->
+			<!-- <modParam name="vlDimensionFactor" value="asdf"/> -->
+			<!-- <modParam name="vlAccel" value="asdf"/> -->
+			<!-- <modParam name="vlDecel" value="asdf"/> -->
+
+			<!-- <modParam name="enableTargetVL" value="true"/> -->
+			<!-- <modParam name="enableVLDemand" value="true"/>-->
+			<!-- <modParam name="enableVLMaximum" value="true"/> -->
+			<!-- <modParam name="enableVLMinimum" value="true"/> -->
+		</slave> 
+	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl 
+		<slave idx="7" type="generic" vid="0200008d" pid="00000064" configPdos="true" name="2001_FC302">
 			<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
 				<syncManager idx="2" dir="out">
 					<pdo idx="1600">
@@ -36,7 +91,6 @@
 						<pdoEntry idx="6504" subIdx="00" bitLen="32" halPin="srv-manufacturer" halType="s32"/>
 					</pdo>
 				</syncManager>
-		</slave> 
-		
+		</slave> -->
 	</master>
 </masters>

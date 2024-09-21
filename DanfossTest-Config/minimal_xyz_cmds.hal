@@ -1,9 +1,9 @@
-# Fri Sep 20 00:16:10 CEST 2024
+# Sat Sep 21 14:47:36 CEST 2024
 #
 # This file:    ./minimal_xyz_cmds.hal
 # Created by:   /usr/share/linuxcnc/hallib/basic_sim.tcl
 # With options: 
-# From inifile: /home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/minimal_xyz.ini
+# From inifile: /home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/DanfossTest-Config/minimal_xyz.ini
 # Halfiles:     LIB:basic_sim.tcl ethercat.hal
 #
 # This file contains the hal commands produced by basic_sim.tcl

@@ -1,0 +1,228 @@
+--- ethercat-conf.xml ---
+<masters>
+	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="5" name="m0">
+	<!-- Beckhoff IO modules -->
+		<!-- <slave idx="0" type="EK1101" name="0501_EK1101"/> -->
+		<slave idx="0" type="generic" vid="0x00000002" pid="0x044d2c52" configPdos="true" name="0501_EK1101">
+			<syncManager idx="0" dir="in">
+				<pdo idx="1a00">
+					<pdoEntry idx="6000" subIdx="01" bitLen="16" halPin="coupler-ID" halType="u32"/>
+				</pdo>
+			</syncManager>
+		</slave>
+    	<!-- SSI Encoder on EL5002 -->
+        <slave idx="1" type="EL5002" name="2001_EL5002"/>
+			<!-- <modParam name="ch0DisFrameErr" value="true"/> -->
+			<!-- <modParam name="ch0EnPwrFailChk" value="true"/> -->
+			<!-- <modParam name="ch0EnInhibitTime" value="true"/> -->
+			<!-- <modParam name="ch0Coding" value="0"/> -->
+			<!-- <modParam name="ch0Baudrate" value="0"/> -->
+			<!-- <modParam name="ch0ClkJitComp" value="0"/> -->
+			<!-- <modParam name="ch0FrameType" value="0"/> -->
+			<!-- <modParam name="ch0FrameSize" value="0"/> -->
+			<!-- <modParam name="ch0DataLen" value="0"/> -->
+			<!-- <modParam name="ch0MinInhibitTime" value="0"/> -->
+			<!-- <modParam name="ch0NoClkBursts" value="0"/> -->
+			<!-- <modParam name="ch1DisFrameErr" value="true"/> -->
+			<!-- <modParam name="ch1EnPwrFailChk" value="true"/> -->
+			<!-- <modParam name="ch1EnInhibitTime" value="true"/> -->
+			<!-- <modParam name="ch1Coding" value="0"/> -->
+			<!-- <modParam name="ch1Baudrate" value="0"/> -->
+			<!-- <modParam name="ch1ClkJitComp" value="0"/> -->
+			<!-- <modParam name="ch1FrameType" value="0"/> -->
+			<!-- <modParam name="ch1FrameSize" value="0"/> -->
+			<!-- <modParam name="ch1DataLen" value="0"/> -->
+			<!-- <modParam name="ch1MinInhibitTime" value="0"/> -->
+			<!-- <modParam name="ch1NoClkBursts" value="0"/> -->
+    	<!-- 32 Inputs, 10 µs (DB37) -->
+		<slave idx="2" type="EL1819" name="0511_EL1819"/>
+		<slave idx="3" type="EL1819" name="0512_EL1819"/>
+    	<!-- 32 Outputs, 0.5 A (DB37) -->
+		<slave idx="4" type="EL2809" name="0521_EL2809"/>
+		<slave idx="5" type="EL2809" name="0522_EL2809"/>
+    	<!-- 4 Axis driver -->
+		<slave idx="6" type="EM7004" name="0531_EM7004"/>
+	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl -->
+		<slave idx="7" type="basic_cia402" vid="0200008d" pid="00000064" name="2001_FC302">
+		<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+			<modParam name="pdoAutoflow" value="true"/>
+			<modParam name="pdoEntryLimit" value="2"/>
+			<modParam name="pdoIncrement" value="1"/>
+			<modParam name="ciaRxPDOEntryLimit" value="8"/>
+			<modParam name="ciaTxPDOEntryLimit" value="8"/>
+			<modParam name="enableVL" value="true"/>
+			<modParam name="digitalInChannels" value="32"/>
+			<modParam name="digitalOutChannels" value="32"/>
+			<modParam name="enableErrorCode" value="true"/> 
+			<!-- <modParam name="ciaChannels" value="0"/> -->
+			<!-- <modParam name="pdoLimit" value="0"/> -->
+			<!-- <modParam name="pdoEntryLimit" value="0"/> -->
+			<!-- <modParam name="vlQuickStopRatio" value="asdf"/> -->
+			<!-- <modParam name="vlSetPoint" value="asdf"/> -->
+			<!-- <modParam name="vlDimensionFactor" value="asdf"/> -->
+			<!-- <modParam name="vlAccel" value="asdf"/> -->
+			<!-- <modParam name="vlDecel" value="asdf"/> -->
+
+			<!-- <modParam name="enableTargetVL" value="true"/> -->
+			<!-- <modParam name="enableVLDemand" value="true"/>-->
+			<!-- <modParam name="enableVLMaximum" value="true"/> -->
+			<!-- <modParam name="enableVLMinimum" value="true"/> -->
+		</slave> 
+	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl 
+		<slave idx="7" type="generic" vid="0200008d" pid="00000064" configPdos="true" name="2001_FC302">
+			<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+				<syncManager idx="2" dir="out">
+					<pdo idx="1600">
+						<pdoEntry idx="6040" subIdx="00" bitLen="16" halPin="srv-cia-controlword" halType="u32"/>
+						<pdoEntry idx="6042" subIdx="00" bitLen="16" halPin="srv-target-vl" halType="s32"/>
+						<pdoEntry idx="6060" subIdx="00" bitLen="8" halPin="srv-opmode" halType="s32"/>
+					</pdo>
+				</syncManager>
+				<syncManager idx="3" dir="in">
+					<pdo idx="1a00">
+						<pdoEntry idx="6041" subIdx="00" bitLen="16" halPin="srv-cia-statusword" halType="u32"/>
+						<pdoEntry idx="6043" subIdx="00" bitLen="16" halPin="srv-actual-vl" halType="s32"/>
+						<pdoEntry idx="6046" subIdx="01" bitLen="32" halPin="srv-vl-minimum" halType="s32"/>
+						<pdoEntry idx="6046" subIdx="02" bitLen="32" halPin="srv-vl-maximum" halType="s32"/>
+						<pdoEntry idx="6048" subIdx="01" bitLen="32" halPin="srv-vl-accel" halType="s32"/>
+						<pdoEntry idx="6049" subIdx="01" bitLen="32" halPin="srv-vl-decel" halType="s32"/>
+						<pdoEntry idx="6061" subIdx="00" bitLen="8" halPin="srv-opmode-display" halType="s32"/>
+						<pdoEntry idx="6064" subIdx="00" bitLen="8" halPin="srv-actual-position" halType="s32"/>
+						<pdoEntry idx="6502" subIdx="00" bitLen="32" halPin="srv-supported-modes" halType="u32"/>
+						<pdoEntry idx="6504" subIdx="00" bitLen="32" halPin="srv-manufacturer" halType="s32"/>
+					</pdo>
+				</syncManager>
+		</slave> -->
+	</master>
+</masters>
+
+
+--- Before starting Machine ---
+cnc@CNC:~/linuxcnc/configs/Maho400E-LinuxCNC$ ethercat slaves
+0  0:0  PREOP  +  EK1101 EtherCAT-Koppler (2A E-Bus, ID-Switch)
+1  0:1  PREOP  +  EL5002 2K. SSI Encoder
+2  0:2  PREOP  +  EL1819 16K. Dig. Eingang 24V, 10�s
+3  0:3  PREOP  +  EL1819 16K. Dig. Eingang 24V, 10�s
+4  0:4  PREOP  +  EL2809 16K. Dig. Ausgang 24V, 0.5A
+5  0:5  PREOP  +  EL2809 16K. Dig. Ausgang 24V, 0.5A
+6  0:6  PREOP  +  EM7004 4-Achs Interface
+7  0:7  PREOP  E  FC-302
+
+
+--- While running Machine ---
+cnc@CNC:~/linuxcnc/configs/Maho400E-LinuxCNC$ ethercat slaves
+0  0:0  OP  +  EK1101 EtherCAT-Koppler (2A E-Bus, ID-Switch)
+1  0:1  OP  +  EL5002 2K. SSI Encoder
+2  0:2  OP  +  EL1819 16K. Dig. Eingang 24V, 10�s
+3  0:3  OP  +  EL1819 16K. Dig. Eingang 24V, 10�s
+4  0:4  OP  +  EL2809 16K. Dig. Ausgang 24V, 0.5A
+5  0:5  OP  +  EL2809 16K. Dig. Ausgang 24V, 0.5A
+6  0:6  OP  +  EM7004 4-Achs Interface
+7  0:7  OP  +  FC-302
+cnc@CNC:~/linuxcnc/configs/Maho400E-LinuxCNC$ ethercat slaves -v -p 1
+=== Master 0, Slave 1 ===
+Device: Main
+State: OP
+Flag: +
+Identity:
+  Vendor Id:       0x00000002
+  Product code:    0x138a3052
+  Revision number: 0x00140000
+  Serial number:   0x00000000
+DL information:
+  FMMU bit operation: no
+  Distributed clocks: yes, 64 bit
+  DC system time transmission delay: 145 ns
+Port  Type  Link  Loop    Signal  NextSlave  RxTime [ns]  Diff [ns]   NextDc [ns]
+   0  EBUS  up    open    yes             0    681904088           0         145
+   1  EBUS  up    open    yes             2    681905538        1450         145
+   2  N/A   down  closed  no              -            -           -           -
+   3  N/A   down  closed  no              -            -           -           -
+Mailboxes:
+  Bootstrap RX: 0x1000/244, TX: 0x10f4/244
+  Standard  RX: 0x1000/128, TX: 0x1080/128
+  Supported protocols: CoE, FoE
+General:
+  Group: Measuring
+  Image name: 
+  Order number: EL5002
+  Device name: EL5002 2K. SSI Encoder
+  CoE details:
+    Enable SDO: yes
+    Enable SDO Info: yes
+    Enable PDO Assign: yes
+    Enable PDO Configuration: no
+    Enable Upload at startup: no
+    Enable SDO complete access: no
+  Flags:
+    Enable SafeOp: no
+    Enable notLRW: no
+  Current consumption: 130 mA
+cnc@CNC:~/linuxcnc/configs/Maho400E-LinuxCNC$ ethercat pdos -p 1
+SM0: PhysAddr 0x1000, DefaultSize  128, ControlRegister 0x26, Enable 1
+SM1: PhysAddr 0x1080, DefaultSize  128, ControlRegister 0x22, Enable 1
+SM2: PhysAddr 0x1100, DefaultSize    0, ControlRegister 0x04, Enable 0
+SM3: PhysAddr 0x1180, DefaultSize   12, ControlRegister 0x20, Enable 1
+  TxPDO 0x1a00 "SSI TxPDO-Map Inputs"
+    PDO entry 0x6000:01,  1 bit, ""
+    PDO entry 0x6000:02,  1 bit, ""
+    PDO entry 0x6000:03,  1 bit, ""
+    PDO entry 0x6000:04,  1 bit, ""
+    PDO entry 0x0000:00,  9 bit, ""
+    PDO entry 0x6000:0e,  1 bit, ""
+    PDO entry 0x6000:0f,  1 bit, ""
+    PDO entry 0x6000:10,  1 bit, ""
+    PDO entry 0x6000:11, 32 bit, ""
+  TxPDO 0x1a01 "SSI TxPDO-Map Inputs"
+    PDO entry 0x6010:01,  1 bit, ""
+    PDO entry 0x6010:02,  1 bit, ""
+    PDO entry 0x6010:03,  1 bit, ""
+    PDO entry 0x6010:04,  1 bit, ""
+    PDO entry 0x0010:00,  9 bit, ""
+    PDO entry 0x6010:0e,  1 bit, ""
+    PDO entry 0x6010:0f,  1 bit, ""
+    PDO entry 0x6010:10,  1 bit, ""
+    PDO entry 0x6010:11, 32 bit, ""
+cnc@CNC:~/linuxcnc/configs/Maho400E-LinuxCNC$ ethercat slaves -v -p 7
+=== Master 0, Slave 7 ===
+Device: Main
+State: OP
+Flag: +
+Identity:
+  Vendor Id:       0x0200008d
+  Product code:    0x00000064
+  Revision number: 0x00000005
+  Serial number:   0x00000000
+DL information:
+  FMMU bit operation: no
+  Distributed clocks: no
+Port  Type  Link  Loop    Signal  NextSlave
+   0  MII   up    open    yes             0
+   1  MII   down  closed  no              -
+   2  N/A   down  closed  no              -
+   3  N/A   down  closed  no              -
+Mailboxes:
+  Bootstrap RX: 0x1000/1400, TX: 0x1578/1400
+  Standard  RX: 0x1000/1400, TX: 0x1578/1400
+  Supported protocols: EoE, CoE, FoE
+General:
+  Group: Drives
+  Image name: 
+  Order number: FC-302
+  Device name: FC-302
+  CoE details:
+    Enable SDO: yes
+    Enable SDO Info: yes
+    Enable PDO Assign: yes
+    Enable PDO Configuration: yes
+    Enable Upload at startup: no
+    Enable SDO complete access: yes
+  Flags:
+    Enable SafeOp: no
+    Enable notLRW: no
+  Current consumption: 0 mA
+cnc@CNC:~/linuxcnc/configs/Maho400E-LinuxCNC$ ethercat pdos -p 7
+SM0: PhysAddr 0x1000, DefaultSize 1400, ControlRegister 0x26, Enable 1
+SM1: PhysAddr 0x1578, DefaultSize 1400, ControlRegister 0x22, Enable 1
+SM2: PhysAddr 0x1af0, DefaultSize    4, ControlRegister 0x64, Enable 0
+SM3: PhysAddr 0x1bf0, DefaultSize    4, ControlRegister 0x20, Enable 0
