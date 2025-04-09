@@ -1,0 +1,38 @@
+=== Master 0, Slave 0 ===
+Device: Main
+State: OP
+Flag: +
+Identity:
+  Vendor Id:       0x0000001d
+  Product code:    0x007b1a95
+  Revision number: 0x00000024
+  Serial number:   0xf0835c53
+DL information:
+  FMMU bit operation: yes
+  Distributed clocks: yes, 32 bit
+  DC system time transmission delay: 0 ns
+Port  Type  Link  Loop    Signal  NextSlave  RxTime [ns]  Diff [ns]   NextDc [ns]
+   0  MII   up    open    yes             -   4055126014           0           0
+   1  MII   up    open    yes             1   4055129364        3350         800
+   2  N/A   down  closed  no              -            -           -           -
+   3  N/A   down  closed  no              -            -           -           -
+Mailboxes:
+  Bootstrap RX: 0x1200/512, TX: 0x1400/512
+  Standard  RX: 0x1200/512, TX: 0x1400/512
+  Supported protocols: EoE, CoE, FoE
+General:
+  Group: FestoCMMT
+  Image name: 
+  Order number: CMMT-AS-MP-S1
+  Device name: CMMT-AS-MP-S1
+  CoE details:
+    Enable SDO: yes
+    Enable SDO Info: yes
+    Enable PDO Assign: yes
+    Enable PDO Configuration: yes
+    Enable Upload at startup: no
+    Enable SDO complete access: yes
+  Flags:
+    Enable SafeOp: no
+    Enable notLRW: no
+  Current consumption: 0 mA

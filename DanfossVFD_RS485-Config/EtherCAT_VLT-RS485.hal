@@ -1,0 +1,18 @@
+loadusr -W lcec_conf ethercat-conf.xml
+loadrt lcec
+
+loadusr -W fc302_vfd --device=/dev/ttyUSB0
+
+addf lcec.read-all				servo-thread
+addf lcec.write-all				servo-thread
+
+#net spindle-cmd-rpm     <= spindle.0.speed-out
+#net spindle-cmd-rpm-abs <= spindle.0.speed-out-abs
+#net spindle-cmd-rps     <= spindle.0.speed-out-rps
+#net spindle-cmd-rps-abs <= spindle.0.speed-out-rps-abs
+#net spindle-cw <= spindle.0.forward
+#net fc302-vfd.0.is-at-speed  => spindle.0.at-speed
+net spindle-cmd-rpm-abs     <= fc302-vfd.0.commanded-speed
+net spindle-rev spindle.0.reverse => fc302-vfd.0.reverse
+net spindle-on              <= fc302-vfd.0.run
+#setp fc302-vfd.0.refmax 3000

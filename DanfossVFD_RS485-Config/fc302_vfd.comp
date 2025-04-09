@@ -1,4 +1,4 @@
-component vlt5000_vfd "Danfoss VLT5000 VFD driver";
+component fc302_vfd "Danfoss FC302 VFD driver";
 param rw unsigned devslaveaddr=10	"Device slave address. Valid numbers are 1-31";
 param rw float speedscale=1.0		"Speed scale. VFD frequency in Hz is speedscale times commanded_speed";
 pin in float commanded_speed  		"Commanded speed of the vfd. when the VLT is in speed open loop mode, this value times the speedscale the frequency in Hz";
@@ -13,8 +13,8 @@ pin out bit error_overtorque		"TRUE when the VFD has encountered an overtorque."
 pin out bit error_overvolt			"TRUE when the VFD has encountered an overvoltage.";
 pin out bit error_overtemp			"TRUE when the VFD has encountered an overtemperature.";
 pin out bit watchdog_out			"Alternates between 1 and 0 after every update cycle. Feed into a watchdog component to ensure vfd driver is communicating with the vfd properly.";
-pin out float refmin				"Minimum reference frequency read from the VLT5000";
-pin out float refmax				"Maximum reference frequency read from the VLT5000";
+pin out float refmin				"Minimum reference frequency read from the FC302";
+pin out float refmax				"Maximum reference frequency read from the FC302";
 pin out float motorcurrent			"Current RMS motor current in Amps";
 pin out float torquepercent			"Current percentage of maximum torque";
 pin out float motorpower			"Current motor power in kW";
@@ -24,21 +24,21 @@ variable float reffreq_max;
 option userspace;
 option userinit yes;
 option extra_cleanup yes;           
-author "Bart van Hest";
+author "Patrick Lermer";
 description """
-This component is designed as an interface between LinuxCNC and a Danfoss VLT5000 variable frequency drive using
+This component is designed as an interface between LinuxCNC and a Danfoss FC302 variable frequency drive using
 the standard RS485 bus on terminals 68 and 69 and the VLT set to FC protocol. It assumes standard communication settings, which are
-9600 baud, 8 databits, even parity, 1 stopbit.
+115200 baud, 8 databits, even parity, 1 stopbit.
 
 .SH SYNOPSIS
 (ignore the auto-generated SYNOPSIS above)
 .SH
 .HP
-.B loadusr -W vlt5000-vfd --device=/dev/ttyUSB0\\fB
+.B loadusr -W fc302_vfd --device=/dev/ttyUSB0\\fB
 Multiple instances of this component for multiple VFDs on the same bus are allowed.
 .SH Assumptions about VFD setup
 This component assumes that the VFD is setup for remote control (parameter 002), LCP+digital control (parameter 013) and open loop speed
-control (parameter 100). also make sure paramater 500 (bus address) is set to a value of 1-31, 501 (baud rate) is set to 9600, 
+control (parameter 100). also make sure paramater 500 (bus address) is set to a value of 1-31, 501 (baud rate) is set to 115200, 
 512 (telegram profile) is set to FC Drive and 561 (Protocol) is set to FC Protocol.
 It might also be wise to set a bus timeout and corresponding action in parameters 513 and 514
 
@@ -46,9 +46,10 @@ It might also be wise to set a bus timeout and corresponding action in parameter
 license "GPLv2 or greater";
 ;;
 /*
-  Userspace HAL component to control a Danfoss VLT5000 series VFD using the Danfoss FC Protocol.
+  Userspace HAL component to control a Danfoss FC302 series VFD using the Danfoss FC Protocol.
 
   Copyright (C) 2014 Bart van Hest
+  Adapted by Patrick Lermer 2024
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -63,7 +64,7 @@ license "GPLv2 or greater";
   License along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
 
-  see 'man vlt5000_vfd' and the VLT5000 user manual.
+  see 'man fc302_vfd' and the FC302 user manual.
 */
 
 #include <termios.h>
@@ -136,7 +137,7 @@ typedef struct {
 	uint16_t ind;
 	int32_t pwe;
 	uint16_t controlword;		/* FC protocol control word */
-	uint16_t reference;		/* reference (0-0x4000 = 0-100%) */
+	uint16_t reference;			/* reference (0-0x4000 = 0-100%) */
 	uint8_t bcc;				/* control byte */
 } LongformTelegram;
 

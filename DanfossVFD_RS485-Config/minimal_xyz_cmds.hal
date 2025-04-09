@@ -1,10 +1,10 @@
-# Sat Sep 21 14:47:36 CEST 2024
+# Sat Sep 28 00:54:31 CEST 2024
 #
 # This file:    ./minimal_xyz_cmds.hal
 # Created by:   /usr/share/linuxcnc/hallib/basic_sim.tcl
 # With options: 
-# From inifile: /home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/DanfossTest-Config/minimal_xyz.ini
-# Halfiles:     LIB:basic_sim.tcl ethercat.hal
+# From inifile: /home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/DanfossVFD_RS485-Config/minimal_xyz.ini
+# Halfiles:     LIB:basic_sim.tcl EtherCAT_VLT-RS485.hal
 #
 # This file contains the hal commands produced by basic_sim.tcl
 # (and any hal commands executed prior to its execution).

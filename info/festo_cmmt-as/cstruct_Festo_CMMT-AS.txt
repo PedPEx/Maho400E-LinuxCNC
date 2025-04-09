@@ -1,0 +1,37 @@
+/* Master 0, Slave 0, "CMMT-AS-MP-S1"
+ * Vendor ID:       0x0000001d
+ * Product code:    0x007b1a95
+ * Revision number: 0x00000024
+ */
+
+ec_pdo_entry_info_t slave_0_pdo_entries[] = {
+    {0x6040, 0x00, 16},
+    {0x6060, 0x00, 8},
+    {0x607a, 0x00, 32},
+    {0x6081, 0x00, 32},
+    {0x60ff, 0x00, 32},
+    {0x6071, 0x00, 16},
+    {0x60b1, 0x00, 32},
+    {0x60b2, 0x00, 16},
+    {0x0000, 0x00, 8}, /* Gap */
+    {0x6041, 0x00, 16},
+    {0x6061, 0x00, 8},
+    {0x6064, 0x00, 32},
+    {0x606c, 0x00, 32},
+    {0x6077, 0x00, 16},
+    {0x0000, 0x00, 8}, /* Gap */
+};
+
+ec_pdo_info_t slave_0_pdos[] = {
+    {0x1600, 9, slave_0_pdo_entries + 0},
+    {0x1a00, 6, slave_0_pdo_entries + 9},
+};
+
+ec_sync_info_t slave_0_syncs[] = {
+    {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE},
+    {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE},
+    {2, EC_DIR_OUTPUT, 1, slave_0_pdos + 0, EC_WD_ENABLE},
+    {3, EC_DIR_INPUT, 1, slave_0_pdos + 1, EC_WD_DISABLE},
+    {0xff}
+};
+

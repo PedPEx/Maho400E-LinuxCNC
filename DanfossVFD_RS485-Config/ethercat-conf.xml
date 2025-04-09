@@ -41,7 +41,7 @@
 		<slave idx="5" type="EL2809" name="0522_EL2809"/>
     	<!-- 4 Axis driver -->
 		<slave idx="6" type="EM7004" name="0531_EM7004"/>
-	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl -->
+	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl 
 		<slave idx="7" type="basic_cia402" vid="0200008d" pid="00000064" name="2001_FC302">
 		<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
 			<modParam name="pdoAutoflow" value="true"/>
@@ -52,7 +52,7 @@
 			<modParam name="enableVL" value="true"/>
 			<modParam name="digitalInChannels" value="32"/>
 			<modParam name="digitalOutChannels" value="32"/>
-			<modParam name="enableErrorCode" value="true"/> 
+			<modParam name="enableErrorCode" value="true"/> -->
 			<!-- <modParam name="ciaChannels" value="0"/> -->
 			<!-- <modParam name="pdoLimit" value="0"/> -->
 			<!-- <modParam name="pdoEntryLimit" value="0"/> -->
@@ -65,8 +65,8 @@
 			<!-- <modParam name="enableTargetVL" value="true"/> -->
 			<!-- <modParam name="enableVLDemand" value="true"/>-->
 			<!-- <modParam name="enableVLMaximum" value="true"/> -->
-			<!-- <modParam name="enableVLMinimum" value="true"/> -->
-		</slave> 
+			<!-- <modParam name="enableVLMinimum" value="true"/> 
+		</slave> -->
 	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl 
 		<slave idx="7" type="generic" vid="0200008d" pid="00000064" configPdos="true" name="2001_FC302">
 			<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
