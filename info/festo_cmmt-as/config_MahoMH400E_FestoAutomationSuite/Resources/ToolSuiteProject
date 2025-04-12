@@ -1,0 +1,494 @@
+{
+  "$id": "1",
+  "Id": "3fa898fc-682e-468f-b15c-3cced49e0007",
+  "StorageType": "ToolSuiteProject",
+  "StorageVersion": "V2.0",
+  "ComponentGraph": {
+    "$id": "2",
+    "Id": "6b2f4c18-d520-40d3-a29f-1d39485ddcf6",
+    "Components": [
+      {
+        "$id": "3",
+        "Id": "d117b722-d8ef-4ae8-87a2-3a8534df8066",
+        "Name": "CMMT-AS-C5-11A-P3-MP-S1",
+        "ToolGuid": "cc0c8c4e-e21d-4f82-b0ff-30882eec7e9a",
+        "ImageKey": "8143167",
+        "ConnectionString": {
+          "$id": "4",
+          "Name": "Eth0",
+          "Type": "IPv4",
+          "Value": "192.168.0.1",
+          "Parameters": []
+        },
+        "Position": "8590,4840",
+        "Actions": "DontOpenToolOnDelete",
+        "CatalogPath": "CMMT-AS-C5-11A-P3-MP-S1",
+        "EngineeringProductCatalog": [
+          {
+            "$id": "5",
+            "Id": "76d2c459-add8-4513-acf6-c40173bd4d97",
+            "IconMarkup": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n\r\n<Canvas xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"\r\n        xmlns:attachedProperties=\"clr-namespace:Festo.Suite.Design.AttachedProperties;assembly=Festo.Suite.Design\"\r\n        Tag=\"CMMT-AS-EC_BGW3\" Width=\"59\" Height=\"231\" VerticalAlignment=\"Top\">\r\n    <Canvas Tag=\"Body\" IsHitTestVisible=\"False\">\r\n        <Rectangle Tag=\"Base\" Width=\"59\" Height=\"229\" Fill=\"#FFF2F3F5\" Canvas.Left=\"0\" Canvas.Top=\"2\" />\r\n        <Rectangle Tag=\"Bottom\" Width=\"59\" Height=\"27.182\" Fill=\"#FFD8DCE1\" Canvas.Left=\"0\"\r\n                   Canvas.Top=\"203.81799999999998\" />\r\n        <Rectangle Tag=\"Top\" Width=\"59\" Height=\"16\" Fill=\"#FFE5E8EB\" Canvas.Left=\"0\" Canvas.Top=\"2\" />\r\n        <Path Tag=\"Middle\" Fill=\"#FFE5E8EB\" Canvas.Left=\"0\" Canvas.Top=\"19.817999999999984\">\r\n            <Path.Data>\r\n                <PathGeometry Figures=\"M0 181.909V48.181H51V0h8V181.909Z\" />\r\n            </Path.Data>\r\n        </Path>\r\n    </Canvas>\r\n    <Canvas Tag=\"Operator Interface\" IsHitTestVisible=\"False\">\r\n        <Rectangle Tag=\"Display_Frame\" Width=\"49\" Height=\"46\" Fill=\"#FFE5E8EB\" Canvas.Left=\"0\" Canvas.Top=\"20\" />\r\n        <Rectangle Tag=\"Display\" Width=\"39\" Height=\"30\" Fill=\"#FFB6BEC6\" Canvas.Left=\"5\" Canvas.Top=\"30\" />\r\n        <Canvas Tag=\"Festo Logo\">\r\n            <Path Tag=\"F\" Fill=\"#FF0091DC\" Canvas.Left=\"26\" Canvas.Top=\"23.336\">\r\n                <Path.Data>\r\n                    <PathGeometry\r\n                        Figures=\"M.111 3.447A.114.114 0 0 1 0 3.332V.115A.114.114 0 0 1 .111 0H3.223a.114.114 0 0 1 .111.115v.46A.113.113 0 0 1 3.223.69H1A.113.113 0 0 0 .889.8v.46A.113.113 0 0 0 1 1.379H3a.113.113 0 0 1 .111.115v.46A.112.112 0 0 1 3 2.068H1a.114.114 0 0 0-.111.116V3.332a.113.113 0 0 1-.111.115Z\" />\r\n                </Path.Data>\r\n            </Path>\r\n            <Path Tag=\"E\" Fill=\"#FF0091DC\" Canvas.Left=\"29.556\" Canvas.Top=\"23.336\">\r\n                <Path.Data>\r\n                    <PathGeometry\r\n                        Figures=\"M0 .115A.113.113 0 0 1 .111 0H3.445a.114.114 0 0 1 .111.115v.46A.113.113 0 0 1 3.445.69H1A.113.113 0 0 0 .889.8v.46A.113.113 0 0 0 1 1.379H3.223a.113.113 0 0 1 .111.115v.46a.113.113 0 0 1-.111.114H1a.114.114 0 0 0-.111.116v.459A.113.113 0 0 0 1 2.758H3.445a.113.113 0 0 1 .111.115v.459a.114.114 0 0 1-.111.115H.111A.113.113 0 0 1 0 3.332Z\" />\r\n                </Path.Data>\r\n            </Path>\r\n            <Path Tag=\"S\" Fill=\"#FF0091DC\" Canvas.Left=\"33.335\" Canvas.Top=\"23.336\">\r\n                <Path.Data>\r\n                    <PathGeometry\r\n                        Figures=\"M0 1.379a.678.678 0 0 0 .667.689H2.445a.226.226 0 0 1 .222.23v.23a.226.226 0 0 1-.222.23H1a.114.114 0 0 1-.111-.115.113.113 0 0 0-.111-.115H.111A.113.113 0 0 0 0 2.642v.115a.678.678 0 0 0 .667.689H2.89a.678.678 0 0 0 .666-.689v-.69a.678.678 0 0 0-.666-.689H1.111a.226.226 0 0 1-.222-.23V.92A.226.226 0 0 1 1.111.69H2.555A.113.113 0 0 1 2.667.8.113.113 0 0 0 2.778.92h.667A.113.113 0 0 0 3.556.8V.69A.679.679 0 0 0 2.89 0H.667A.679.679 0 0 0 0 .69Z\" />\r\n                </Path.Data>\r\n            </Path>\r\n            <Path Tag=\"T\" Fill=\"#FF0091DC\" Canvas.Left=\"37.113\" Canvas.Top=\"23.336\">\r\n                <Path.Data>\r\n                    <PathGeometry\r\n                        Figures=\"M0 .115A.114.114 0 0 1 .112 0H3.445a.114.114 0 0 1 .112.115v.46A.113.113 0 0 1 3.445.69H2.334A.113.113 0 0 0 2.224.8V3.332a.113.113 0 0 1-.112.115H1.446a.113.113 0 0 1-.112-.115V.8A.113.113 0 0 0 1.223.69H.112A.113.113 0 0 1 0 .575V.115Z\" />\r\n                </Path.Data>\r\n            </Path>\r\n            <Path Tag=\"O\" Fill=\"#FF0091DC\" Canvas.Left=\"40.946\" Canvas.Top=\"23.336\">\r\n                <Path.Data>\r\n                    <PathGeometry\r\n                        Figures=\"M2.845 3.457H.656A.623.623 0 0 1 .4 3.4a.653.653 0 0 1-.208-.148.692.692 0 0 1-.141-.22A.719.719 0 0 1 0 2.766V.692A.719.719 0 0 1 .052.423.694.694 0 0 1 .192.2.654.654 0 0 1 .4.054.622.622 0 0 1 .656 0H2.845A.623.623 0 0 1 3.1.054.652.652 0 0 1 3.309.2a.692.692 0 0 1 .14.22A.721.721 0 0 1 3.5.692V2.766a.721.721 0 0 1-.051.269.691.691 0 0 1-.14.22A.652.652 0 0 1 3.1 3.4.624.624 0 0 1 2.845 3.457ZM1.094.692A.212.212 0 0 0 .939.759.235.235 0 0 0 .875.922V2.535A.236.236 0 0 0 .939 2.7a.212.212 0 0 0 .155.067H2.406A.212.212 0 0 0 2.561 2.7a.236.236 0 0 0 .064-.163V.922A.235.235 0 0 0 2.561.759.212.212 0 0 0 2.406.692Z\" />\r\n                </Path.Data>\r\n            </Path>\r\n        </Canvas>\r\n    </Canvas>\r\n    <Canvas Tag=\"Auxiliary Interfaces\" IsHitTestVisible=\"False\">\r\n        <Rectangle Tag=\"X6A\" Width=\"17\" Height=\"35\" Fill=\"#FFB6BEC6\" Canvas.Left=\"35\" Canvas.Top=\"127\" />\r\n        <Rectangle Tag=\"X6B\" Width=\"12\" Height=\"14\" Fill=\"#FFB6BEC6\" Canvas.Left=\"40\" Canvas.Top=\"113\" />\r\n        <Rectangle Tag=\"X1C\" Width=\"9\" Height=\"15\" Fill=\"#FFB6BEC6\" Canvas.Left=\"43\" Canvas.Top=\"82\" />\r\n        <Rectangle Tag=\"X2\" Width=\"12.0\" Height=\"12.0\" Fill=\"#FFB6BEC6\" Stroke=\"#FFB6BEC6\" StrokeThickness=\"2\"\r\n                   Canvas.Left=\"6.0\" Canvas.Top=\"130.0\" />\r\n        <Rectangle Tag=\"X3\" Width=\"12.0\" Height=\"12.0\" Fill=\"#FFB6BEC6\" Stroke=\"#FFB6BEC6\" StrokeThickness=\"2\"\r\n                   Canvas.Left=\"6.0\" Canvas.Top=\"115.0\" />\r\n        <Rectangle Tag=\"X10\" Width=\"12.0\" Height=\"12.0\" Fill=\"#FFB6BEC6\" Stroke=\"#FFB6BEC6\" StrokeThickness=\"2\"\r\n                   Canvas.Left=\"6.0\" Canvas.Top=\"97.0\" />\r\n        <Rectangle Tag=\"X18\" Width=\"12.0\" Height=\"12.0\" Fill=\"#FFB6BEC6\" Stroke=\"#FFB6BEC6\" StrokeThickness=\"2\"\r\n                   Canvas.Left=\"6.0\" Canvas.Top=\"82.0\" />\r\n    </Canvas>\r\n    <Canvas Tag=\"Connectors\">\r\n        <Canvas Tag=\"XF2 OUT\" attachedProperties:SuiteProps.ConnectorName=\"XF2 OUT\"\r\n                attachedProperties:SuiteProps.TranslateTransformX=\"36.99999999999998\"\r\n                attachedProperties:SuiteProps.TranslateTransformY=\"4.0\"\r\n                attachedProperties:SuiteProps.ConnectorOutDirection=\"Up\" attachedProperties:SuiteProps.UIType=\"RJ45\">\r\n            <Canvas Tag=\"Up\">\r\n                <Rectangle Tag=\"RJ45\" Width=\"12.0\" Height=\"12.0\" Fill=\"#FFFFD600\" Stroke=\"#FFFFD600\"\r\n                           StrokeThickness=\"2\" Canvas.Left=\"36.99999999999998\" Canvas.Top=\"4.0\" />\r\n            </Canvas>\r\n        </Canvas>\r\n        <Canvas Tag=\"XF1 IN\" attachedProperties:SuiteProps.ConnectorName=\"XF1 IN\"\r\n                attachedProperties:SuiteProps.TranslateTransformX=\"9.999999999999975\"\r\n                attachedProperties:SuiteProps.TranslateTransformY=\"4.0\"\r\n                attachedProperties:SuiteProps.ConnectorOutDirection=\"Up\" attachedProperties:SuiteProps.UIType=\"RJ45\">\r\n            <Canvas Tag=\"Up\">\r\n                <Rectangle Tag=\"RJ45\" Width=\"12.0\" Height=\"12.0\" Fill=\"#FFFFD600\" Stroke=\"#FFFFD600\"\r\n                           StrokeThickness=\"2\" Canvas.Left=\"9.999999999999975\" Canvas.Top=\"4.0\" />\r\n            </Canvas>\r\n        </Canvas>\r\n    </Canvas>\r\n    <Rectangle Tag=\"StatusIconPlaceholder\" Width=\"16\" Height=\"16\" Canvas.Left=\"2\" Canvas.Top=\"22\"\r\n               IsHitTestVisible=\"False\" attachedProperties:SuiteProps.TranslateTransformX=\"2\"\r\n               attachedProperties:SuiteProps.TranslateTransformY=\"22\"\r\n               attachedProperties:SuiteProps.IsStatusIconPlaceHolder=\"True\" />\r\n    <Rectangle Tag=\"CodesysFieldbusSlaveStatusIconPlaceHolder\" Width=\"20\" Height=\"20\" Canvas.Left=\"20\" Canvas.Top=\"0\"\r\n               IsHitTestVisible=\"False\" attachedProperties:SuiteProps.TranslateTransformX=\"20\"\r\n               attachedProperties:SuiteProps.TranslateTransformY=\"0\"\r\n               attachedProperties:SuiteProps.IsCodesysFieldbusSlaveStatusIconPlaceHolder=\"True\" />\r\n</Canvas>",
+            "Vendor": "Festo",
+            "OrderCode": "CMMT-AS-C5-11A-P3-MP-S1",
+            "PartNumber": "8143167",
+            "Connectors": [
+              {
+                "$id": "6",
+                "Id": "13573387-17da-42f0-b08a-5b8450cac884",
+                "Name": "XF1 IN",
+                "Role": "In",
+                "ConnectionType": "758ac86d-adda-4670-8240-64a0d7f300c6",
+                "Constraints": "MaxComponentConnections=1",
+                "ParameterSet": [
+                  {
+                    "Name": "CodesysDeviceIdentification",
+                    "Value": "65;^1D_007B1A95;"
+                  }
+                ]
+              },
+              {
+                "$id": "7",
+                "Id": "b22ebb6d-bde2-4ef9-819b-3fb5871162e2",
+                "Name": "XF2 OUT",
+                "Role": "Out",
+                "ConnectionType": "758ac86d-adda-4670-8240-64a0d7f300c6",
+                "Constraints": "MaxComponentConnections=1"
+              }
+            ],
+            "Connections": [
+              {
+                "$id": "8",
+                "Id": "eb226008-0b54-40f0-b3ab-2889ab5a6bd0",
+                "SourceConnector": {
+                  "$ref": "6"
+                },
+                "TargetConnector": {
+                  "$ref": "7"
+                }
+              }
+            ],
+            "ParameterSet": [
+              {
+                "Name": "ExportFormats",
+                "Value": "pck, Festo PCK"
+              }
+            ]
+          },
+          {
+            "$id": "9",
+            "Id": "ef5f3f60-1294-43e3-8f44-67e29b18f720",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "10",
+            "Id": "e989e852-affa-4bc2-b78f-099dfbda989a",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "11",
+            "Id": "224b89df-3e74-467e-a0ad-f95b35baef5f",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "12",
+            "Id": "04441091-5bd9-43d1-8b5a-eff25ec03a7e",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "13",
+            "Id": "db7f6339-acf6-4bec-b05b-1f86848b6b9a",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "14",
+            "Id": "6ab7d185-457a-484b-ab61-f406d8a536b1",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "15",
+            "Id": "cdb45949-4a13-4242-8d6b-c0be931a34ea",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "16",
+            "Id": "32e493d0-2c42-4413-b251-69501c16ba0f",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "17",
+            "Id": "61230420-f09c-4fc7-a7af-82dcb5935967",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "18",
+            "Id": "e4c9ab6a-b44b-433d-b261-07e9a8115865",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "19",
+            "Id": "da9ac31f-80c3-414a-b5eb-7a2c2b3734f2",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "20",
+            "Id": "55b7e41a-7968-483c-acd4-58423e793f40",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "21",
+            "Id": "33b60269-812d-4577-8adf-a3c70e6a1908",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "22",
+            "Id": "f53cd04b-62f9-4c01-bfd0-19ee5437db64",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "23",
+            "Id": "dffadd51-8e33-4830-872d-78b1f17cbcc1",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "24",
+            "Id": "1bc6f2be-a538-4c3e-b2f7-93ddbbca70cc",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "25",
+            "Id": "c42a5429-5762-4047-9444-519fbc159c2e",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "26",
+            "Id": "650856e2-3128-4147-9159-ffeb10649040",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "27",
+            "Id": "0cd3fbb8-09bf-455d-8a42-fb8fbcf1c4e6",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "28",
+            "Id": "cae4cd65-fb76-4d58-baac-d72e746b74f2",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "29",
+            "Id": "ba693b59-3f11-47ee-acd4-185c1f466e91",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "30",
+            "Id": "c981106f-e5ad-40f7-a99d-15b1013a5cf1",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "31",
+            "Id": "a659fdff-906a-4572-aeb0-68975afd6d0b",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "32",
+            "Id": "db2079ad-f8a3-4ce2-a017-b7f13b4389b7",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "33",
+            "Id": "fac1b1e9-93bb-4681-b3d9-7407fee6f51c",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "34",
+            "Id": "bff82e54-fc9e-4733-8e6f-9e79d7069bed",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "35",
+            "Id": "a9800887-89cc-45aa-99ff-2327f3ad39af",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "36",
+            "Id": "ee55e791-ba2e-4b65-a391-6f779429c5b4",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "37",
+            "Id": "8d23b568-78fb-447e-9f6f-d11ac73ab225",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "38",
+            "Id": "fc58745f-2efb-4c7e-9672-0b5d6dba4acb",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "39",
+            "Id": "099689d2-f73a-4aca-bff6-2f3172cc6fc1",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "40",
+            "Id": "e8287db8-7b20-428c-aaf4-634115e966e2",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "41",
+            "Id": "13fd52a2-dd3d-4c3a-95ec-6d9c1231b3d6",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "42",
+            "Id": "b0ba753a-ab6f-4c7c-b4e5-a9fbfc05eecb",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "43",
+            "Id": "c48e46ce-3b0f-4912-bbbb-a42f35429805",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "44",
+            "Id": "f79ac1de-b695-4036-b193-fdc41273a7b6",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "45",
+            "Id": "4a58fec6-2427-449d-8444-6f8e1bba4147",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "46",
+            "Id": "b96442bf-2a16-4ae9-874c-b0697c46df83",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "47",
+            "Id": "0b433281-53ee-4c15-a936-461fe3a36528",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "48",
+            "Id": "8223e63e-9cff-4453-86ee-45a78886ea74",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "49",
+            "Id": "a5ff1eee-508a-46f0-a753-1f607aa00991",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "50",
+            "Id": "cd064687-82d2-4514-b2a9-077f78c302f6",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "51",
+            "Id": "86031982-add5-4bb3-9645-86b37388c5d1",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "52",
+            "Id": "dc5fc720-df3a-4dc1-9dcb-751840b6df01",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "53",
+            "Id": "18b8ab97-cca6-4fae-aa22-7ef223fe4d82",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "54",
+            "Id": "9b777e96-57f7-42e3-9bbd-e378899b532c",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "55",
+            "Id": "ca4be908-f7e6-447e-b78c-1ac15dae8353",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "56",
+            "Id": "e46837d1-8b7f-40da-a458-3579297dcabe",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "57",
+            "Id": "0c884ba2-c1b2-4af7-996c-800435126bb6",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "58",
+            "Id": "eae2a5f6-1843-4611-81eb-5764397990e8",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "59",
+            "Id": "ce1e22f9-7f13-40fa-9437-cb09c36872f1",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          },
+          {
+            "$id": "60",
+            "Id": "8e2d8df6-d144-45c4-9e90-72f796fdec2f",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "PartNumber": ""
+          },
+          {
+            "$id": "61",
+            "Id": "e0d89cf5-d263-44fc-b4c1-495f432c72e8",
+            "Name": "User defined rotative axis"
+          },
+          {
+            "$id": "62",
+            "Id": "3d925ebf-996f-4b75-8e7a-df83cd5ff086",
+            "Name": "User Defined Mounting Kit",
+            "PartNumber": ""
+          }
+        ],
+        "EngineeringComponents": [
+          {
+            "$id": "63",
+            "Id": "6fe35544-49c1-4a2d-9745-7e1750102557",
+            "Name": "CMMT-AS-C5-11A-P3-MP-S1",
+            "Product": {
+              "$ref": "5"
+            },
+            "Connectors": [
+              {
+                "$id": "64",
+                "Id": "593829da-ac82-4f8b-b77b-02f24fbbd379",
+                "Name": "XF1 IN",
+                "Role": "In",
+                "ConnectionType": "758ac86d-adda-4670-8240-64a0d7f300c6",
+                "Constraints": "MaxComponentConnections=1",
+                "ParameterSet": [
+                  {
+                    "Name": "CodesysDeviceIdentification",
+                    "Value": "65;^1D_007B1A95;"
+                  },
+                  {
+                    "$valuetype": "System.Guid",
+                    "Name": "CodesysDeviceObjectId"
+                  }
+                ]
+              },
+              {
+                "$id": "65",
+                "Id": "3576f375-8d1e-4716-852c-23e1ac1c6331",
+                "Name": "XF2 OUT",
+                "Role": "Out",
+                "ConnectionType": "758ac86d-adda-4670-8240-64a0d7f300c6",
+                "Constraints": "MaxComponentConnections=1"
+              }
+            ],
+            "Connections": [
+              {
+                "$id": "66",
+                "Id": "691d3061-2080-4022-ad29-6454adc4f5ae",
+                "SourceConnector": {
+                  "$ref": "64"
+                },
+                "TargetConnector": {
+                  "$ref": "65"
+                }
+              }
+            ],
+            "ParameterSet": [
+              {
+                "Name": "StoredData",
+                "Value": true
+              },
+              {
+                "Name": "ExportFormats",
+                "Value": "pck, Festo PCK"
+              }
+            ]
+          },
+          {
+            "$id": "67",
+            "Id": "23eda734-f194-44d8-88b7-f8c5f9e0e4ac",
+            "Name": "User Defined Motor (With Holding Brake)",
+            "Product": {
+              "$ref": "60"
+            },
+            "ParameterSet": [
+              {
+                "Name": "ComponentType",
+                "Value": "Motor"
+              }
+            ]
+          },
+          {
+            "$id": "68",
+            "Id": "ca2aff30-aebb-422c-9644-d55fa1b962cf",
+            "Name": "User defined rotative axis",
+            "Product": {
+              "$ref": "61"
+            },
+            "ParameterSet": [
+              {
+                "Name": "ComponentType",
+                "Value": "Axis"
+              }
+            ]
+          },
+          {
+            "$id": "69",
+            "Id": "810c977d-4d6e-4b50-905b-4acab676e926",
+            "Name": "User Defined Mounting Kit",
+            "Product": {
+              "$ref": "62"
+            },
+            "ParameterSet": [
+              {
+                "Name": "ComponentType",
+                "Value": "MountingKit"
+              }
+            ]
+          }
+        ],
+        "MainEngineeringComponent": {
+          "$ref": "63"
+        },
+        "ParameterSet": []
+      }
+    ],
+    "Connections": []
+  }
+}
