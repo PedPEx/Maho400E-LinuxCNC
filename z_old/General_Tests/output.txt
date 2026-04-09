@@ -1,0 +1,230 @@
+LINUXCNC - 2.9.8
+Machine configuration directory is '/home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/General_Tests'
+Machine configuration file is 'minimal_xyz.ini'
+
+check_config:
+  Unspecified [JOINT_0]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_0]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_1]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_1]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_2]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_2]MAX_ACCELERATION, default used: 1.0
+
+Starting LinuxCNC...
+emc/iotask/ioControl.cc 786: can't load tool table.
+linuxcnc TPMOD=tpmod HOMEMOD=homemod EMCMOT=motmod
+Found file(LIB): /usr/share/linuxcnc/hallib/basic_sim.tcl
+Found file(REL): ./ethercat.hal
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+Shutting down and cleaning up LinuxCNC...
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+LinuxCNC terminated with an error.  You can find more information in the log:
+    /home/cnc/linuxcnc_debug.txt
+and
+    /home/cnc/linuxcnc_print.txt
+as well as in the output of the shell command 'dmesg' and in the terminal
+LINUXCNC - 2.9.8
+Machine configuration directory is '/home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/General_Tests'
+Machine configuration file is 'minimal_xyz.ini'
+
+check_config:
+  Unspecified [JOINT_0]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_0]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_1]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_1]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_2]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_2]MAX_ACCELERATION, default used: 1.0
+
+Starting LinuxCNC...
+emc/iotask/ioControl.cc 786: can't load tool table.
+linuxcnc TPMOD=tpmod HOMEMOD=homemod EMCMOT=motmod
+Found file(LIB): /usr/share/linuxcnc/hallib/basic_sim.tcl
+Found file(REL): ./ethercat.hal
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+Shutting down and cleaning up LinuxCNC...
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+USRMOT: ERROR: command timeout
+LinuxCNC terminated with an error.  You can find more information in the log:
+    /home/cnc/linuxcnc_debug.txt
+and
+    /home/cnc/linuxcnc_print.txt
+as well as in the output of the shell command 'dmesg' and in the terminal
+LINUXCNC - 2.9.8
+Machine configuration directory is '/home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/General_Tests'
+Machine configuration file is 'minimal_xyz.ini'
+
+check_config:
+  Unspecified [JOINT_0]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_0]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_1]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_1]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_2]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_2]MAX_ACCELERATION, default used: 1.0
+
+Starting LinuxCNC...
+emc/iotask/ioControl.cc 786: can't load tool table.
+linuxcnc TPMOD=tpmod HOMEMOD=homemod EMCMOT=motmod
+Found file(LIB): /usr/share/linuxcnc/hallib/basic_sim.tcl
+Found file(REL): ./ethercat.hal
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+waiting for s.joints<0>, s.kinematics_type<0>
+Shutting down and cleaning up LinuxCNC...
+USRMOT: ERROR: command timeout
+emcMotionInit: emcTrajInit failed
+LinuxCNC terminated with an error.  You can find more information in the log:
+    /home/cnc/linuxcnc_debug.txt
+and
+    /home/cnc/linuxcnc_print.txt
+as well as in the output of the shell command 'dmesg' and in the terminal
+LINUXCNC - 2.9.8
+Machine configuration directory is '/home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/General_Tests'
+Machine configuration file is 'minimal_xyz.ini'
+
+check_config:
+  Unspecified [JOINT_0]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_0]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_1]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_1]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_2]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_2]MAX_ACCELERATION, default used: 1.0
+
+Starting LinuxCNC...
+emc/iotask/ioControl.cc 786: can't load tool table.
+linuxcnc TPMOD=tpmod HOMEMOD=homemod EMCMOT=motmod
+Found file(LIB): /usr/share/linuxcnc/hallib/basic_sim.tcl
+Found file(REL): ./ethercat.hal
+Unexpected realtime delay on task 0 with period 1000000
+This Message will only display once per session.
+Run the Latency Test and resolve before continuing.
+
+task: main loop took 0.013047 seconds
+task: main loop took 0.015223 seconds
+task: main loop took 0.015981 seconds
+Shutting down and cleaning up LinuxCNC...
+task: 21684 cycles, min=0.000017, max=0.015981, avg=0.001072, 3 latency excursions (> 10x expected cycle time of 0.001000s)
+LINUXCNC - 2.9.8
+Machine configuration directory is '/home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/General_Tests'
+Machine configuration file is 'minimal_xyz.ini'
+
+check_config:
+  Unspecified [JOINT_0]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_0]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_1]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_1]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_2]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_2]MAX_ACCELERATION, default used: 1.0
+
+Starting LinuxCNC...
+emc/iotask/ioControl.cc 786: can't load tool table.
+linuxcnc TPMOD=tpmod HOMEMOD=homemod EMCMOT=motmod
+Found file(LIB): /usr/share/linuxcnc/hallib/basic_sim.tcl
+Found file(REL): ./ethercat.hal
+Unexpected realtime delay on task 0 with period 1000000
+This Message will only display once per session.
+Run the Latency Test and resolve before continuing.
+
+task: main loop took 0.012543 seconds
+task: main loop took 0.016123 seconds
+task: main loop took 0.047505 seconds
+Shutting down and cleaning up LinuxCNC...
+task: 1999384 cycles, min=0.000017, max=0.047505, avg=0.001064, 3 latency excursions (> 10x expected cycle time of 0.001000s)
+LINUXCNC - 2.9.8
+Machine configuration directory is '/home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/General_Tests'
+Machine configuration file is 'minimal_xyz.ini'
+
+check_config:
+  Unspecified [JOINT_0]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_0]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_1]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_1]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_2]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_2]MAX_ACCELERATION, default used: 1.0
+
+Starting LinuxCNC...
+emc/iotask/ioControl.cc 786: can't load tool table.
+linuxcnc TPMOD=tpmod HOMEMOD=homemod EMCMOT=motmod
+Found file(LIB): /usr/share/linuxcnc/hallib/basic_sim.tcl
+Found file(REL): ./ethercat.hal
+task: main loop took 0.014482 seconds
+task: main loop took 0.015521 seconds
+task: main loop took 0.010509 seconds
+task: main loop took 0.010322 seconds
+task: main loop took 0.017467 seconds
+task: main loop took 0.010870 seconds
+task: main loop took 0.010765 seconds
+Shutting down and cleaning up LinuxCNC...
+task: 2705638 cycles, min=0.000017, max=0.017467, avg=0.001065, 7 latency excursions (> 10x expected cycle time of 0.001000s)
+LINUXCNC - 2.9.8
+Machine configuration directory is '/home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/General_Tests'
+Machine configuration file is 'minimal_xyz.ini'
+
+check_config:
+  Unspecified [JOINT_0]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_0]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_1]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_1]MAX_ACCELERATION, default used: 1.0
+  Unspecified [JOINT_2]MAX_VELOCITY,     default used: 1.0
+  Unspecified [JOINT_2]MAX_ACCELERATION, default used: 1.0
+
+Starting LinuxCNC...
+emc/iotask/ioControl.cc 786: can't load tool table.
+linuxcnc TPMOD=tpmod HOMEMOD=homemod EMCMOT=motmod
+Found file(LIB): /usr/share/linuxcnc/hallib/basic_sim.tcl
+Found file(REL): ./ethercat.hal
+Unexpected realtime delay on task 0 with period 1000000
+This Message will only display once per session.
+Run the Latency Test and resolve before continuing.
+
+task: main loop took 0.013843 seconds
+task: main loop took 0.011342 seconds
+task: main loop took 0.012614 seconds
+task: main loop took 0.010271 seconds
+task: main loop took 0.010492 seconds
+task: main loop took 0.010081 seconds
+task: main loop took 0.013684 seconds
+task: main loop took 0.014310 seconds
+Shutting down and cleaning up LinuxCNC...
+task: 287806 cycles, min=0.000017, max=0.014310, avg=0.001066, 8 latency excursions (> 10x expected cycle time of 0.001000s)

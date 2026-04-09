@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<EtherCATMailbox>
+	<CoE>
+		<InitCmds>
+			<InitCmd>
+				<Transition>PS</Transition>
+				<Comment><![CDATA[clear sm pdos (0x1C12)]]></Comment>
+				<Timeout>0</Timeout>
+				<Ccs>1</Ccs>
+				<Index>7186</Index>
+				<SubIndex>0</SubIndex>
+				<Data>00</Data>
+			</InitCmd>
+			<InitCmd>
+				<Transition>PS</Transition>
+				<Comment><![CDATA[clear sm pdos (0x1C13)]]></Comment>
+				<Timeout>0</Timeout>
+				<Ccs>1</Ccs>
+				<Index>7187</Index>
+				<SubIndex>0</SubIndex>
+				<Data>00</Data>
+			</InitCmd>
+			<InitCmd>
+				<Transition>PS</Transition>
+				<Comment><![CDATA[download pdo 0x1C12:01 index]]></Comment>
+				<Timeout>0</Timeout>
+				<Ccs>1</Ccs>
+				<Index>7186</Index>
+				<SubIndex>1</SubIndex>
+				<Data>0116</Data>
+			</InitCmd>
+			<InitCmd>
+				<Transition>PS</Transition>
+				<Comment><![CDATA[download pdo 0x1C12 count]]></Comment>
+				<Timeout>0</Timeout>
+				<Ccs>1</Ccs>
+				<Index>7186</Index>
+				<SubIndex>0</SubIndex>
+				<Data>01</Data>
+			</InitCmd>
+			<InitCmd>
+				<Transition>PS</Transition>
+				<Comment><![CDATA[download pdo 0x1C13:01 index]]></Comment>
+				<Timeout>0</Timeout>
+				<Ccs>1</Ccs>
+				<Index>7187</Index>
+				<SubIndex>1</SubIndex>
+				<Data>011a</Data>
+			</InitCmd>
+			<InitCmd>
+				<Transition>PS</Transition>
+				<Comment><![CDATA[download pdo 0x1C13 count]]></Comment>
+				<Timeout>0</Timeout>
+				<Ccs>1</Ccs>
+				<Index>7187</Index>
+				<SubIndex>0</SubIndex>
+				<Data>01</Data>
+			</InitCmd>
+		</InitCmds>
+	</CoE>
+</EtherCATMailbox>

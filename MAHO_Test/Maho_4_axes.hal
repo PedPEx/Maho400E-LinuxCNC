@@ -1,0 +1,144 @@
+###########################################################
+# Setup
+###########################################################
+
+loadrt [KINS]KINEMATICS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS
+
+# Lade 3 PID-Regler für die X, Y und Z Achse
+loadrt pid names=pid.x,pid.y,pid.z
+
+loadusr -W lcec_conf ethercat-conf_4axes.xml
+loadrt lcec
+loadrt cia402 names=cia402.0
+
+###########################################################
+# Functions servo-thread
+###########################################################
+
+# Die Reihenfolge im Thread ist wichtig: 
+# 1. Eingänge lesen -> 2. Motion berechnen -> 3. PID berechnen -> 4. Ausgänge schreiben
+addf lcec.read-all servo-thread
+addf cia402.0.read-all servo-thread
+
+
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+
+addf pid.x.do-pid-calcs servo-thread
+addf pid.y.do-pid-calcs servo-thread
+addf pid.z.do-pid-calcs servo-thread
+
+addf lcec.write-all servo-thread
+addf cia402.0.write-all servo-thread
+
+
+
+#########################################
+# Allgemeine Signale
+#########################################
+net emc-enable => iocontrol.0.emc-enable-in
+sets emc-enable 1
+
+
+#########################################
+# Achse X / Joint 0
+#########################################
+
+# PID Parameter aus INI laden
+setp pid.x.Pgain [JOINT_0]P
+setp pid.x.Igain [JOINT_0]I
+setp pid.x.Dgain [JOINT_0]D
+setp pid.x.FF0 [JOINT_0]FF0
+setp pid.x.FF1 [JOINT_0]FF1
+setp pid.x.FF2 [JOINT_0]FF2
+setp pid.x.deadband [JOINT_0]DEADBAND
+setp pid.x.maxoutput [JOINT_0]MAX_OUTPUT
+
+# Hardware Skalierungen aus INI laden
+setp lcec.m0.EP5101-x.enc-pos-scale [JOINT_0]ENCODER_SCALE
+setp lcec.m0.EL4034.aout-0-scale [JOINT_0]OUTPUT_SCALE
+
+# Signale verschalten
+net x-enable     joint.0.amp-enable-out   => pid.x.enable lcec.m0.EL4034.aout-0-enable
+net x-pos-cmd    joint.0.motor-pos-cmd    => pid.x.command
+net x-pos-fb     lcec.m0.EP5101-x.enc-pos => pid.x.feedback joint.0.motor-pos-fb
+net x-output     pid.x.output             => lcec.m0.EL4034.aout-0-value
+
+
+#########################################
+# Achse Y / Joint 1
+#########################################
+
+# PID Parameter aus INI laden
+setp pid.y.Pgain [JOINT_1]P
+setp pid.y.Igain [JOINT_1]I
+setp pid.y.Dgain [JOINT_1]D
+setp pid.y.FF0 [JOINT_1]FF0
+setp pid.y.FF1 [JOINT_1]FF1
+setp pid.y.FF2 [JOINT_1]FF2
+setp pid.y.deadband [JOINT_1]DEADBAND
+setp pid.y.maxoutput [JOINT_1]MAX_OUTPUT
+
+# Hardware Skalierungen aus INI laden
+setp lcec.m0.EP5101-y.enc-pos-scale [JOINT_1]ENCODER_SCALE
+setp lcec.m0.EL4034.aout-1-scale [JOINT_1]OUTPUT_SCALE
+
+# Signale verschalten
+net y-enable     joint.1.amp-enable-out   => pid.y.enable lcec.m0.EL4034.aout-1-enable
+net y-pos-cmd    joint.1.motor-pos-cmd    => pid.y.command
+net y-pos-fb     lcec.m0.EP5101-y.enc-pos => pid.y.feedback joint.1.motor-pos-fb
+net y-output     pid.y.output             => lcec.m0.EL4034.aout-1-value
+
+
+#########################################
+# Achse Z / Joint 2
+#########################################
+
+# PID Parameter aus INI laden
+setp pid.z.Pgain [JOINT_2]P
+setp pid.z.Igain [JOINT_2]I
+setp pid.z.Dgain [JOINT_2]D
+setp pid.z.FF0 [JOINT_2]FF0
+setp pid.z.FF1 [JOINT_2]FF1
+setp pid.z.FF2 [JOINT_2]FF2
+setp pid.z.deadband [JOINT_2]DEADBAND
+setp pid.z.maxoutput [JOINT_2]MAX_OUTPUT
+
+# Hardware Skalierungen aus INI laden
+setp lcec.m0.EP5101-z.enc-pos-scale [JOINT_2]ENCODER_SCALE
+setp lcec.m0.EL4034.aout-2-scale [JOINT_2]OUTPUT_SCALE
+
+# Signale verschalten
+net z-enable     joint.2.amp-enable-out   => pid.z.enable lcec.m0.EL4034.aout-2-enable
+net z-pos-cmd    joint.2.motor-pos-cmd    => pid.z.command
+net z-pos-fb     lcec.m0.EP5101-z.enc-pos => pid.z.feedback joint.2.motor-pos-fb
+net z-output     pid.z.output             => lcec.m0.EL4034.aout-2-value
+
+ 
+#########################################
+# Achse A / Joint 3 (CiA402 EtherCAT)
+#########################################
+
+setp cia402.0.csp-mode 1
+setp cia402.0.pos-scale 3600
+
+# Vom Servo (EtherCAT) zur CiA402-Komponente
+net a-statusword      lcec.m0.JMC01.srv-cia-statusword => cia402.0.statusword
+net a-opmode-display  lcec.m0.JMC01.srv-opmode-display => cia402.0.opmode-display
+net a-drv-act-pos     lcec.m0.JMC01.srv-actual-position => cia402.0.drv-actual-position
+net a-drv-act-velo    lcec.m0.JMC01.srv-actual-velocity => cia402.0.drv-actual-velocity
+
+# Von LinuxCNC (Motion) zur CiA402-Komponente (Joint 3)
+net a-home-index <= joint.3.index-enable   => cia402.0.home
+net a-enable     <= joint.3.amp-enable-out => cia402.0.enable
+net a-amp-fault  => joint.3.amp-fault-in   <= cia402.0.drv-fault
+net a-pos-cmd    <= joint.3.motor-pos-cmd  => cia402.0.pos-cmd
+net a-pos-fb     => joint.3.motor-pos-fb   <= cia402.0.pos-fb
+#net a-home           lcec.m0.JMC01.in-5   => joint.3.home-sw-in
+
+# Von der CiA402-Komponente zum Servo (EtherCAT)
+net a-controlword          cia402.0.controlword         => lcec.m0.JMC01.srv-cia-controlword
+net a-modes-of-operation   cia402.0.opmode              => lcec.m0.JMC01.srv-opmode
+net a-drv-target-pos       cia402.0.drv-target-position => lcec.m0.JMC01.srv-target-position
+net a-drv-target-velo      cia402.0.drv-target-velocity => lcec.m0.JMC01.srv-target-velocity

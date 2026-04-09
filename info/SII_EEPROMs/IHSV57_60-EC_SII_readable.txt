@@ -1,0 +1,491 @@
+parse_dclock_section: Warning counter differs from size
+First print preamble and config
+Preamble:
+PDI Control: ................ 0x3c00
+PDI Config: ................. 0x0000
+Sync Impulse Length: ........ 1000 ns (raw: 0x0064)
+PDI Config 2: ............... 0x0000
+Configured Station Alias: ... 0x0000
+Checksum of Preamble: ....... 0x0091 (ok)
+Identity:
+  Vendor ID: ................ 0x66668888
+  Product ID: ............... 0x2019a301
+  Revision ID: .............. 0x20191105
+  Serial Number: ............ 0x00000000
+
+Default mailbox settings:
+  Bootstrap Mailbox:
+  Received Mailbox Offset: .. 0x0000
+  Received Mailbox Size: .... 0
+  Send Mailbox Offset: ...... 0x0000
+  Send Mailbox Size: ........ 0
+  Mailbox Settings:
+  Received Mailbox Offset: .. 0x1000
+  Received Mailbox Size: .... 128
+  Send Mailbox Offset: ...... 0x1200
+  Send Mailbox Size: ........ 256
+
+Supported Mailboxes:
+  CoE ....................... True
+  EoE ....................... False
+  FoE ....................... False
+  SoE ....................... False
+  VoE ....................... False
+
+EEPROM size: ................ 2048 bytes
+Version: .................... 1
+
+Print Categorie: Strings (0xa)
+  Size: 578 Bytes with 36 strings
+  ID   Size (Bytes)    String
+    1: ( 12) ......... 'IHSV57/60-EC'
+    2: ( 10) ......... 'IHSV Slave'
+    3: ( 11) ......... 'IHSV Slaves'
+    4: (  2) ......... 'DC'
+    5: (  8) ......... 'Synchron'
+    6: ( 12) ......... 'TxPdoMapping'
+    7: (  9) ......... 'errorcode'
+    8: ( 10) ......... 'statusword'
+    9: ( 15) ......... 'op_mode_display'
+   10: ( 15) ......... 'actual_position'
+   11: ( 18) ......... 'Touch_probe_status'
+   12: ( 26) ......... 'Touch_probe_pos1_pos_value'
+   13: ( 26) ......... 'Touch_probe_pos1_neg_value'
+   14: ( 26) ......... 'Touch_probe_pos2_pos_value'
+   15: ( 26) ......... 'Touch_probe_pos2_neg_value'
+   16: ( 13) ......... 'digtal_inputs'
+   17: ( 15) ......... 'actual_velocity'
+   18: ( 17) ......... 'follow_err_actual'
+   19: ( 19) ......... 'Torque_actual_value'
+   20: ( 12) ......... 'RxPdoMapping'
+   21: ( 11) ......... 'controlword'
+   22: (  7) ......... 'op_mode'
+   23: ( 15) ......... 'target_position'
+   24: ( 20) ......... 'Touch_probe_function'
+   25: ( 16) ......... 'physical_outputs'
+   26: (  8) ......... 'bit_mask'
+   27: ( 15) ......... 'targrt_velocity'
+   28: ( 13) ......... 'target_torque'
+   29: ( 16) ......... 'profile_velocity'
+   30: ( 20) ......... 'profile_acceleration'
+   31: ( 20) ......... 'profile_deceleration'
+   32: ( 11) ......... 'home_offset'
+   33: ( 11) ......... 'home_method'
+   34: ( 20) ......... 'home_switch_velocity'
+   35: ( 18) ......... 'home_zero_velocity'
+   36: ( 17) ......... 'home_acceleration'
+
+Print Categorie: General (0x1e)
+  Size: 32 Bytes
+  Vendor Specific (Index of String)
+    Name  Index: 1: ............. IHSV57/60-EC
+    Group Index: 2: ............. IHSV Slave
+    Image Index: 0: ............. not set
+    Order Index: 1: ............. IHSV57/60-EC
+
+  CoE Details:
+    Enable SDO: .................. yes
+    Enable SDO Info: ............. yes
+    Enable PDO Assign: ........... yes
+    Enable PDO Configuration: .... yes
+    Enable Upload at Startup: .... no
+    Enable SDO complete access: .. yes
+  FoE Details: ................... not enabled
+  EoE Details: ................... not enabled
+
+  Flag SafeOp: ................... not enabled
+  Flag notLRW: ................... not enabled
+  Flag MBox Data Link Layer ...... enabled
+  Flag Ident AL Status ........... not enabled
+  Flag Ident Physical Memory ..... not enabled
+
+  CurrentOnEBus: ................. 0 mA
+  Physical Ports:
+     Port 0: ..................... MII
+     Port 1: ..................... MII
+     Port 2: ..................... not used
+     Port 3: ..................... not used
+
+  Physical Memory Address ........ 0x0000
+
+Print Categorie: FMMU (0x28)
+  Size: 4 Bytes
+  Number of FMMUs: 4
+    FMMU0: used for Outputs
+    FMMU1: used for Inputs
+    FMMU2: used for SyncM mailbox status (MBoxStat)
+    FMMU3: not used
+
+Print Categorie: SyncManager (0x29)
+  Size: 32 Bytes
+  Number of SyncManager: 4
+  SyncManager SM0
+    Physical Startaddress: ... 0x1000
+    Length: .................. 128
+    Control Register: ........ 0x26
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Mailbox Out
+  SyncManager SM1
+    Physical Startaddress: ... 0x1200
+    Length: .................. 256
+    Control Register: ........ 0x22
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Mailbox In
+  SyncManager SM2
+    Physical Startaddress: ... 0x1400
+    Length: .................. 0
+    Control Register: ........ 0x64
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Process Data Out
+  SyncManager SM3
+    Physical Startaddress: ... 0x1600
+    Length: .................. 0
+    Control Register: ........ 0x20
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Process Data In
+
+Print Categorie: TX PDO (0x32)
+  Size: 152 Bytes
+  TxPDO:
+    PDO Index: .................. 0x1a00
+    Entries: .................... 10
+    SyncM: ...................... 3
+    Synchronization: ............ 0x00
+    Name Index: ................. 6
+    Flags ....................... 0x0001
+                                  PDO is Mandatory
+
+      Entry 0:
+      Entry Index: .............. 0x603f
+      Subindex: ................. 0x00
+      String Index: ............. 7 (errorcode)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 1:
+      Entry Index: .............. 0x6041
+      Subindex: ................. 0x00
+      String Index: ............. 8 (statusword)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 2:
+      Entry Index: .............. 0x6061
+      Subindex: ................. 0x00
+      String Index: ............. 9 (op_mode_display)
+      Data Type: ................ 0x02 (Index in CoE Object Dictionary)
+      Bitlength: ................ 8
+
+      Entry 3:
+      Entry Index: .............. 0x6064
+      Subindex: ................. 0x00
+      String Index: ............. 10 (actual_position)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 4:
+      Entry Index: .............. 0x60b9
+      Subindex: ................. 0x00
+      String Index: ............. 11 (Touch_probe_status)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 5:
+      Entry Index: .............. 0x60ba
+      Subindex: ................. 0x00
+      String Index: ............. 12 (Touch_probe_pos1_pos_value)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 6:
+      Entry Index: .............. 0x60bb
+      Subindex: ................. 0x00
+      String Index: ............. 13 (Touch_probe_pos1_neg_value)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 7:
+      Entry Index: .............. 0x60bc
+      Subindex: ................. 0x00
+      String Index: ............. 14 (Touch_probe_pos2_pos_value)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 8:
+      Entry Index: .............. 0x60bd
+      Subindex: ................. 0x00
+      String Index: ............. 15 (Touch_probe_pos2_neg_value)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 9:
+      Entry Index: .............. 0x60fd
+      Subindex: ................. 0x00
+      String Index: ............. 16 (digtal_inputs)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 10:
+      Entry Index: .............. 0x1a01
+      Subindex: ................. 0x03
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 6
+
+      Entry 11:
+      Entry Index: .............. 0x6061
+      Subindex: ................. 0x00
+      String Index: ............. 9 (op_mode_display)
+      Data Type: ................ 0x02 (Index in CoE Object Dictionary)
+      Bitlength: ................ 8
+
+      Entry 12:
+      Entry Index: .............. 0x606c
+      Subindex: ................. 0x00
+      String Index: ............. 17 (actual_velocity)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 13:
+      Entry Index: .............. 0x60f4
+      Subindex: ................. 0x00
+      String Index: ............. 18 (follow_err_actual)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 14:
+      Entry Index: .............. 0x1a02
+      Subindex: ................. 0x02
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 6
+
+      Entry 15:
+      Entry Index: .............. 0x603f
+      Subindex: ................. 0x00
+      String Index: ............. 7 (errorcode)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 16:
+      Entry Index: .............. 0x6077
+      Subindex: ................. 0x00
+      String Index: ............. 19 (Torque_actual_value)
+      Data Type: ................ 0x03 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 17:
+      Entry Index: .............. 0x1a03
+      Subindex: ................. 0x00
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 6
+
+Print Categorie: RX PDO (0x33)
+  Size: 216 Bytes
+  RxPDO:
+    PDO Index: .................. 0x1600
+    Entries: .................... 6
+    SyncM: ...................... 2
+    Synchronization: ............ 0x00
+    Name Index: ................. 20
+    Flags ....................... 0x0001
+                                  PDO is Mandatory
+
+      Entry 0:
+      Entry Index: .............. 0x6040
+      Subindex: ................. 0x00
+      String Index: ............. 21 (controlword)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 1:
+      Entry Index: .............. 0x6060
+      Subindex: ................. 0x00
+      String Index: ............. 22 (op_mode)
+      Data Type: ................ 0x02 (Index in CoE Object Dictionary)
+      Bitlength: ................ 8
+
+      Entry 2:
+      Entry Index: .............. 0x607a
+      Subindex: ................. 0x00
+      String Index: ............. 23 (target_position)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 3:
+      Entry Index: .............. 0x60b8
+      Subindex: ................. 0x00
+      String Index: ............. 24 (Touch_probe_function)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 4:
+      Entry Index: .............. 0x60fe
+      Subindex: ................. 0x01
+      String Index: ............. 25 (physical_outputs)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 5:
+      Entry Index: .............. 0x60fe
+      Subindex: ................. 0x02
+      String Index: ............. 26 (bit_mask)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 6:
+      Entry Index: .............. 0x1601
+      Subindex: ................. 0x06
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 20
+
+      Entry 7:
+      Entry Index: .............. 0x6040
+      Subindex: ................. 0x00
+      String Index: ............. 21 (controlword)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 8:
+      Entry Index: .............. 0x6060
+      Subindex: ................. 0x00
+      String Index: ............. 22 (op_mode)
+      Data Type: ................ 0x02 (Index in CoE Object Dictionary)
+      Bitlength: ................ 8
+
+      Entry 9:
+      Entry Index: .............. 0x60ff
+      Subindex: ................. 0x00
+      String Index: ............. 27 (targrt_velocity)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 10:
+      Entry Index: .............. 0x60b8
+      Subindex: ................. 0x00
+      String Index: ............. 24 (Touch_probe_function)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 11:
+      Entry Index: .............. 0x60fe
+      Subindex: ................. 0x01
+      String Index: ............. 25 (physical_outputs)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 12:
+      Entry Index: .............. 0x60fe
+      Subindex: ................. 0x02
+      String Index: ............. 26 (bit_mask)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 13:
+      Entry Index: .............. 0x1602
+      Subindex: ................. 0x06
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 20
+
+      Entry 14:
+      Entry Index: .............. 0x6071
+      Subindex: ................. 0x00
+      String Index: ............. 28 (target_torque)
+      Data Type: ................ 0x03 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 15:
+      Entry Index: .............. 0x6081
+      Subindex: ................. 0x00
+      String Index: ............. 29 (profile_velocity)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 16:
+      Entry Index: .............. 0x6083
+      Subindex: ................. 0x00
+      String Index: ............. 30 (profile_acceleration)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 17:
+      Entry Index: .............. 0x6084
+      Subindex: ................. 0x00
+      String Index: ............. 31 (profile_deceleration)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 18:
+      Entry Index: .............. 0x60fe
+      Subindex: ................. 0x01
+      String Index: ............. 25 (physical_outputs)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 19:
+      Entry Index: .............. 0x60fe
+      Subindex: ................. 0x02
+      String Index: ............. 26 (bit_mask)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 20:
+      Entry Index: .............. 0x1603
+      Subindex: ................. 0x05
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 20
+
+      Entry 21:
+      Entry Index: .............. 0x607c
+      Subindex: ................. 0x00
+      String Index: ............. 32 (home_offset)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 22:
+      Entry Index: .............. 0x6098
+      Subindex: ................. 0x00
+      String Index: ............. 33 (home_method)
+      Data Type: ................ 0x02 (Index in CoE Object Dictionary)
+      Bitlength: ................ 8
+
+      Entry 23:
+      Entry Index: .............. 0x6099
+      Subindex: ................. 0x01
+      String Index: ............. 34 (home_switch_velocity)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 24:
+      Entry Index: .............. 0x6099
+      Subindex: ................. 0x02
+      String Index: ............. 35 (home_zero_velocity)
+      Data Type: ................ 0x04 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 25:
+      Entry Index: .............. 0x609a
+      Subindex: ................. 0x00
+      String Index: ............. 36 (home_acceleration)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+Print Categorie: DC CLOCK (0x3c)
+Size: 48 Bytes
+  Cycle Time 0 .................. 0
+  Shift Time 0 .................. 0
+  Shift Time 1 .................. 0
+  Sync1 Cycle Factor ............ 0
+  Assign Activate ............... 768
+  Sync0 Cylce Factor ............ 1
+  Name Index .................... 4 (DC)
+  Description Index ............. 0 ((null))
+

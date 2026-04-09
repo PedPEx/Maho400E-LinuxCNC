@@ -1,0 +1,6 @@
+<masters>
+	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="1000" name="m0">
+      <slave idx="0" type="EP2316" name="EP2316"/>
+  </master>
+</masters>
+ 

@@ -1,0 +1,116 @@
+First print preamble and config
+Preamble:
+PDI Control: ................ 0x0006
+PDI Config: ................. 0x0c00
+Sync Impulse Length: ........ 10000 ns (raw: 0x03e8)
+PDI Config 2: ............... 0x0000
+Configured Station Alias: ... 0x0000
+Checksum of Preamble: ....... 0x00cf (ok)
+Identity:
+  Vendor ID: ................ 0x0000001d
+  Product ID: ............... 0x007b1a95
+  Revision ID: .............. 0x00000024
+  Serial Number: ............ 0xf0835c53
+
+Default mailbox settings:
+  Bootstrap Mailbox:
+  Received Mailbox Offset: .. 0x1200
+  Received Mailbox Size: .... 512
+  Send Mailbox Offset: ...... 0x1400
+  Send Mailbox Size: ........ 512
+  Mailbox Settings:
+  Received Mailbox Offset: .. 0x1200
+  Received Mailbox Size: .... 512
+  Send Mailbox Offset: ...... 0x1400
+  Send Mailbox Size: ........ 512
+
+Supported Mailboxes:
+  CoE ....................... True
+  EoE ....................... True
+  FoE ....................... True
+  SoE ....................... False
+  VoE ....................... False
+
+EEPROM size: ................ 4096 bytes
+Version: .................... 1
+
+Print Categorie: Strings (0xa)
+  Size: 40 Bytes with 3 strings
+  ID   Size (Bytes)    String
+    1: (  9) ......... 'FestoCMMT'
+    2: ( 13) ......... 'CMMT-AS-MP-S1'
+    3: ( 13) ......... 'CMMT-AS-MP-S1'
+
+Print Categorie: General (0x1e)
+  Size: 32 Bytes
+  Vendor Specific (Index of String)
+    Name  Index: 2: ............. CMMT-AS-MP-S1
+    Group Index: 1: ............. FestoCMMT
+    Image Index: 0: ............. not set
+    Order Index: 3: ............. CMMT-AS-MP-S1
+
+  CoE Details:
+    Enable SDO: .................. yes
+    Enable SDO Info: ............. yes
+    Enable PDO Assign: ........... yes
+    Enable PDO Configuration: .... yes
+    Enable Upload at Startup: .... no
+    Enable SDO complete access: .. yes
+  FoE Details: ................... enabled
+  EoE Details: ................... enabled
+
+  Flag SafeOp: ................... not enabled
+  Flag notLRW: ................... not enabled
+  Flag MBox Data Link Layer ...... enabled
+  Flag Ident AL Status ........... not enabled
+  Flag Ident Physical Memory ..... not enabled
+
+  CurrentOnEBus: ................. 0 mA
+  Physical Ports:
+     Port 0: ..................... MII
+     Port 1: ..................... MII
+     Port 2: ..................... not used
+     Port 3: ..................... not used
+
+  Physical Memory Address ........ 0x0000
+
+Print Categorie: FMMU (0x28)
+  Size: 4 Bytes
+  Number of FMMUs: 4
+    FMMU0: used for Outputs
+    FMMU1: used for Inputs
+    FMMU2: used for SyncM mailbox status (MBoxStat)
+    FMMU3: not used
+
+Print Categorie: SyncManager (0x29)
+  Size: 32 Bytes
+  Number of SyncManager: 4
+  SyncManager SM0
+    Physical Startaddress: ... 0x1200
+    Length: .................. 512
+    Control Register: ........ 0x26
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Mailbox Out
+  SyncManager SM1
+    Physical Startaddress: ... 0x1400
+    Length: .................. 512
+    Control Register: ........ 0x22
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Mailbox In
+  SyncManager SM2
+    Physical Startaddress: ... 0x1000
+    Length: .................. 24
+    Control Register: ........ 0x64
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Process Data Out
+  SyncManager SM3
+    Physical Startaddress: ... 0x1100
+    Length: .................. 14
+    Control Register: ........ 0x20
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Process Data In
+

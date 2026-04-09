@@ -1,0 +1,609 @@
+parse_dclock_section: Warning counter differs from size
+First print preamble and config
+Preamble:
+PDI Control: ................ 0x0e05
+PDI Config: ................. 0x0e03
+Sync Impulse Length: ........ 0 ns (raw: 0x0000)
+PDI Config 2: ............... 0x0000
+Configured Station Alias: ... 0x0000
+Checksum of Preamble: ....... 0x00d8 (ok)
+Identity:
+  Vendor ID: ................ 0x00000002
+  Product ID: ............... 0x13ed4052
+  Revision ID: .............. 0x0013000b
+  Serial Number: ............ 0x00000000
+
+Default mailbox settings:
+  Bootstrap Mailbox:
+  Received Mailbox Offset: .. 0x1000
+  Received Mailbox Size: .... 244
+  Send Mailbox Offset: ...... 0x10f4
+  Send Mailbox Size: ........ 244
+  Mailbox Settings:
+  Received Mailbox Offset: .. 0x1000
+  Received Mailbox Size: .... 128
+  Send Mailbox Offset: ...... 0x1080
+  Send Mailbox Size: ........ 128
+
+Supported Mailboxes:
+  CoE ....................... True
+  EoE ....................... False
+  FoE ....................... True
+  SoE ....................... False
+  VoE ....................... False
+
+EEPROM size: ................ 2048 bytes
+Version: .................... 1
+
+Print Categorie: Strings (0xa)
+  Size: 872 Bytes with 42 strings
+  ID   Size (Bytes)    String
+    1: ( 11) ......... 'EP5101-0011'
+    2: ( 17) ......... 'FieldbusBoxEP5xxx'
+    3: ( 30) ......... 'EtherCAT Feldbusboxen (EP5xxx)'
+    4: ( 40) ......... 'EP5101-0011 1K. Inc. Encoder 5V, D-SUB15'
+    5: (  8) ......... 'Synchron'
+    6: (  2) ......... 'DC'
+    7: (  4) ......... 'DCIN'
+    8: ( 18) ......... 'ENC Status compact'
+    9: ( 21) ......... 'Status__Latch C valid'
+   10: ( 26) ......... 'Status__Latch extern valid'
+   11: ( 24) ......... 'Status__Set counter done'
+   12: ( 25) ......... 'Status__Counter underflow'
+   13: ( 24) ......... 'Status__Counter overflow'
+   14: ( 30) ......... 'Status__Status of input status'
+   15: ( 20) ......... 'Status__Open circuit'
+   16: ( 27) ......... 'Status__Extrapolation stall'
+   17: ( 25) ......... 'Status__Status of input A'
+   18: ( 25) ......... 'Status__Status of input B'
+   19: ( 25) ......... 'Status__Status of input C'
+   20: ( 28) ......... 'Status__Status of input gate'
+   21: ( 30) ......... 'Status__Status of extern latch'
+   22: ( 18) ......... 'Status__Sync error'
+   23: ( 19) ......... 'Status__TxPDO State'
+   24: ( 20) ......... 'Status__TxPDO Toggle'
+   25: ( 13) ......... 'Counter value'
+   26: ( 11) ......... 'Latch value'
+   27: ( 10) ......... 'ENC Status'
+   28: ( 13) ......... 'ENC Frequency'
+   29: ( 15) ......... 'Frequency value'
+   30: ( 10) ......... 'ENC Period'
+   31: ( 12) ......... 'Period value'
+   32: ( 11) ......... 'ENC Timest.'
+   33: (  9) ......... 'Timestamp'
+   34: ( 19) ......... 'ENC Timest. compact'
+   35: ( 19) ......... 'ENC Control compact'
+   36: ( 23) ......... 'Control__Enable latch C'
+   37: ( 45) ......... 'Control__Enable latch extern on positive edge'
+   38: ( 20) ......... 'Control__Set counter'
+   39: ( 45) ......... 'Control__Enable latch extern on negative edge'
+   40: (  9) ......... 'Control__'
+   41: ( 17) ......... 'Set counter value'
+   42: ( 11) ......... 'ENC Control'
+
+Print Categorie: General (0x1e)
+  Size: 32 Bytes
+  Vendor Specific (Index of String)
+    Name  Index: 4: ............. EP5101-0011 1K. Inc. Encoder 5V, D-SUB15
+    Group Index: 2: ............. FieldbusBoxEP5xxx
+    Image Index: 0: ............. not set
+    Order Index: 1: ............. EP5101-0011
+
+  CoE Details:
+    Enable SDO: .................. yes
+    Enable SDO Info: ............. yes
+    Enable PDO Assign: ........... yes
+    Enable PDO Configuration: .... no
+    Enable Upload at Startup: .... no
+    Enable SDO complete access: .. no
+  FoE Details: ................... enabled
+  EoE Details: ................... not enabled
+
+  Flag SafeOp: ................... not enabled
+  Flag notLRW: ................... not enabled
+  Flag MBox Data Link Layer ...... enabled
+  Flag Ident AL Status ........... not enabled
+  Flag Ident Physical Memory ..... not enabled
+
+  CurrentOnEBus: ................. 0 mA
+  Physical Ports:
+     Port 0: ..................... MII
+     Port 1: ..................... MII
+     Port 2: ..................... not used
+     Port 3: ..................... not used
+
+  Physical Memory Address ........ 0x0000
+
+Print Categorie: FMMU (0x28)
+  Size: 4 Bytes
+  Number of FMMUs: 4
+    FMMU0: used for Outputs
+    FMMU1: used for Inputs
+    FMMU2: used for SyncM mailbox status (MBoxStat)
+    FMMU3: not used
+
+Print Categorie: SyncManager (0x29)
+  Size: 32 Bytes
+  Number of SyncManager: 4
+  SyncManager SM0
+    Physical Startaddress: ... 0x1000
+    Length: .................. 128
+    Control Register: ........ 0x26
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Mailbox Out
+  SyncManager SM1
+    Physical Startaddress: ... 0x1080
+    Length: .................. 128
+    Control Register: ........ 0x22
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Mailbox In
+  SyncManager SM2
+    Physical Startaddress: ... 0x1100
+    Length: .................. 4
+    Control Register: ........ 0x24
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Process Data Out
+  SyncManager SM3
+    Physical Startaddress: ... 0x1180
+    Length: .................. 6
+    Control Register: ........ 0x20
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x01
+    SM Type: ................. Process Data In
+
+Print Categorie: TX PDO (0x32)
+  Size: 368 Bytes
+  TxPDO:
+    PDO Index: .................. 0x1a00
+    Entries: .................... 18
+    SyncM: ...................... 3
+    Synchronization: ............ 0x00
+    Name Index: ................. 8
+    Flags ....................... 0x0010
+                                  PDO is Fixed
+
+      Entry 0:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x01
+      String Index: ............. 9 (Status__Latch C valid)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 1:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x02
+      String Index: ............. 10 (Status__Latch extern valid)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 2:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x03
+      String Index: ............. 11 (Status__Set counter done)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 3:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x04
+      String Index: ............. 12 (Status__Counter underflow)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 4:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x05
+      String Index: ............. 13 (Status__Counter overflow)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 5:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x06
+      String Index: ............. 14 (Status__Status of input status)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 6:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x07
+      String Index: ............. 15 (Status__Open circuit)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 7:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x08
+      String Index: ............. 16 (Status__Extrapolation stall)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 8:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x09
+      String Index: ............. 17 (Status__Status of input A)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 9:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x0a
+      String Index: ............. 18 (Status__Status of input B)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 10:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x0b
+      String Index: ............. 19 (Status__Status of input C)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 11:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x0c
+      String Index: ............. 20 (Status__Status of input gate)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 12:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x0d
+      String Index: ............. 21 (Status__Status of extern latch)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 13:
+      Entry Index: .............. 0x1c32
+      Subindex: ................. 0x20
+      String Index: ............. 22 (Status__Sync error)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 14:
+      Entry Index: .............. 0x1800
+      Subindex: ................. 0x07
+      String Index: ............. 23 (Status__TxPDO State)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 15:
+      Entry Index: .............. 0x1800
+      Subindex: ................. 0x09
+      String Index: ............. 24 (Status__TxPDO Toggle)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 16:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x11
+      String Index: ............. 25 (Counter value)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 17:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x12
+      String Index: ............. 26 (Latch value)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 18:
+      Entry Index: .............. 0x1a01
+      Subindex: ................. 0x12
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 27
+
+      Entry 19:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x01
+      String Index: ............. 9 (Status__Latch C valid)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 20:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x02
+      String Index: ............. 10 (Status__Latch extern valid)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 21:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x03
+      String Index: ............. 11 (Status__Set counter done)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 22:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x04
+      String Index: ............. 12 (Status__Counter underflow)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 23:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x05
+      String Index: ............. 13 (Status__Counter overflow)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 24:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x06
+      String Index: ............. 14 (Status__Status of input status)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 25:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x07
+      String Index: ............. 15 (Status__Open circuit)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 26:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x08
+      String Index: ............. 16 (Status__Extrapolation stall)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 27:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x09
+      String Index: ............. 17 (Status__Status of input A)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 28:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x0a
+      String Index: ............. 18 (Status__Status of input B)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 29:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x0b
+      String Index: ............. 19 (Status__Status of input C)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 30:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x0c
+      String Index: ............. 20 (Status__Status of input gate)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 31:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x0d
+      String Index: ............. 21 (Status__Status of extern latch)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 32:
+      Entry Index: .............. 0x1c32
+      Subindex: ................. 0x20
+      String Index: ............. 22 (Status__Sync error)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 33:
+      Entry Index: .............. 0x1801
+      Subindex: ................. 0x07
+      String Index: ............. 23 (Status__TxPDO State)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 34:
+      Entry Index: .............. 0x1801
+      Subindex: ................. 0x09
+      String Index: ............. 24 (Status__TxPDO Toggle)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 35:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x11
+      String Index: ............. 25 (Counter value)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 36:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x12
+      String Index: ............. 26 (Latch value)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 37:
+      Entry Index: .............. 0x1a02
+      Subindex: ................. 0x01
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 28
+
+      Entry 38:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x13
+      String Index: ............. 29 (Frequency value)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 39:
+      Entry Index: .............. 0x1a03
+      Subindex: ................. 0x01
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 30
+
+      Entry 40:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x14
+      String Index: ............. 31 (Period value)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 41:
+      Entry Index: .............. 0x1a04
+      Subindex: ................. 0x01
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+      Entry 42:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x16
+      String Index: ............. 33 (Timestamp)
+      Data Type: ................ 0x1b (Index in CoE Object Dictionary)
+      Bitlength: ................ 64
+
+      Entry 43:
+      Entry Index: .............. 0x1a05
+      Subindex: ................. 0x01
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 34
+
+      Entry 44:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x16
+      String Index: ............. 33 (Timestamp)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+Print Categorie: RX PDO (0x33)
+  Size: 128 Bytes
+  RxPDO:
+    PDO Index: .................. 0x1600
+    Entries: .................... 7
+    SyncM: ...................... 2
+    Synchronization: ............ 0x00
+    Name Index: ................. 35
+    Flags ....................... 0x0010
+                                  PDO is Fixed
+
+      Entry 0:
+      Entry Index: .............. 0x7000
+      Subindex: ................. 0x01
+      String Index: ............. 36 (Control__Enable latch C)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 1:
+      Entry Index: .............. 0x7000
+      Subindex: ................. 0x02
+      String Index: ............. 37 (Control__Enable latch extern on positive edge)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 2:
+      Entry Index: .............. 0x7000
+      Subindex: ................. 0x03
+      String Index: ............. 38 (Control__Set counter)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 3:
+      Entry Index: .............. 0x7000
+      Subindex: ................. 0x04
+      String Index: ............. 39 (Control__Enable latch extern on negative edge)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 4:
+      Entry Index: .............. 0x0000
+      Subindex: ................. 0x00
+      String Index: ............. 40 (Control__)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 4
+
+      Entry 5:
+      Entry Index: .............. 0x0000
+      Subindex: ................. 0x00
+      String Index: ............. 40 (Control__)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 8
+
+      Entry 6:
+      Entry Index: .............. 0x7000
+      Subindex: ................. 0x11
+      String Index: ............. 41 (Set counter value)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+
+      Entry 7:
+      Entry Index: .............. 0x1601
+      Subindex: ................. 0x07
+      String Index: ............. 255 (not set)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 42
+
+      Entry 8:
+      Entry Index: .............. 0x7000
+      Subindex: ................. 0x01
+      String Index: ............. 36 (Control__Enable latch C)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 9:
+      Entry Index: .............. 0x7000
+      Subindex: ................. 0x02
+      String Index: ............. 37 (Control__Enable latch extern on positive edge)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 10:
+      Entry Index: .............. 0x7000
+      Subindex: ................. 0x03
+      String Index: ............. 38 (Control__Set counter)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 11:
+      Entry Index: .............. 0x7000
+      Subindex: ................. 0x04
+      String Index: ............. 39 (Control__Enable latch extern on negative edge)
+      Data Type: ................ 0x01 (Index in CoE Object Dictionary)
+      Bitlength: ................ 1
+
+      Entry 12:
+      Entry Index: .............. 0x0000
+      Subindex: ................. 0x00
+      String Index: ............. 40 (Control__)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 4
+
+      Entry 13:
+      Entry Index: .............. 0x0000
+      Subindex: ................. 0x00
+      String Index: ............. 40 (Control__)
+      Data Type: ................ 0x00 (Index in CoE Object Dictionary)
+      Bitlength: ................ 8
+
+      Entry 14:
+      Entry Index: .............. 0x7000
+      Subindex: ................. 0x11
+      String Index: ............. 41 (Set counter value)
+      Data Type: ................ 0x07 (Index in CoE Object Dictionary)
+      Bitlength: ................ 32
+
+Print Categorie: DC CLOCK (0x3c)
+Size: 72 Bytes
+  Cycle Time 0 .................. 0
+  Shift Time 0 .................. 0
+  Shift Time 1 .................. 0
+  Sync1 Cycle Factor ............ 0
+  Assign Activate ............... 0
+  Sync0 Cylce Factor ............ 0
+  Name Index .................... 5 (Synchron)
+  Description Index ............. 0 ((null))
+

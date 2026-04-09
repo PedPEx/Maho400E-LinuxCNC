@@ -1,0 +1,170 @@
+<masters>
+	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="1000" name="m0">
+	<!-- Beckhoff IO modules -->
+		<!-- <slave idx="0" type="EK1101" name="0501_EK1101"/> -->
+		<slave idx="0" type="generic" vid="0x00000002" pid="0x044d2c52" configPdos="true" name="0501_EK1101">
+			<syncManager idx="0" dir="in">
+				<pdo idx="1a00">
+					<pdoEntry idx="6000" subIdx="01" bitLen="16" halPin="coupler-ID" halType="u32"/>
+				</pdo>
+			</syncManager>
+		</slave>
+    	<!-- SSI Encoder on EL5002 -->
+		<slave idx="1" type="EL5002" name="2001_EL5002">
+			<!-- <modParam name="ch0DisFrameErr" value="true"/> -->
+			<!-- <modParam name="ch0EnPwrFailChk" value="true"/> -->
+			<!-- <modParam name="ch0EnInhibitTime" value="true"/> -->
+			<modParam name="ch0Coding" value="1"/>
+			<modParam name="ch0Baudrate" value="2"/>
+			<modParam name="ch0ClkJitComp" value="1"/>
+			<modParam name="ch0FrameType" value="0"/>
+			<modParam name="ch0FrameSize" value="25"/>
+			<modParam name="ch0DataLen" value="25"/>
+			<!-- <modParam name="ch0MinInhibitTime" value="0"/> -->
+			<!-- <modParam name="ch0NoClkBursts" value="0"/> -->
+			<!-- <modParam name="ch1DisFrameErr" value="true"/> -->
+			<!-- <modParam name="ch1EnPwrFailChk" value="true"/> -->
+			<!-- <modParam name="ch1EnInhibitTime" value="true"/> -->
+			<!-- <modParam name="ch1Coding" value="0"/> -->
+			<!-- <modParam name="ch1Baudrate" value="0"/> -->
+			<!-- <modParam name="ch1ClkJitComp" value="0"/> -->
+			<!-- <modParam name="ch1FrameType" value="0"/> -->
+			<!-- <modParam name="ch1FrameSize" value="0"/> -->
+			<!-- <modParam name="ch1DataLen" value="0"/> -->
+			<!-- <modParam name="ch1MinInhibitTime" value="0"/> -->
+			<!-- <modParam name="ch1NoClkBursts" value="0"/> -->
+		</slave>
+    	<!-- 32 Inputs, 10 µs (DB37) -->
+		<slave idx="2" type="EL1819" name="0511_EL1819"/>
+		<slave idx="3" type="EL1819" name="0512_EL1819"/>
+    	<!-- 32 Outputs, 0.5 A (DB37) -->
+		<slave idx="4" type="EL2809" name="0521_EL2809"/>
+		<slave idx="5" type="EL2809" name="0522_EL2809"/>
+    	<!-- 4 Axis driver -->
+		<slave idx="6" type="EL4034" name="0531_EL4034"/>
+	<!-- EP5101 - Incr. Encoder Input -->
+		<slave idx="7" type="generic" vid="0x00000002" pid="0x13ED4052" name="EP5101" configPdos="true">
+		<!----><initCmds filename="endian_InitCMDs_EP5101.xml"/>		      
+		      <sdoConfig idx="1C12" subIdx="complete">
+		        <sdoDataRaw data="01000116" />
+		      </sdoConfig>
+		      <sdoConfig idx="1C13" subIdx="complete">
+		        <sdoDataRaw data="0100011A" />
+		      </sdoConfig>
+
+<syncManager idx="0" dir="in"/>
+            <syncManager idx="1" dir="out"/>
+            <syncManager idx="2" dir="out">
+                <!-- ENC RxPDO-Map Control -->
+                <pdo idx="1601">
+                    <!-- Enable latch C -->
+                    <pdoEntry idx="7000" subIdx="01" bitLen="1" halPin="enable-latch-C" halType="bit"/>
+                    <!-- Enable latch extern on positive edge -->
+                    <pdoEntry idx="7000" subIdx="02" bitLen="1" halPin="ena-latch-ext-on-pos_edge" halType="bit"/>
+                    <!-- Set counter -->
+                    <pdoEntry idx="7000" subIdx="03" bitLen="1" halPin="set-counter" halType="bit"/>
+                    <!-- Enable latch extern on negative edge -->
+                    <pdoEntry idx="7000" subIdx="04" bitLen="1" halPin="ena-latch-ext-on-neg_edge" halType="bit"/>
+                    <!-- Set counter value -->
+                    <pdoEntry idx="7000" subIdx="11" bitLen="32" halPin="set-counter_value" halType="u32"/>
+                </pdo>
+            </syncManager>
+            <syncManager idx="3" dir="in">
+                <!-- ENC TxPDO-Map Status -->
+                <pdo idx="1a01">
+                    <!-- Latch C valid -->
+                    <pdoEntry idx="6000" subIdx="01" bitLen="1" halPin="latch-c-valid" halType="bit"/>
+                    <!-- Latch extern valid -->
+                    <pdoEntry idx="6000" subIdx="02" bitLen="1" halPin="latch-extern-valid" halType="bit"/>
+                    <!-- Set counter done -->
+                    <pdoEntry idx="6000" subIdx="03" bitLen="1" halPin="set-counter-done" halType="bit"/>
+                    <!-- Counter underflow -->
+                    <pdoEntry idx="6000" subIdx="04" bitLen="1" halPin="counter-underflow" halType="bit"/>
+                    <!-- Counter overflow -->
+                    <pdoEntry idx="6000" subIdx="05" bitLen="1" halPin="counter-overflow" halType="bit"/>
+                    <!-- Status of input status -->
+                    <pdoEntry idx="6000" subIdx="06" bitLen="1" halPin="status-of-input-status" halType="bit"/>
+                    <!-- Open circuit -->
+                    <pdoEntry idx="6000" subIdx="07" bitLen="1" halPin="open-circuit" halType="bit"/>
+                    <!-- Extrapolation stall -->
+                    <pdoEntry idx="6000" subIdx="08" bitLen="1" halPin="extrapolation-stall" halType="bit"/>
+                    <!-- Status of input A -->
+                    <pdoEntry idx="6000" subIdx="09" bitLen="1" halPin="status-A" halType="bit"/>
+                    <!-- Status of input B -->
+                    <pdoEntry idx="6000" subIdx="0a" bitLen="1" halPin="status-B" halType="bit"/>
+                    <!-- Status of input C -->
+                    <pdoEntry idx="6000" subIdx="0b" bitLen="1" halPin="status-C" halType="bit"/>
+                    <!-- Status of input gate -->
+                    <pdoEntry idx="6000" subIdx="0c" bitLen="1" halPin="status-gate" halType="bit"/>
+                    <!-- Status of extern latch -->
+                    <pdoEntry idx="6000" subIdx="0d" bitLen="1" halPin="status-ext_latch" halType="bit"/>
+                    <!-- Sync error -->
+                    <pdoEntry idx="1c32" subIdx="20" bitLen="1" halPin="sync-error" halType="bit"/>
+                    <!-- TxPDO State -->
+                    <pdoEntry idx="1800" subIdx="07" bitLen="1" halPin="TxPDO-state" halType="bit"/>
+                    <!-- TxPDO Toggle -->
+                    <pdoEntry idx="1800" subIdx="09" bitLen="1" halPin="TxPDO-toggle" halType="bit"/>
+                    <!-- Counter value -->
+                    <pdoEntry idx="6000" subIdx="11" bitLen="32" halPin="counter_value" halType="u32"/>
+                    <!-- Latch value -->
+                    <pdoEntry idx="6000" subIdx="12" bitLen="32" halPin="latch_value" halType="u32"/>
+                </pdo>
+            </syncManager>
+
+		      <dcConf assignActivate="1000" sync0Cycle="1000000" sync0Shift="0" sync1Cycle="0" sync1Shift="0" />
+		      <!--IMPORTANT: sometime (sync1Cycle = n * sync0Cycle) sync1Cycle must be appTimePeriod - sync0Cycle)-->
+		      <!--Check your DC config...generated is from impoted .xml but assignActivate is hard coded ... it should be different-->
+		    </slave>
+	<!-- Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl -->
+		<!--<slave idx="7" type="basic_cia402" vid="0200008d" pid="00000064" name="2001_FC302">
+		<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+			<modParam name="pdoAutoflow" value="true"/>
+			<modParam name="pdoEntryLimit" value="2"/>
+			<modParam name="pdoIncrement" value="1"/>
+			<modParam name="ciaRxPDOEntryLimit" value="8"/>
+			<modParam name="ciaTxPDOEntryLimit" value="8"/>
+			<modParam name="enableVL" value="true"/>
+			<modParam name="digitalInChannels" value="32"/>
+			<modParam name="digitalOutChannels" value="32"/>
+			<modParam name="enableErrorCode" value="true"/> 
+			 <modParam name="ciaChannels" value="0"/> -->
+			<!-- <modParam name="pdoLimit" value="0"/> -->
+			<!-- <modParam name="pdoEntryLimit" value="0"/> -->
+			<!-- <modParam name="vlQuickStopRatio" value="asdf"/> -->
+			<!-- <modParam name="vlSetPoint" value="asdf"/> -->
+			<!-- <modParam name="vlDimensionFactor" value="asdf"/> -->
+			<!-- <modParam name="vlAccel" value="asdf"/> -->
+			<!-- <modParam name="vlDecel" value="asdf"/> -->
+
+			<!-- <modParam name="enableTargetVL" value="true"/> -->
+			<!-- <modParam name="enableVLDemand" value="true"/>-->
+			<!-- <modParam name="enableVLMaximum" value="true"/> -->
+			<!-- <modParam name="enableVLMinimum" value="true"/> -->
+		<!--</slave> 
+	 Danfoss FC302 in CiA402/DSP402 mode -> needs CiA402 mode vl 
+		<slave idx="7" type="generic" vid="0200008d" pid="00000064" configPdos="true" name="2001_FC302">
+			<dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="0"/>
+				<syncManager idx="2" dir="out">
+					<pdo idx="1600">
+						<pdoEntry idx="6040" subIdx="00" bitLen="16" halPin="srv-cia-controlword" halType="u32"/>
+						<pdoEntry idx="6042" subIdx="00" bitLen="16" halPin="srv-target-vl" halType="s32"/>
+						<pdoEntry idx="6060" subIdx="00" bitLen="8" halPin="srv-opmode" halType="s32"/>
+					</pdo>
+				</syncManager>
+				<syncManager idx="3" dir="in">
+					<pdo idx="1a00">
+						<pdoEntry idx="6041" subIdx="00" bitLen="16" halPin="srv-cia-statusword" halType="u32"/>
+						<pdoEntry idx="6043" subIdx="00" bitLen="16" halPin="srv-actual-vl" halType="s32"/>
+						<pdoEntry idx="6046" subIdx="01" bitLen="32" halPin="srv-vl-minimum" halType="s32"/>
+						<pdoEntry idx="6046" subIdx="02" bitLen="32" halPin="srv-vl-maximum" halType="s32"/>
+						<pdoEntry idx="6048" subIdx="01" bitLen="32" halPin="srv-vl-accel" halType="s32"/>
+						<pdoEntry idx="6049" subIdx="01" bitLen="32" halPin="srv-vl-decel" halType="s32"/>
+						<pdoEntry idx="6061" subIdx="00" bitLen="8" halPin="srv-opmode-display" halType="s32"/>
+						<pdoEntry idx="6064" subIdx="00" bitLen="8" halPin="srv-actual-position" halType="s32"/>
+						<pdoEntry idx="6502" subIdx="00" bitLen="32" halPin="srv-supported-modes" halType="u32"/>
+						<pdoEntry idx="6504" subIdx="00" bitLen="32" halPin="srv-manufacturer" halType="s32"/>
+					</pdo>
+				</syncManager>
+		</slave> -->
+	</master>
+</masters>

@@ -1,0 +1,254 @@
+<masters>
+	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="1000" name="m0">
+	<!-- EP5101 - Incr. Encoder Input -->
+		<slave idx="0" type="generic" vid="0x00000002" pid="0x13ED4052" name="EP5101-0" configPdos="true">
+			<!-- IMPORTANT: sometime (sync1Cycle = n * sync0Cycle) sync1Cycle must be appTimePeriod - sync0Cycle) -->
+			<!-- Check your DC config...generated is from impoted .xml but assignActivate is hard coded ... it should be different -->
+			<dcConf assignActivate="1000" sync0Cycle="1000000" sync0Shift="0" sync1Cycle="0" sync1Shift="0"/>
+			<sdoConfig idx="1C12" subIdx="complete">
+				<sdoDataRaw data="01000116"/>
+			</sdoConfig>
+			<sdoConfig idx="1C13" subIdx="complete">
+				<sdoDataRaw data="0100011A"/>
+			</sdoConfig>
+			<syncManager idx="0" dir="out"/>
+			<syncManager idx="1" dir="in"/>
+			<syncManager idx="2" dir="out">
+			<pdo idx="1601">
+                    <!-- Enable latch C -->
+                    <pdoEntry idx="7000" subIdx="01" bitLen="1" halPin="enable-latch-C" halType="bit"/>
+                    <!-- Enable latch extern on positive edge -->
+                    <pdoEntry idx="7000" subIdx="02" bitLen="1" halPin="ena-latch-ext-on-pos_edge" halType="bit"/>
+                    <!-- Set counter -->
+                    <pdoEntry idx="7000" subIdx="03" bitLen="1" halPin="set-counter" halType="bit"/>
+                    <!-- Enable latch extern on negative edge -->
+                    <pdoEntry idx="7000" subIdx="04" bitLen="1" halPin="ena-latch-ext-on-neg_edge" halType="bit"/>
+                    <!-- Set counter value -->
+                    <pdoEntry idx="7000" subIdx="11" bitLen="32" halPin="set-counter_value" halType="u32"/>
+			</pdo>
+			</syncManager>
+			<syncManager idx="3" dir="in">
+				<pdo idx="1A01">
+				<pdoEntry idx="6000" subIdx="01" bitLen="1" halPin="Status-Latch-C-197" halType="bit">
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="02" bitLen="1" halPin="Status-Latch-e-198" halType="bit">
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="03" bitLen="1" halPin="Status-Set-cou-199" halType="bit">
+				<!-- ENC STATUS-Status- -Set-cou-199 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="04" bitLen="1" halPin="Status-Counter-200" halType="bit">
+				<!-- ENC STATUS-Status- -Counter-200 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="05" bitLen="1" halPin="Status-Counter-201" halType="bit">
+				<!-- ENC STATUS-Status- -Counter-201 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="06" bitLen="1" halPin="Status-Status-202" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -202 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="07" bitLen="1" halPin="Status-Open-ci-203" halType="bit">
+				<!-- ENC STATUS-Status- -Open-ci-203 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="08" bitLen="1" halPin="Status-Extrapo-204" halType="bit">
+				<!-- ENC STATUS-Status- -Extrapo-204 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="09" bitLen="1" halPin="Status-Status-205" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -205 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="10" bitLen="1" halPin="Status-Status-206" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -206 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="11" bitLen="1" halPin="Status-Status-207" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -207 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="12" bitLen="1" halPin="Status-Status-208" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -208 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="13" bitLen="1" halPin="Status-Status-209" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -209 -->
+				</pdoEntry>
+				<pdoEntry idx="1C32" subIdx="32" bitLen="1" halPin="Status-Sync-er-210" halType="bit">
+				<!-- ENC STATUS-Status- -Sync-er-210 -->
+				</pdoEntry>
+				<pdoEntry idx="1801" subIdx="07" bitLen="1" halPin="Status-TxPDO-S-211" halType="bit">
+				<!-- ENC STATUS-Status- -TxPDO-S-211 -->
+				</pdoEntry>
+				<pdoEntry idx="1801" subIdx="09" bitLen="1" halPin="Status-TxPDO-T-212" halType="bit">
+				<!-- ENC STATUS-Status- -TxPDO-T-212 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="17" bitLen="32" halPin="Counter-value-213" halType="s32">
+				<!-- ENC STATUS-Counter-value-213 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="18" bitLen="32" halPin="Latch-value-214" halType="s32">
+				<!-- ENC STATUS-Latch-value-214 -->
+				</pdoEntry>
+			</pdo>
+			</syncManager>
+		</slave>
+		<slave idx="1" type="generic" vid="0x00000002" pid="0x13ED4052" name="EP5101-1" configPdos="true">
+			<!-- IMPORTANT: sometime (sync1Cycle = n * sync0Cycle) sync1Cycle must be appTimePeriod - sync0Cycle) -->
+			<!-- Check your DC config...generated is from impoted .xml but assignActivate is hard coded ... it should be different -->
+			<dcConf assignActivate="1000" sync0Cycle="1000000" sync0Shift="0" sync1Cycle="0" sync1Shift="0"/>
+			<sdoConfig idx="1C12" subIdx="complete">
+				<sdoDataRaw data="01000116"/>
+			</sdoConfig>
+				<sdoConfig idx="1C13" subIdx="complete">
+			<sdoDataRaw data="0100011A"/>
+			</sdoConfig>
+			<syncManager idx="0" dir="out"/>
+			<syncManager idx="1" dir="in"/>
+			<syncManager idx="2" dir="out">
+			<pdo idx="1601">
+                    <!-- Enable latch C -->
+                    <pdoEntry idx="7000" subIdx="01" bitLen="1" halPin="enable-latch-C" halType="bit"/>
+                    <!-- Enable latch extern on positive edge -->
+                    <pdoEntry idx="7000" subIdx="02" bitLen="1" halPin="ena-latch-ext-on-pos_edge" halType="bit"/>
+                    <!-- Set counter -->
+                    <pdoEntry idx="7000" subIdx="03" bitLen="1" halPin="set-counter" halType="bit"/>
+                    <!-- Enable latch extern on negative edge -->
+                    <pdoEntry idx="7000" subIdx="04" bitLen="1" halPin="ena-latch-ext-on-neg_edge" halType="bit"/>
+                    <!-- Set counter value -->
+                    <pdoEntry idx="7000" subIdx="11" bitLen="32" halPin="set-counter_value" halType="u32"/>
+			</pdo>
+			</syncManager>
+			<syncManager idx="3" dir="in">
+				<pdo idx="1A01">
+				<pdoEntry idx="6000" subIdx="01" bitLen="1" halPin="Status-Latch-C-197" halType="bit">
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="02" bitLen="1" halPin="Status-Latch-e-198" halType="bit">
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="03" bitLen="1" halPin="Status-Set-cou-199" halType="bit">
+				<!-- ENC STATUS-Status- -Set-cou-199 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="04" bitLen="1" halPin="Status-Counter-200" halType="bit">
+				<!-- ENC STATUS-Status- -Counter-200 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="05" bitLen="1" halPin="Status-Counter-201" halType="bit">
+				<!-- ENC STATUS-Status- -Counter-201 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="06" bitLen="1" halPin="Status-Status-202" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -202 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="07" bitLen="1" halPin="Status-Open-ci-203" halType="bit">
+				<!-- ENC STATUS-Status- -Open-ci-203 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="08" bitLen="1" halPin="Status-Extrapo-204" halType="bit">
+				<!-- ENC STATUS-Status- -Extrapo-204 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="09" bitLen="1" halPin="Status-Status-205" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -205 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="10" bitLen="1" halPin="Status-Status-206" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -206 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="11" bitLen="1" halPin="Status-Status-207" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -207 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="12" bitLen="1" halPin="Status-Status-208" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -208 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="13" bitLen="1" halPin="Status-Status-209" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -209 -->
+				</pdoEntry>
+				<pdoEntry idx="1C32" subIdx="32" bitLen="1" halPin="Status-Sync-er-210" halType="bit">
+				<!-- ENC STATUS-Status- -Sync-er-210 -->
+				</pdoEntry>
+				<pdoEntry idx="1801" subIdx="07" bitLen="1" halPin="Status-TxPDO-S-211" halType="bit">
+				<!-- ENC STATUS-Status- -TxPDO-S-211 -->
+				</pdoEntry>
+				<pdoEntry idx="1801" subIdx="09" bitLen="1" halPin="Status-TxPDO-T-212" halType="bit">
+				<!-- ENC STATUS-Status- -TxPDO-T-212 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="17" bitLen="32" halPin="Counter-value-213" halType="s32">
+				<!-- ENC STATUS-Counter-value-213 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="18" bitLen="32" halPin="Latch-value-214" halType="s32">
+				<!-- ENC STATUS-Latch-value-214 -->
+				</pdoEntry>
+			</pdo>
+			</syncManager>
+		</slave>
+		<slave idx="2" type="generic" vid="0x00000002" pid="0x13ED4052" name="EP5101-2" configPdos="true">
+			<!-- IMPORTANT: sometime (sync1Cycle = n * sync0Cycle) sync1Cycle must be appTimePeriod - sync0Cycle) -->
+			<!-- Check your DC config...generated is from impoted .xml but assignActivate is hard coded ... it should be different -->
+			<dcConf assignActivate="1000" sync0Cycle="1000000" sync0Shift="0" sync1Cycle="0" sync1Shift="0"/>
+			<sdoConfig idx="1C12" subIdx="complete">
+				<sdoDataRaw data="01000116"/>
+			</sdoConfig>
+				<sdoConfig idx="1C13" subIdx="complete">
+			<sdoDataRaw data="0100011A"/>
+			</sdoConfig>
+			<syncManager idx="0" dir="out"/>
+			<syncManager idx="1" dir="in"/>
+			<syncManager idx="2" dir="out">
+			<pdo idx="1601">
+                    <!-- Enable latch C -->
+                    <pdoEntry idx="7000" subIdx="01" bitLen="1" halPin="enable-latch-C" halType="bit"/>
+                    <!-- Enable latch extern on positive edge -->
+                    <pdoEntry idx="7000" subIdx="02" bitLen="1" halPin="ena-latch-ext-on-pos_edge" halType="bit"/>
+                    <!-- Set counter -->
+                    <pdoEntry idx="7000" subIdx="03" bitLen="1" halPin="set-counter" halType="bit"/>
+                    <!-- Enable latch extern on negative edge -->
+                    <pdoEntry idx="7000" subIdx="04" bitLen="1" halPin="ena-latch-ext-on-neg_edge" halType="bit"/>
+                    <!-- Set counter value -->
+                    <pdoEntry idx="7000" subIdx="11" bitLen="32" halPin="set-counter_value" halType="u32"/>
+			</pdo>
+			</syncManager>
+			<syncManager idx="3" dir="in">
+				<pdo idx="1A01">
+				<pdoEntry idx="6000" subIdx="01" bitLen="1" halPin="Status-Latch-C-197" halType="bit">
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="02" bitLen="1" halPin="Status-Latch-e-198" halType="bit">
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="03" bitLen="1" halPin="Status-Set-cou-199" halType="bit">
+				<!-- ENC STATUS-Status- -Set-cou-199 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="04" bitLen="1" halPin="Status-Counter-200" halType="bit">
+				<!-- ENC STATUS-Status- -Counter-200 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="05" bitLen="1" halPin="Status-Counter-201" halType="bit">
+				<!-- ENC STATUS-Status- -Counter-201 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="06" bitLen="1" halPin="Status-Status-202" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -202 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="07" bitLen="1" halPin="Status-Open-ci-203" halType="bit">
+				<!-- ENC STATUS-Status- -Open-ci-203 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="08" bitLen="1" halPin="Status-Extrapo-204" halType="bit">
+				<!-- ENC STATUS-Status- -Extrapo-204 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="09" bitLen="1" halPin="Status-Status-205" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -205 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="10" bitLen="1" halPin="Status-Status-206" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -206 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="11" bitLen="1" halPin="Status-Status-207" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -207 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="12" bitLen="1" halPin="Status-Status-208" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -208 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="13" bitLen="1" halPin="Status-Status-209" halType="bit">
+				<!-- ENC STATUS-Status- -Status- -209 -->
+				</pdoEntry>
+				<pdoEntry idx="1C32" subIdx="32" bitLen="1" halPin="Status-Sync-er-210" halType="bit">
+				<!-- ENC STATUS-Status- -Sync-er-210 -->
+				</pdoEntry>
+				<pdoEntry idx="1801" subIdx="07" bitLen="1" halPin="Status-TxPDO-S-211" halType="bit">
+				<!-- ENC STATUS-Status- -TxPDO-S-211 -->
+				</pdoEntry>
+				<pdoEntry idx="1801" subIdx="09" bitLen="1" halPin="Status-TxPDO-T-212" halType="bit">
+				<!-- ENC STATUS-Status- -TxPDO-T-212 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="17" bitLen="32" halPin="Counter-value-213" halType="s32">
+				<!-- ENC STATUS-Counter-value-213 -->
+				</pdoEntry>
+				<pdoEntry idx="6000" subIdx="18" bitLen="32" halPin="Latch-value-214" halType="s32">
+				<!-- ENC STATUS-Latch-value-214 -->
+				</pdoEntry>
+			</pdo>
+			</syncManager>
+		</slave>
+	</master>
+</masters>

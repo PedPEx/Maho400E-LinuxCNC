@@ -1,0 +1,132 @@
+<masters>
+  <master idx="0" appTimePeriod="1000000" refClockSyncCycles="1" name="m0">
+    <slave idx="0" type="FC302" name="FC302">
+      <!-- ============================================================
+           VL Geschwindigkeitsgrenzen: NICHT per SDO konfigurierbar!
+           Der FC302 lehnt SDO-Writes auf 0x6046:01/02 mit Abort-Code
+           0x08000020 ab, auch bei Wert=0.
+           Geschwindigkeitsgrenzen am FC302-Fronttafel oder per MCT-10:
+             P4-11  Motor Speed Low Limit  [RPM]
+             P4-12  Motor Speed High Limit [RPM]
+           Beispiel für 2-poligen DASM mit max. 3000 RPM:
+             P4-11 = 0 RPM, P4-12 = 3000 RPM
+           Links-/Rechtslauf: FC302 P4-10 auf "Both directions" setzen.
+           Im HAL: positive srv-target-vl = Rechtslauf,
+                   negative srv-target-vl = Linkslauf.
+           ============================================================
+           CiA 402 Rampen (Zähler / Nenner)
+           accel = accelDeltaSpeed / accelDeltaTime [vel/time]
+           SDO 0x6048 / 0x6049
+           ============================================================ -->
+      <modParam name="accelDeltaSpeed"  value="5000"/>  <!-- Zähler: 50,00 Hz Spanne -->
+      <modParam name="accelDeltaTime"   value="2000"/>  <!-- Nenner: 2,000 s          -->
+      <modParam name="decelDeltaSpeed"  value="5000"/>
+      <modParam name="decelDeltaTime"   value="2000"/>
+      <!-- ============================================================
+           VL Dimension Factor – Einheitenskalierung
+           v_physical = v_raw * vlDimNumerator / vlDimDenominator
+           SDO 0x604C:01 / 0x604C:02
+           Beispiel RPM (2-polig): numerator=60 denominator=1
+           ============================================================ -->
+      <modParam name="vlDimNumerator"   value="1"/>
+      <modParam name="vlDimDenominator" value="1"/>
+      <!-- ============================================================
+           Danfoss-spezifische Rampenzeiten (par. 3-xx)
+           Einheit: ms / 10
+           SDO 0x2155 / 0x2156 / 0x215F / 0x2160 / 0x217C / 0x217D
+           ============================================================ -->
+      <modParam name="ramp1Up"          value="2000"/>  <!-- par. 3-41: Hochlaufzeit Rampe 1 -->
+      <modParam name="ramp1Down"        value="2000"/>  <!-- par. 3-42: Ablaufzeit Rampe 1   -->
+      <modParam name="ramp2Up"          value="500"/>   <!-- par. 3-51: Hochlaufzeit Rampe 2 -->
+      <modParam name="ramp2Down"        value="500"/>   <!-- par. 3-52: Ablaufzeit Rampe 2   -->
+      <modParam name="jogRampTime"      value="1000"/>  <!-- par. 3-80: Jog-Rampe            -->
+      <modParam name="qstopRampTime"    value="200"/>   <!-- par. 3-81: Quick-Stop-Rampe     -->
+      <!-- ============================================================
+           Danfoss-spezifische Jog-Geschwindigkeiten (par. 8-xx)
+           Einheit: 0,01 Hz/Digit (Standard)
+           SDO 0x237A / 0x237B
+           ============================================================ -->
+      <modParam name="busJog1Speed"     value="500"/>   <!-- par. 8-90: 5,00 Hz Jog 1 -->
+      <modParam name="busJog2Speed"     value="1000"/>  <!-- par. 8-91: 10,00 Hz Jog 2 -->
+      <!-- SDO READ KONFIGURATION -->
+          <!-- Infos-RO Monitoring: Bitmask
+              Bit  0 = 0x264A  power-kw
+              Bit  1 = 0x264E  motor-current
+              Bit  2 = 0x265E  dc-link-voltage
+              Bit  3 = 0x2652  motor-thermal-pct
+              Bit  4 = 0x2653  kty-temperature
+              Bit  5 = 0x2662  heatsink-temp
+              Bit  6 = 0x2663  inverter-thermal-pct
+              Bit  7 = 0x2667  ctrl-card-temp
+              Bit  8 = 0x2650  torque-nm
+              Bit  9 = 0x25DE  kwh-counter
+              Bit 10 = 0x2656  torque-pct
+          -->
+      <!-- Nur Strom + Drehmoment: Bits 1+8 = 0x102 = 258 -->
+        <modParam name="sdoReadConfig" value="2047"/>
+      <!-- Alle 11 Kanäle: 0x7FF = 2047 -->
+        <!--<modParam name="sdoReadConfig" value="2047"/>-->
+      <!-- Deaktiviert (default): -->
+        <!--<modParam name="sdoReadConfig" value="0"/>-->
+    </slave>
+    <slave idx="1" type="EK1101" name="D1"/>
+    <slave idx="2" type="EL5002" name="D2"/>
+    <slave idx="3" type="EL1819" name="D3"/>
+    <slave idx="4" type="EL1819" name="D4"/>
+    <slave idx="5" type="EL2809" name="D5"/>
+    <slave idx="6" type="EL2809" name="D6"/>
+    <slave idx="7" type="EL4034" name="D7"/>
+    <slave idx="8" type="generic" vid="0x00000002" pid="0x18503052" name="D8"/>
+    <!--EL6224 (IO Link Master)-->
+    <slave idx="9" type="EL6002" name="D9"/>
+    <!--EL6002 Interface 2Ch. (RS232)-->
+    <slave idx="10" type="EP5101" name="enc1">
+      <!-- 0x8000:01 Enable C reset (index pulse resets counter)       -->  <modParam name="enableCReset"       value="1"/>
+      <!-- 0x8000:02 Enable extern reset via external input            -->  <modParam name="enableExtReset"     value="0"/>
+      <!-- 0x8000:03 Enable up/down counter (direction from B-track)   -->  <modParam name="enableUpDown"       value="1"/>
+      <!-- 0x8000:04 Gate polarity (0=active LOW, 1=active HIGH)       -->  <modParam name="gatePolarity"       value="0"/>
+      <!-- 0x8000:08 Disable input filter (0=active, 1=disabled)       -->  <modParam name="disableFilter"      value="0"/>
+      <!-- 0x8000:0A Enable micro increments                           -->  <modParam name="enableMicroInc"     value="0"/>
+      <!-- 0x8000:0E Reversion of rotation (0=normal, 1=inverted)      -->  <modParam name="revRotation"        value="0"/>
+      <!-- 0x8000:10 Extern reset polarity (0=rising edge)             -->  <modParam name="extResetPolarity"   value="0"/>
+      <!-- 0x8000:11 Frequency window                                  -->  <!-- <modParam name="freqWindow"         value="0"/> -->
+      <!-- 0x8000:13 Frequency scaling                                 -->  <!-- <modParam name="freqScaling"        value="0"/> -->
+      <!-- 0x8000:14 Period scaling                                    -->  <!-- <modParam name="periodScaling"      value="0"/> -->
+      <!-- 0x8000:15 Frequency resolution                              -->  <!-- <modParam name="freqResolution"     value="0"/> -->
+      <!-- 0x8000:16 Period resolution                                 -->  <!-- <modParam name="periodResolution"   value="0"/> -->
+      <!-- 0x8000:17 Frequency wait time                               -->  <!-- <modParam name="waitTime"           value="0"/> -->
+    </slave>
+    <slave idx="11" type="EP5101" name="enc2">
+      <!-- 0x8000:01 Enable C reset (index pulse resets counter)       -->  <!-- <modParam name="enableCReset"       value="1"/> -->
+      <!-- 0x8000:02 Enable extern reset via external input            -->  <!-- <modParam name="enableExtReset"     value="0"/> -->
+      <!-- 0x8000:03 Enable up/down counter (direction from B-track)   -->  <!-- <modParam name="enableUpDown"       value="1"/> -->
+      <!-- 0x8000:04 Gate polarity (0=active LOW, 1=active HIGH)       -->  <!-- <modParam name="gatePolarity"       value="0"/> -->
+      <!-- 0x8000:08 Disable input filter (0=active, 1=disabled)       -->  <!-- <modParam name="disableFilter"      value="0"/> -->
+      <!-- 0x8000:0A Enable micro increments                           -->  <!-- <modParam name="enableMicroInc"     value="0"/> -->
+      <!-- 0x8000:0E Reversion of rotation (0=normal, 1=inverted)      -->  <!-- <modParam name="revRotation"        value="0"/> -->
+      <!-- 0x8000:10 Extern reset polarity (0=rising edge)             -->  <!-- <modParam name="extResetPolarity"   value="0"/> -->
+      <!-- 0x8000:11 Frequency window                                  -->  <!-- <modParam name="freqWindow"         value="0"/> -->
+      <!-- 0x8000:13 Frequency scaling                                 -->  <!-- <modParam name="freqScaling"        value="0"/> -->
+      <!-- 0x8000:14 Period scaling                                    -->  <!-- <modParam name="periodScaling"      value="0"/> -->
+      <!-- 0x8000:15 Frequency resolution                              -->  <!-- <modParam name="freqResolution"     value="0"/> -->
+      <!-- 0x8000:16 Period resolution                                 -->  <!-- <modParam name="periodResolution"   value="0"/> -->
+      <!-- 0x8000:17 Frequency wait time                               -->  <!-- <modParam name="waitTime"           value="0"/> -->
+    </slave>
+    <slave idx="12" type="EP5101" name="enc3">
+      <!-- 0x8000:01 Enable C reset (index pulse resets counter)       -->  <!-- <modParam name="enableCReset"       value="1"/> -->
+      <!-- 0x8000:02 Enable extern reset via external input            -->  <!-- <modParam name="enableExtReset"     value="0"/> -->
+      <!-- 0x8000:03 Enable up/down counter (direction from B-track)   -->  <!-- <modParam name="enableUpDown"       value="1"/> -->
+      <!-- 0x8000:04 Gate polarity (0=active LOW, 1=active HIGH)       -->  <!-- <modParam name="gatePolarity"       value="0"/> -->
+      <!-- 0x8000:08 Disable input filter (0=active, 1=disabled)       -->  <!-- <modParam name="disableFilter"      value="0"/> -->
+      <!-- 0x8000:0A Enable micro increments                           -->  <!-- <modParam name="enableMicroInc"     value="0"/> -->
+      <!-- 0x8000:0E Reversion of rotation (0=normal, 1=inverted)      -->  <!-- <modParam name="revRotation"        value="0"/> -->
+      <!-- 0x8000:10 Extern reset polarity (0=rising edge)             -->  <!-- <modParam name="extResetPolarity"   value="0"/> -->
+      <!-- 0x8000:11 Frequency window                                  -->  <!-- <modParam name="freqWindow"         value="0"/> -->
+      <!-- 0x8000:13 Frequency scaling                                 -->  <!-- <modParam name="freqScaling"        value="0"/> -->
+      <!-- 0x8000:14 Period scaling                                    -->  <!-- <modParam name="periodScaling"      value="0"/> -->
+      <!-- 0x8000:15 Frequency resolution                              -->  <!-- <modParam name="freqResolution"     value="0"/> -->
+      <!-- 0x8000:16 Period resolution                                 -->  <!-- <modParam name="periodResolution"   value="0"/> -->
+      <!-- 0x8000:17 Frequency wait time                               -->  <!-- <modParam name="waitTime"           value="0"/> -->
+    </slave>
+  </master>
+</masters>

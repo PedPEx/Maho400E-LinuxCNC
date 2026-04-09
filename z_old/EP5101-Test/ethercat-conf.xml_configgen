@@ -1,0 +1,118 @@
+<masters>
+  <master idx="0">
+    <slave idx="0" type="generic" vid="0x00000002" pid="0x13ed4052" name="D1">
+      <!--EP5101-0011 1K. Inc. Encoder 5V, D-SUB15-->
+      <syncManager idx="0" dir="in"/>
+      <syncManager idx="1" dir="out"/>
+      <syncManager idx="2" dir="out">
+        <pdo idx="1601">
+          <!--ENC RxPDO-Map Control-->
+          <pdoEntry idx="7000" subIdx="01" bitLen="1" halPin="enable-latch-c" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="02" bitLen="1" halPin="enable-latch-extern-on-positive-edge" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="03" bitLen="1" halPin="set-counter" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="04" bitLen="1" halPin="enable-latch-extern-on-negative-edge" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="11" bitLen="32" halPin="set-counter-value" halType="u32"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1a01">
+          <!--ENC TxPDO-Map Status-->
+          <pdoEntry idx="6000" subIdx="01" bitLen="1" halPin="latch-c-valid" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="02" bitLen="1" halPin="latch-extern-valid" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="03" bitLen="1" halPin="set-counter-done" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="04" bitLen="1" halPin="counter-underflow" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="05" bitLen="1" halPin="counter-overflow" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="06" bitLen="1" halPin="status-of-input-status" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="07" bitLen="1" halPin="open-circuit" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="08" bitLen="1" halPin="extrapolation-stall" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="09" bitLen="1" halPin="status-of-input-a" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0a" bitLen="1" halPin="status-of-input-b" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0b" bitLen="1" halPin="status-of-input-c" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0c" bitLen="1" halPin="status-of-input-gate" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0d" bitLen="1" halPin="status-of-extern-latch" halType="bit"/>
+          <pdoEntry idx="1c32" subIdx="20" bitLen="1" halPin="sync-error" halType="bit"/>
+          <pdoEntry idx="1801" subIdx="07" bitLen="1" halPin="txpdo-state" halType="bit"/>
+          <pdoEntry idx="1801" subIdx="09" bitLen="1" halPin="txpdo-toggle" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="11" bitLen="32" halPin="counter-value" halType="u32"/>
+          <pdoEntry idx="6000" subIdx="12" bitLen="32" halPin="latch-value" halType="u32"/>
+        </pdo>
+      </syncManager>
+    </slave>
+    <slave idx="1" type="generic" vid="0x00000002" pid="0x13ed4052" name="D2">
+      <!--EP5101-0011 1K. Inc. Encoder 5V, D-SUB15-->
+      <syncManager idx="0" dir="in"/>
+      <syncManager idx="1" dir="out"/>
+      <syncManager idx="2" dir="out">
+        <pdo idx="1601">
+          <!--ENC RxPDO-Map Control-->
+          <pdoEntry idx="7000" subIdx="01" bitLen="1" halPin="enable-latch-c" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="02" bitLen="1" halPin="enable-latch-extern-on-positive-edge" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="03" bitLen="1" halPin="set-counter" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="04" bitLen="1" halPin="enable-latch-extern-on-negative-edge" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="11" bitLen="32" halPin="set-counter-value" halType="u32"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1a01">
+          <!--ENC TxPDO-Map Status-->
+          <pdoEntry idx="6000" subIdx="01" bitLen="1" halPin="latch-c-valid" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="02" bitLen="1" halPin="latch-extern-valid" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="03" bitLen="1" halPin="set-counter-done" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="04" bitLen="1" halPin="counter-underflow" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="05" bitLen="1" halPin="counter-overflow" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="06" bitLen="1" halPin="status-of-input-status" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="07" bitLen="1" halPin="open-circuit" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="08" bitLen="1" halPin="extrapolation-stall" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="09" bitLen="1" halPin="status-of-input-a" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0a" bitLen="1" halPin="status-of-input-b" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0b" bitLen="1" halPin="status-of-input-c" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0c" bitLen="1" halPin="status-of-input-gate" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0d" bitLen="1" halPin="status-of-extern-latch" halType="bit"/>
+          <pdoEntry idx="1c32" subIdx="20" bitLen="1" halPin="sync-error" halType="bit"/>
+          <pdoEntry idx="1801" subIdx="07" bitLen="1" halPin="txpdo-state" halType="bit"/>
+          <pdoEntry idx="1801" subIdx="09" bitLen="1" halPin="txpdo-toggle" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="11" bitLen="32" halPin="counter-value" halType="u32"/>
+          <pdoEntry idx="6000" subIdx="12" bitLen="32" halPin="latch-value" halType="u32"/>
+        </pdo>
+      </syncManager>
+    </slave>
+    <slave idx="2" type="generic" vid="0x00000002" pid="0x13ed4052" name="D3">
+      <!--EP5101-0011 1K. Inc. Encoder 5V, D-SUB15-->
+      <syncManager idx="0" dir="in"/>
+      <syncManager idx="1" dir="out"/>
+      <syncManager idx="2" dir="out">
+        <pdo idx="1601">
+          <!--ENC RxPDO-Map Control-->
+          <pdoEntry idx="7000" subIdx="01" bitLen="1" halPin="enable-latch-c" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="02" bitLen="1" halPin="enable-latch-extern-on-positive-edge" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="03" bitLen="1" halPin="set-counter" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="04" bitLen="1" halPin="enable-latch-extern-on-negative-edge" halType="bit"/>
+          <pdoEntry idx="7000" subIdx="11" bitLen="32" halPin="set-counter-value" halType="u32"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1a01">
+          <!--ENC TxPDO-Map Status-->
+          <pdoEntry idx="6000" subIdx="01" bitLen="1" halPin="latch-c-valid" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="02" bitLen="1" halPin="latch-extern-valid" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="03" bitLen="1" halPin="set-counter-done" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="04" bitLen="1" halPin="counter-underflow" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="05" bitLen="1" halPin="counter-overflow" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="06" bitLen="1" halPin="status-of-input-status" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="07" bitLen="1" halPin="open-circuit" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="08" bitLen="1" halPin="extrapolation-stall" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="09" bitLen="1" halPin="status-of-input-a" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0a" bitLen="1" halPin="status-of-input-b" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0b" bitLen="1" halPin="status-of-input-c" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0c" bitLen="1" halPin="status-of-input-gate" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="0d" bitLen="1" halPin="status-of-extern-latch" halType="bit"/>
+          <pdoEntry idx="1c32" subIdx="20" bitLen="1" halPin="sync-error" halType="bit"/>
+          <pdoEntry idx="1801" subIdx="07" bitLen="1" halPin="txpdo-state" halType="bit"/>
+          <pdoEntry idx="1801" subIdx="09" bitLen="1" halPin="txpdo-toggle" halType="bit"/>
+          <pdoEntry idx="6000" subIdx="11" bitLen="32" halPin="counter-value" halType="u32"/>
+          <pdoEntry idx="6000" subIdx="12" bitLen="32" halPin="latch-value" halType="u32"/>
+        </pdo>
+      </syncManager>
+    </slave>
+  </master>
+</masters>
