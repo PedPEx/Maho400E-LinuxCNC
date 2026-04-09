@@ -6,3 +6,4 @@ position_mm.txt
 *.var
 *.bak
 *.tbl
+info/festo_cmmt-as/Festo_VFD_Docs/misc*

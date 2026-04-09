@@ -1,0 +1,26 @@
+﻿{
+  "Guid": "00000000-0000-0000-0000-000000000000",
+  "PreviewImagePath": "Resources/Maho_MH400E",
+  "Description": null,
+  "CreationDate": "2025-01-07T19:48:58.5583553+01:00",
+  "ModifiedDate": "2025-03-06T01:52:36.2080205+01:00",
+  "CreationUser": "UserVM",
+  "ModifiedUser": "UserVM",
+  "Tools": [],
+  "Components": [
+    "d117b722-d8ef-4ae8-87a2-3a8534df8066"
+  ],
+  "Resources": [
+    {
+      "Location": "ToolSuiteProject",
+      "Description": null,
+      "OwnerGuid": null,
+      "Metadata": {}
+    }
+  ],
+  "Metadata": {
+    "SystemVersions": "[{\"Type\":4,\"Configurations\":[{\"Key\":\"Version\",\"Value\":\"2.9.0.719\"},{\"Key\":\"RenderTier\",\"Value\":\"2\"},{\"Key\":\"InformationalVersion\",\"Value\":\"Rev. 6f8f2eaa75179d5d67d4983633f2878d6e5da085\"}]},{\"Type\":5,\"Configurations\":[{\"Key\":\"Name\",\"Value\":\"CMMT-AS Plug-in\"},{\"Key\":\"Version\",\"Value\":\"2.8.2.0\"},{\"Key\":\"ToolGUID\",\"Value\":\"cc0c8c4e-e21d-4f82-b0ff-30882eec7e9a\"}]},{\"Type\":6,\"Configurations\":[{\"Key\":\"Name\",\"Value\":\"Scan\"},{\"Key\":\"Version\",\"Value\":\"2.9.0.190\"},{\"Key\":\"ToolGUID\",\"Value\":\"bb65b1ea-a5b7-470b-97c2-97c614d315ac\"}]}]",
+    "Versions": "[\"2.9.0.719\"]"
+  },
+  "FormatVersion": "2.00"
+}
