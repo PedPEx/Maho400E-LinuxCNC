@@ -1,6 +1,24 @@
+# =========================================
+# Quelle: 2020_12_11-2000.CM (Philips 432/10)
+# Referenz-Tuning: MAHO_MH400E_2026-04-07 (Mesa 5i25/7i77, real abgestimmt)
+#
+# Korrekturen gegenüber CM-Theorie (Mesa-Referenz übernommen):
+#   MAX_ACCELERATION  : 416 → 50 mm/s²   (Hochlaufzeit CM unrealistisch)
+#   PID P/FF1/FF2     : real abgestimmte Werte aus Mesa-Config
+#   OUTPUT_SCALE Y+Z  : +10 → -10        (Antriebsrichtung invertiert)
+#   ENCODER_SCALE X   : +1000 → -1000    (Encoder-Richtung X invertiert)
+#   ENCODER_SCALE Y   : +1000 → -200     (andere Geberauflösung am Tisch!)
+#   FERROR/MIN_FERROR : CM-Werte zu eng → Mesa-Toleranzen
+#   Homing            : Indexpuls (HOME_USE_INDEX=YES, SEARCH_VEL=0)
+#   Z-Koordinaten     : positiv 0–376 mm (Mesa), nicht negativ wie im CM
+# =========================================
+
 [DISPLAY]
-DISPLAY = gmoccapy
-MAX_LINEAR_VELOCITY = 1
+DISPLAY = axis
+MAX_LINEAR_VELOCITY = 41.667
+DEFAULT_LINEAR_VELOCITY = 16.667
+MAX_FEED_OVERRIDE = 1.5
+MIN_FEED_OVERRIDE = 0.0
 
 [TASK]
 TASK = milltask
@@ -24,98 +42,168 @@ MAX_FORWARD_VELOCITY = 4500
 INCREMENT = 10
 
 # =========================================
-# Axis X
+# Achse X / Joint 0
+# MC200: Drive-Platine 1 / Platz 1
+# ENCODER_SCALE = -1000: Richtung invertiert (Mesa-Referenz)
+# OUTPUT_SCALE  = +10:   X nicht invertiert (Mesa-Referenz)
 # =========================================
+
 [AXIS_X]
-MAX_VELOCITY = 100.0
-MAX_ACCELERATION = 500.0
+MAX_VELOCITY     = 41.667
+# Mesa-Referenz: 50 mm/s² — CM-Theorie 416 mm/s² überlastet die Antriebe
+MAX_ACCELERATION = 50.0
+# 1 mm Puffer vor mechanischem Anschlag (Mesa: MIN=-1, MAX=400)
+MIN_LIMIT        = -1.0
+MAX_LIMIT        = 400.0
 
 [JOINT_0]
-TYPE = LINEAR
-HOME_SEQUENCE = 0
-HOME_SEARCH_VEL = 20.0
-HOME_LATCH_VEL = 1.0
+TYPE       = LINEAR
+MIN_LIMIT  = -1.0
+MAX_LIMIT  = 400.0
 
-# PID Parameters
-P = 10.0
-I = 0.0
-D = 0.1
-FF0 = 0.0
-FF1 = 1.0
-FF2 = 0.0
-DEADBAND = 0.005
-MAX_OUTPUT = 10.0
+# --- Homing: Indexpuls (kein physischer Referenzschalter) ---
+# SEARCH_VEL=0: kein Schalter suchen, Achse fährt direkt auf Indexpuls
+# LATCH_VEL negativ: X fährt in negativer Richtung zum Index
+HOME_SEQUENCE   = 1
+HOME_USE_INDEX  = YES
+HOME_SEARCH_VEL = 0
+HOME_LATCH_VEL  = -10.0
+HOME_FINAL_VEL  = -1.0
+HOME_OFFSET     = 0.0
+HOME            = 100.0
 
-# Scaling
-# OUTPUT_SCALE: Usually corresponds to the maximum voltage (e.g. 10V for EL4034)
-OUTPUT_SCALE = 10.0
-# ENCODER_SCALE: Encoder increments per millimeter of travel
-ENCODER_SCALE = 1000.0
+# --- PID: Mesa-Werte (real abgestimmt) ---
+P       = 6.5
+I       = 0.0
+D       = 0.0
+BIAS    = 0.0
+FF0     = 0.0
+# FF1=0.220 statt 1.0 — 1.0 erzeugt massiven Überschwinger!
+FF1     = 0.220
+# FF2: Beschleunigungs-Feedforward verbessert Konturgenauigkeit
+FF2     = 0.0021
+# DEADBAND=0: Toleranzfenster läuft über MIN_FERROR
+DEADBAND    = 0.0
+MAX_OUTPUT  = 10.0
 
-# Following error limits (Closed Loop)
-FERROR = 1.0
-MIN_FERROR = 0.1
+OUTPUT_SCALE  = 10.0
+# Negatives Vorzeichen: X-Encoder zählt entgegengesetzt zur Bewegungsrichtung
+ENCODER_SCALE = -1000.0
+
+# Mesa-Toleranzen — für erste Inbetriebnahme großzügig lassen
+FERROR     = 0.5
+MIN_FERROR = 0.2
 
 
 # =========================================
-# Axis Y
+# Achse Y / Joint 1
+# MC300: Drive-Platine 2 / Platz 1
+#
+# ENCODER_SCALE = -200:
+#   Y-Geber liefert nur 200 Ink/mm (Mesa-Referenz bestätigt).
+#   Ursache: 50-Linien-Geber mit ×4 bei 4 mm Spindelsteigung,
+#   oder abweichendes Getriebeverhältnis am Tisch.
+#   Vor Inbetriebnahme am realen Encoder nachmessen!
+#
+# OUTPUT_SCALE = -10: Y-Antrieb invertiert (Mesa-Referenz)
+#
+# Koordinatensystem: 0–251 mm positiv (Mesa)
+#   nicht −250…+1.5 mm wie im CM-File
 # =========================================
+
 [AXIS_Y]
-MAX_VELOCITY = 100.0
-MAX_ACCELERATION = 500.0
+# Mesa: Y etwas langsamer als X/Z (schwererer Tisch)
+MAX_VELOCITY     = 40.0
+MAX_ACCELERATION = 50.0
+MIN_LIMIT        = -1.0
+MAX_LIMIT        = 251.0
 
 [JOINT_1]
-TYPE = LINEAR
-HOME_SEQUENCE = 1
-HOME_SEARCH_VEL = 20.0
-HOME_LATCH_VEL = 1.0
+TYPE       = LINEAR
+MIN_LIMIT  = -1.0
+MAX_LIMIT  = 251.0
 
-# PID Parameters
-P = 10.0
-I = 0.0
-D = 0.1
-FF0 = 0.0
-FF1 = 1.0
-FF2 = 0.0
-DEADBAND = 0.005
-MAX_OUTPUT = 10.0
+HOME_SEQUENCE   = 1
+HOME_USE_INDEX  = YES
+HOME_SEARCH_VEL = 0
+HOME_LATCH_VEL  = 8.0
+HOME_FINAL_VEL  = 40.0
+# Mesa: Y-Position am Indexpuls = 250 mm
+HOME_OFFSET     = 250.0
+HOME            = 200.0
 
-# Scaling
-OUTPUT_SCALE = 10.0
-ENCODER_SCALE = 1000.0
+P       = 5.5
+I       = 0.0
+D       = 0.0
+BIAS    = 0.0
+FF0     = 0.0
+FF1     = 0.228
+FF2     = 0.0015
+DEADBAND    = 0.0
+MAX_OUTPUT  = 10.0
 
-# Following error limits (Closed Loop)
-FERROR = 1.0
-MIN_FERROR = 0.1
+# Y-Antriebsrichtung invertiert — ACHTUNG: Achse läuft weg wenn falsch!
+OUTPUT_SCALE  = -10.0
+# Y-Encoder: invertiert — unbedingt vor IBN prüfen!
+ENCODER_SCALE = -1000.0
+
+FERROR     = 0.5
+MIN_FERROR = 0.2
 
 
 # =========================================
-# Axis Z
+# Achse Z / Joint 2
+# MC250: Drive-Platine 1 / Platz 2
+# OUTPUT_SCALE = -10:  Z-Antrieb invertiert (Mesa-Referenz)
+# ENCODER_SCALE = +1000: Z-Richtung stimmt mit Encoder überein (Mesa)
+#
+# Koordinatensystem (Mesa, positiv):
+#   Z =   0 mm → Spindel ganz unten (max. Eintauchtiefe)
+#   Z = 376 mm → Spindel oben (Referenzpunkt / Werkzeugwechsel)
+#   Abweichend vom CM-File: dort −323…−0.1 mm (negatives System)
 # =========================================
+
 [AXIS_Z]
-MAX_VELOCITY = 50.0
-MAX_ACCELERATION = 250.0
+MAX_VELOCITY     = 41.667
+# Z mit Gegengewicht: Beschleunigung realistisch halten
+MAX_ACCELERATION = 50.0
+MIN_LIMIT        = -1.0
+MAX_LIMIT        = 376.0
 
 [JOINT_2]
-TYPE = LINEAR
-HOME_SEQUENCE = 2
-HOME_SEARCH_VEL = 10.0
-HOME_LATCH_VEL = 1.0
+TYPE       = LINEAR
+MIN_LIMIT  = -1.0
+MAX_LIMIT  = 376.0
 
-# PID Parameters
-P = 15.0
-I = 0.0
-D = 0.1
-FF0 = 0.0
-FF1 = 1.0
-FF2 = 0.0
-DEADBAND = 0.005
-MAX_OUTPUT = 10.0
+# Z IMMER zuerst referenzieren — Spindel sichern vor Tischbewegung!
+HOME_SEQUENCE   = 0
+HOME_USE_INDEX  = YES
+HOME_SEARCH_VEL = 0
+# Positiv: Spindel fährt hoch zum Indexpuls am oberen Anschlag
+HOME_LATCH_VEL  = 10.0
+HOME_FINAL_VEL  = 15.0
+# Mesa: Z-Position am Indexpuls = 375 mm (Spindel oben)
+HOME_OFFSET     = 375.0
+# Nach Referenz in sichere Höhe fahren
+HOME            = 370.0
 
-# Scaling
-OUTPUT_SCALE = 10.0
+# Z hat höheren P (Gewichtskraft, Bremse): Mesa 7.5
+P       = 7.5
+I       = 0.0
+D       = 0.0
+BIAS    = 0.0
+FF0     = 0.0
+FF1     = 0.218
+FF2     = 0.0020
+DEADBAND    = 0.0
+MAX_OUTPUT  = 10.0
+
+# Z-Antriebsrichtung invertiert
+OUTPUT_SCALE  = -10.0
+# Z-Encoder-Richtung stimmt (positiv = Spindel hoch)
 ENCODER_SCALE = 1000.0
 
-# Following error limits (Closed Loop)
-FERROR = 1.0
-MIN_FERROR = 0.1
+# Z braucht deutlich mehr Toleranz wegen Eigengewicht der Spindel
+# Mesa: FERROR=2.0 / MIN_FERROR=1.0
+FERROR     = 2.0
+MIN_FERROR = 1.0

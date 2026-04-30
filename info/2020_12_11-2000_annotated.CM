@@ -1,0 +1,226 @@
+%CM
+; ============================================================
+; MAHO Maschinenkonstanten – Philips 432/10
+; Datei: 2020_12_11-2000.CM
+; Referenz: Maschinenkonstanten-Beschreibung E3.2174xC / E3.2462xC
+; Aenderungsdatum Dok.: 22.01.1987
+; ============================================================
+
+; ------------------------------------------------------------
+; HARDWARE-KONFIGURATION
+; ------------------------------------------------------------
+N0 C1      ; MC0  | Anzahl I/O-Karten: 1 = eine I/O-Karte
+N1 C4      ; MC1  | Anzahl Drive-Module: 4
+N2 C224    ; MC2  | Gesamtspeicher NC-RAM: 224 KByte
+N4 C0      ; MC4  | Handbedienpult: 0 = kein Handbedienpult
+N9 C1      ; MC9  | Grafikmodul: 1 = 2-Ebenen-Modul
+
+; ------------------------------------------------------------
+; MASCHINEN-KONFIGURATION
+; ------------------------------------------------------------
+N10 C3     ; MC10 | Anzahl der Achsen: 3
+N11 C0     ; MC11 | Ebenenanwahl bei Netz-Ein: 0 = G17 (XY-Ebene)
+N14 C71    ; MC14 | Messsystemtyp: 71 = metrisch (70 = Zoll)
+N27 C99    ; MC27 | Anzahl der Werkzeuge im Magazin: 99
+N39 C0     ; MC39 | Verzoegerung Ausgaenge Werkzeugmagazin: 0 x 15ms = 0ms
+
+; ------------------------------------------------------------
+; M/T-ADRESS-AUSGABE
+; ------------------------------------------------------------
+N61 C5     ; MC61 | Ausgabe M-Adresse: 5 = dekodiert und BCD
+N63 C0     ; MC63 | Ausgabe T-Adresse: 0 = Aus (keine T-Adr.-Ausgabe)
+
+; ------------------------------------------------------------
+; SOFTWARE-KONFIGURATION CNC
+; ------------------------------------------------------------
+N80 C0     ; MC80 | Demo-Modus: 0 = Aus
+N81 C0     ; MC81 | Anzeigart Bildschirm: 0 = dist-to-go (Restweg)
+N82 C99    ; MC82 | Anzahl der Punktedefinitionen: 99
+N83 C99    ; MC83 | Anzahl der E-Parameter: 99
+N84 C0     ; MC84 | Anzeige Programmnummern: 0 = mit Text
+N85 C50    ; MC85 | Anzahl der Programme und Macros: 50
+N86 C1     ; MC86 | Softkey lock/unlock: 1 = aktiv
+
+; ------------------------------------------------------------
+; ACHSEN-KONFIGURATION – Anwahl und Zuordnung
+; Adressbezeichnung: X=88, Y=89, Z=90, A=65, B=66
+; Zuordnung MC-Block: 1=MC200-249, 2=MC250-299, 3=MC300-349,
+;                     4=MC350-399, 5=MC400-449, 6=MC450-499
+; ------------------------------------------------------------
+
+; --- 1. Achse: X ---
+N100 C1    ; MC100 | 1. Achse Funktion: 1 = geschlossener Lageregelkreis
+N101 C1    ; MC101 | 1. Achse MC-Block-Zuordnung: 1 = MC200–MC249
+N103 C88   ; MC103 | 1. Achse Adressbezeichnung: 88 = X
+
+; --- 2. Achse: Y ---
+N105 C1    ; MC105 | 2. Achse Funktion: 1 = geschlossener Lageregelkreis
+N106 C3    ; MC106 | 2. Achse MC-Block-Zuordnung: 3 = MC300–MC349
+N108 C89   ; MC108 | 2. Achse Adressbezeichnung: 89 = Y
+
+; --- 3. Achse: Z ---
+N110 C1    ; MC110 | 3. Achse Funktion: 1 = geschlossener Lageregelkreis
+N111 C2    ; MC111 | 3. Achse MC-Block-Zuordnung: 2 = MC250–MC299
+N113 C90   ; MC113 | 3. Achse Adressbezeichnung: 90 = Z
+
+; --- 4. Achse: B (Rundachse, inaktiv) ---
+N116 C4    ; MC116 | 4. Achse MC-Block-Zuordnung: 4 = MC350–MC399
+N118 C66   ; MC118 | 4. Achse Adressbezeichnung: 66 = B
+
+; ============================================================
+; ACHS-PARAMETER-BLOCK 1. ACHSE: X  (MC200–MC249)
+; Drive-Platine 1 / Platz 1
+; ============================================================
+N200 C1    ; MC200 | X: Zuordnung Drive-Modul: 1 = Drive-Platine 1/Platz 1
+N202 C1    ; MC202 | X: Messystem Zaehlrichtung: +1 = positiv
+N203 C2    ; MC203 | X: Messystem Impulsvervielfachung: 2 = x4
+N205 C25000 ; MC205 | X: Eilganggeschwindigkeit: 25000 x 0.1 mm/min = 2500 mm/min
+N206 C15000 ; MC206 | X: Vorschub Tippbetrieb: 15000 x 0.1 mm/min = 1500 mm/min
+N208 C10000 ; MC208 | X: Referenzpunktfahren Geschwindigkeit: 1000 mm/min
+N209 C1000  ; MC209 | X: Position Einfahren Softwareendschalter: 1000 Inkremente
+N215 C2775  ; MC215 | X: Schleppabstand 1 bei 10V: 2775 Inkremente
+N216 C2775  ; MC216 | X: Knickpunkt Schleppabstand: 2775 Inkremente
+N217 C2775  ; MC217 | X: Schleppabstand 2 bei 10V: 2775 Inkremente
+N218 C2     ; MC218 | X: Gefuehrte Beschleunigung/Verzoegerung: 2 = doppelt
+N219 C100   ; MC219 | X: Hochlaufzeit bei gefuehrt. Beschl.: 100 ms
+N220 C0     ; MC220 | X: Sollwertsprung gefuehrt. Beschl.: 0 x 0.1 mm/min
+N221 C5     ; MC221 | X: In-Position Verzoegerungszeit: 5 x 15ms = 75ms
+N222 C10    ; MC222 | X: In-Position Fenster: 10 Inkremente
+N223 C200   ; MC223 | X: Fenster Stillstandsueberwachung: 200 Inkremente
+N224 C0     ; MC224 | X: Spielausgleich: 0 Inkremente (kein Spiel)
+N230 C-1    ; MC230 | X: Anfahrrichtung Referenzpunkt: -1 = negativ
+N231 C10000 ; MC231 | X: Anfahrgeschwindigkeit Referenzpunkt: 1000 mm/min
+N232 C100   ; MC232 | X: Anfahrgeschwindigkeit Schleichgang: 10 mm/min
+N233 C-400600 ; MC233 | X: Referenzpunktverschiebung: -400600 Inkremente
+N234 C0     ; MC234 | X: In-Gebietschalter f. Referenzpunkt: 0 = nicht aktiv
+N235 C401100 ; MC235 | X: Softwareendschalter + Richtung: +401100 Inkremente (~401.1 mm)
+N236 C100   ; MC236 | X: Softwareendschalter - Richtung: +100 Inkremente
+N237 C-11500 ; MC237 | X: Wechselposition 1 f. M68/M86: -11500 Inkremente
+N238 C0     ; MC238 | X: Wechselposition 2 f. M68: 0 Inkremente
+N240 C0     ; MC240 | X: Festtaster Position: 0 Inkremente
+N242 C-1    ; MC242 | X: Messtaster Kalibrierring Mittelpunkt: -1 Inkremente
+
+; ============================================================
+; ACHS-PARAMETER-BLOCK 3. ACHSE: Z  (MC250–MC299)
+; HINWEIS: Z-Achse liegt auf MC-Block 2 (MC250–299), obwohl
+;          sie die 3. logische Achse ist (N111 C2)
+; Drive-Platine 1 / Platz 2
+; ============================================================
+N250 C2     ; MC250 | Z: Zuordnung Drive-Modul: 2 = Drive-Platine 1/Platz 2
+N252 C1     ; MC252 | Z: Messystem Zaehlrichtung: +1 = positiv
+N253 C2     ; MC253 | Z: Messystem Impulsvervielfachung: 2 = x4
+N255 C25000 ; MC255 | Z: Eilganggeschwindigkeit: 2500 mm/min
+N256 C15000 ; MC256 | Z: Vorschub Tippbetrieb: 1500 mm/min
+N258 C10000 ; MC258 | Z: Referenzpunktfahren Geschwindigkeit: 1000 mm/min
+N259 C1000  ; MC259 | Z: Position Einfahren Softwareendschalter: 1000 Inkremente
+N265 C2775  ; MC265 | Z: Schleppabstand 1 bei 10V: 2775 Inkremente
+N266 C2775  ; MC266 | Z: Knickpunkt: 2775 Inkremente
+N267 C2775  ; MC267 | Z: Schleppabstand 2 bei 10V: 2775 Inkremente
+N268 C2     ; MC268 | Z: Gefuehrte Beschleunigung/Verzoegerung: 2 = doppelt
+N269 C100   ; MC269 | Z: Hochlaufzeit: 100 ms
+N270 C0     ; MC270 | Z: Sollwertsprung: 0 mm/min
+N271 C5     ; MC271 | Z: In-Position Verzoegerungszeit: 75 ms
+N272 C10    ; MC272 | Z: In-Position Fenster: 10 Inkremente
+N273 C200   ; MC273 | Z: Fenster Stillstandsueberwachung: 200 Inkremente
+N274 C0     ; MC274 | Z: Spielausgleich: 0 Inkremente
+N280 C1     ; MC280 | Z: Anfahrrichtung Referenzpunkt: +1 = positiv (aufwaerts)
+N281 C10000 ; MC281 | Z: Anfahrgeschwindigkeit Referenzpunkt: 1000 mm/min
+N282 C0     ; MC282 | Z: Anfahrgeschwindigkeit Schleichgang: 0 (Standardwert)
+N283 C322500 ; MC283 | Z: Referenzpunktverschiebung: +322500 Inkremente
+N284 C0     ; MC284 | Z: In-Gebietschalter f. Referenzpunkt: 0 = nicht aktiv
+N285 C-100  ; MC285 | Z: Softwareendschalter + Richtung: -100 Inkremente (oberer Anschlag)
+N286 C-323000 ; MC286 | Z: Softwareendschalter - Richtung: -323000 Inkremente (~-323 mm Verfahrweg)
+N287 C173000 ; MC287 | Z: Wechselposition 1 f. M68/M86: +173000 Inkremente (WZ-Wechselhoehe)
+N288 C0     ; MC288 | Z: Wechselposition 2 f. M68: 0
+N290 C0     ; MC290 | Z: Festtaster Position: 0
+N292 C-1    ; MC292 | Z: Messtaster Kalibrierring Mittelpunkt: -1 Inkremente
+
+; ============================================================
+; ACHS-PARAMETER-BLOCK 2. ACHSE: Y  (MC300–MC349)
+; HINWEIS: Y-Achse liegt auf MC-Block 3 (MC300–349), obwohl
+;          sie die 2. logische Achse ist (N106 C3)
+; Drive-Platine 2 / Platz 1
+; ============================================================
+N300 C3     ; MC300 | Y: Zuordnung Drive-Modul: 3 = Drive-Platine 2/Platz 1
+N302 C1     ; MC302 | Y: Messystem Zaehlrichtung: +1 = positiv
+N303 C2     ; MC303 | Y: Messystem Impulsvervielfachung: 2 = x4
+N305 C25000 ; MC305 | Y: Eilganggeschwindigkeit: 2500 mm/min
+N306 C15000 ; MC306 | Y: Vorschub Tippbetrieb: 1500 mm/min
+N308 C10000 ; MC308 | Y: Referenzpunktfahren Geschwindigkeit: 1000 mm/min
+N309 C1000  ; MC309 | Y: Position Einfahren Softwareendschalter: 1000 Inkremente
+N315 C2775  ; MC315 | Y: Schleppabstand 1 bei 10V: 2775 Inkremente
+N316 C2775  ; MC316 | Y: Knickpunkt: 2775 Inkremente
+N317 C2775  ; MC317 | Y: Schleppabstand 2 bei 10V: 2775 Inkremente
+N318 C2     ; MC318 | Y: Gefuehrte Beschleunigung/Verzoegerung: 2 = doppelt
+N319 C100   ; MC319 | Y: Hochlaufzeit: 100 ms
+N320 C0     ; MC320 | Y: Sollwertsprung: 0 mm/min
+N321 C5     ; MC321 | Y: In-Position Verzoegerungszeit: 75 ms
+N322 C10    ; MC322 | Y: In-Position Fenster: 10 Inkremente
+N323 C200   ; MC323 | Y: Fenster Stillstandsueberwachung: 200 Inkremente
+N324 C0     ; MC324 | Y: Spielausgleich: 0 Inkremente
+N330 C1     ; MC330 | Y: Anfahrrichtung Referenzpunkt: +1 = positiv
+N331 C10000 ; MC331 | Y: Anfahrgeschwindigkeit Referenzpunkt: 1000 mm/min
+N332 C0     ; MC332 | Y: Anfahrgeschwindigkeit Schleichgang: 0
+N333 C249500 ; MC333 | Y: Referenzpunktverschiebung: +249500 Inkremente
+N334 C0     ; MC334 | Y: In-Gebietschalter f. Referenzpunkt: 0 = nicht aktiv
+N335 C1500  ; MC335 | Y: Softwareendschalter + Richtung: +1500 Inkremente
+N336 C-250000 ; MC336 | Y: Softwareendschalter - Richtung: -250000 Inkremente (~-250 mm Verfahrweg)
+N337 C-346000 ; MC337 | Y: Wechselposition 1 f. M68/M86: -346000 Inkremente
+N338 C0     ; MC338 | Y: Wechselposition 2 f. M68: 0
+N340 C0     ; MC340 | Y: Festtaster Position: 0
+N342 C-1    ; MC342 | Y: Messtaster Kalibrierring Mittelpunkt: -1 Inkremente
+
+; ============================================================
+; ACHS-PARAMETER-BLOCK 4. ACHSE: B  (MC350–MC399)
+; B-Achse nicht aktiv (N350 C0) – nur SW-Endschalter definiert
+; ============================================================
+N350 C0     ; MC350 | B: Zuordnung Drive-Modul: 0 = nicht aktiv
+N352 C1     ; MC352 | B: Messystem Zaehlrichtung: +1 = positiv (Defaultwert)
+N353 C0     ; MC353 | B: Messystem Impulsvervielfachung: 0 = 1:1
+N383 C-1    ; MC383 | B: Referenzpunktverschiebung: -1 Inkremente
+N384 C0     ; MC384 | B: In-Gebietschalter f. Referenzpunkt: 0 = nicht aktiv
+N385 C-1    ; MC385 | B: Softwareendschalter + Richtung: -1 Inkremente
+N386 C0     ; MC386 | B: Softwareendschalter - Richtung: 0 Inkremente
+
+; ============================================================
+; SPINDEL-PARAMETER (Fraesspin delmotor MC500–MC591)
+; ============================================================
+N579 C5     ; MC579 | Spindel: Fraesspindeldrehzahlreihe (10-stufig): 5 = 80–4000 U/min
+N590 C8     ; MC590 | Spindel: Fraesspindeltakt Pausenzeit: 8 x 50ms = 400ms
+N591 C10    ; MC591 | Spindel: Fraesspindeltakt Impulszeit: 10 x 50ms = 500ms
+
+; ============================================================
+; ALLGEMEINE MASCHINENKONSTANTEN
+; ============================================================
+N705 C3     ; MC705 | Dezimalpunkt Weginformation/Koordinaten: Stelle 3 (0.001 mm)
+N706 C3     ; MC706 | Dezimalpunkt Vorschubwerte: Stelle 3
+N707 C71    ; MC707 | Betriebsart Zoll/metrisch bei Netz-Ein: 71 = metrisch
+N710 C10    ; MC710 | Zwischenkreis/Gerade bei tangentialen Uebergaengen: 10 Inkremente
+N711 C44    ; MC711 | Rundungswinkel fuer G41/G42: 44 Grad
+N712 C10    ; MC712 | Zielpunktfenster bei Kreisprog. mit IJK: 10 Inkremente
+N713 C0     ; MC713 | Schruppen: 0 = Aus
+N714 C2     ; MC714 | Vergroesserung/Verkleinerung: 2 = Faktor mit Werkzeugachse
+N715 C6     ; MC715 | Dezimalpunkt Faktor Vergroesserung/Verkl.: Stelle 6
+N720 C83    ; MC720 | Werkzeugueberlappung bei Taschenfraesen: 83 (x E)
+N723 C5000  ; MC723 | Abstand Lochgrund fuer Spindelreduz. G84: 5000 Inkremente
+N724 C0     ; MC724 | Umkehrzeit Links/Rechtslauf G84: 0 x 15ms
+N730 C0     ; MC730 | (Reserviert / nicht dokumentiert in Ref.)
+N731 C0     ; MC731 | Eingaenge Open Loop: 0 = nicht aktiviert
+
+; --- Vorschubgrenzen ---
+N740 C15000 ; MC740 | Max. Vorschubgeschwindigkeit: 15000 x 0.1 mm/min = 1500 mm/min
+N741 C10000 ; MC741 | Vorschubgeschwindigkeit Testbetrieb: 1000 mm/min
+N745 C150   ; MC745 | Vorschubbeeinflussung max. Wert: 150 %
+N746 C0     ; MC746 | Vorschubbeeinflussung min. Wert: 0 %
+
+; --- Serielle Datenkommunikation ---
+N770 C0     ; MC770 | Ser. Daten-E/A: 0 = local V24, kein V11
+N771 C1     ; MC771 | Ein-/Ausgabecode (data I/O): 1 = ISO
+N772 C2     ; MC772 | Autom. Codeerkennung: 2 = nicht aktiv mit XON/XOFF
+N773 C30    ; MC773 | Nachgesendete Zeichen nach Einlesen-Stop: 30 Zeichen
+N775 C0     ; MC775 | V24 Anzahl Stopbits: 0 = 1 Stopbit
+N776 C4800  ; MC776 | V24 Baudrate auslesen: 4800 Baud
+N777 C4800  ; MC777 | V24 Baudrate einlesen: 4800 Baud
+N785 C1     ; MC785 | V11 Anzahl Stopbits: 1 = 2 Stopbits
+N786 C4800  ; MC786 | V11 Baudrate ein-/auslesen: 4800 Baud
+N796 C0     ; MC796 | Summernummer-Ueberpruefung: 0 = Aus
