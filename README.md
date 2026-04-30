@@ -36,7 +36,7 @@ accomplished Milestones / ToDo:
 ## Documentation
 My bachelor's thesis addressed the topic of this retrofit in detail. Feel free to use it as a reference. The components were not installed within the CNC mill, but that step is planned in the near future (coming soon™).
 
-The [thesis](docs/bachelors_thesis.pdf) can be found in the ```docs``` subfolder.
+The [thesis](https://pedpex.github.io/Maho400E-LinuxCNC/docs/bachelors_thesis.pdf) can be found in the ```docs``` subfolder.
 
 ## Reference Configuration
 [RotarySMP](https://github.com/rotarysmp) already retrofitted the exact same MAHO MH400E CNC mill with Mesa hardware and made a [very good video](https://www.youtube.com/watch?v=LXwbRhgq1og) about it. In the still ongoing [discussion on the LinuxCNC Forum](https://forum.linuxcnc.org/12-milling/33035-retrofitting-a-1986-maho-mh400e) he also shared his configuration, which was also used within this project and can be found within the [RotarySMP_reference](RotarySMP_reference/) subfolder (only INI and HAL file).
