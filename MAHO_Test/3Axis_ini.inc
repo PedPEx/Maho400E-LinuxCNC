@@ -61,11 +61,12 @@ TYPE       = LINEAR
 MIN_LIMIT  = -1.0
 MAX_LIMIT  = 400.0
 
-# --- Homing: Indexpuls (kein physischer Referenzschalter) ---
-# SEARCH_VEL=0: kein Schalter suchen, Achse fährt direkt auf Indexpuls
-# LATCH_VEL negativ: X fährt in negativer Richtung zum Index
+# --- Homing: EP5101 Latch-C ---
+# Kein physischer Schalter, kein Indexpuls-Protokoll (HOME_USE_INDEX entfernt)
+# SEARCH_VEL=0: Achse fährt direkt mit LATCH_VEL, kein Schaltersuchen
+# Ablauf: homing=TRUE → ena-latch-c=TRUE → C-Puls → latch-c-valid=TRUE
+#         → home-sw-in=TRUE → LinuxCNC setzt Maschinenpos. auf HOME_OFFSET
 HOME_SEQUENCE   = 1
-HOME_USE_INDEX  = YES
 HOME_SEARCH_VEL = 0
 HOME_LATCH_VEL  = -10.0
 HOME_FINAL_VEL  = -1.0
@@ -123,12 +124,11 @@ TYPE       = LINEAR
 MIN_LIMIT  = -1.0
 MAX_LIMIT  = 251.0
 
+# --- Homing: EP5101 Latch-C ---
 HOME_SEQUENCE   = 1
-HOME_USE_INDEX  = YES
 HOME_SEARCH_VEL = 0
 HOME_LATCH_VEL  = 8.0
 HOME_FINAL_VEL  = 40.0
-# Mesa: Y-Position am Indexpuls = 250 mm
 HOME_OFFSET     = 250.0
 HOME            = 200.0
 
@@ -175,9 +175,9 @@ TYPE       = LINEAR
 MIN_LIMIT  = -1.0
 MAX_LIMIT  = 376.0
 
-# Z IMMER zuerst referenzieren — Spindel sichern vor Tischbewegung!
+# --- Homing: EP5101 Latch-C ---
+# Z immer zuerst referenzieren!
 HOME_SEQUENCE   = 0
-HOME_USE_INDEX  = YES
 HOME_SEARCH_VEL = 0
 # Positiv: Spindel fährt hoch zum Indexpuls am oberen Anschlag
 HOME_LATCH_VEL  = 10.0
