@@ -67,11 +67,12 @@ MAX_LIMIT  = 400.0
 # Ablauf: homing=TRUE → ena-latch-c=TRUE → C-Puls → latch-c-valid=TRUE
 #         → home-sw-in=TRUE → LinuxCNC setzt Maschinenpos. auf HOME_OFFSET
 HOME_SEQUENCE   = 1
-HOME_SEARCH_VEL = 0
-HOME_LATCH_VEL  = -10.0
-HOME_FINAL_VEL  = -1.0
+HOME_SEARCH_VEL = -2.5
+#HOME_USE_INDEX  = YES
+HOME_LATCH_VEL  = -1.0
+#HOME_FINAL_VEL  = 10.0
 HOME_OFFSET     = 0.0
-HOME            = 100.0
+HOME            = 5.0
 
 # --- PID: Mesa-Werte (real abgestimmt) ---
 P       = 6.5
@@ -89,7 +90,7 @@ MAX_OUTPUT  = 10.0
 
 OUTPUT_SCALE  = 10.0
 # Negatives Vorzeichen: X-Encoder zählt entgegengesetzt zur Bewegungsrichtung
-ENCODER_SCALE = -1000.0
+ENCODER_SCALE = -500.0
 
 # Mesa-Toleranzen — für erste Inbetriebnahme großzügig lassen
 FERROR     = 0.5
@@ -126,11 +127,12 @@ MAX_LIMIT  = 251.0
 
 # --- Homing: EP5101 Latch-C ---
 HOME_SEQUENCE   = 1
-HOME_SEARCH_VEL = 0
-HOME_LATCH_VEL  = 8.0
-HOME_FINAL_VEL  = 40.0
+HOME_SEARCH_VEL = 2.5
+#HOME_USE_INDEX  = YES
+HOME_LATCH_VEL  = 1.0
+#HOME_FINAL_VEL  = 10.0
 HOME_OFFSET     = 250.0
-HOME            = 200.0
+HOME            = 245.0
 
 P       = 5.5
 I       = 0.0
@@ -145,7 +147,7 @@ MAX_OUTPUT  = 10.0
 # Y-Antriebsrichtung invertiert — ACHTUNG: Achse läuft weg wenn falsch!
 OUTPUT_SCALE  = -10.0
 # Y-Encoder: invertiert — unbedingt vor IBN prüfen!
-ENCODER_SCALE = -1000.0
+ENCODER_SCALE = 500.0
 
 FERROR     = 0.5
 MIN_FERROR = 0.2
@@ -178,10 +180,11 @@ MAX_LIMIT  = 376.0
 # --- Homing: EP5101 Latch-C ---
 # Z immer zuerst referenzieren!
 HOME_SEQUENCE   = 0
-HOME_SEARCH_VEL = 0
+HOME_SEARCH_VEL = 2.5
 # Positiv: Spindel fährt hoch zum Indexpuls am oberen Anschlag
-HOME_LATCH_VEL  = 10.0
-HOME_FINAL_VEL  = 15.0
+#HOME_USE_INDEX  = YES
+HOME_LATCH_VEL  = 1.0
+#HOME_FINAL_VEL  = 10.0
 # Mesa: Z-Position am Indexpuls = 375 mm (Spindel oben)
 HOME_OFFSET     = 375.0
 # Nach Referenz in sichere Höhe fahren
@@ -198,12 +201,8 @@ FF2     = 0.0020
 DEADBAND    = 0.0
 MAX_OUTPUT  = 10.0
 
-# Z-Antriebsrichtung invertiert
-OUTPUT_SCALE  = -10.0
-# Z-Encoder-Richtung stimmt (positiv = Spindel hoch)
-ENCODER_SCALE = 1000.0
+OUTPUT_SCALE  = 10.0
+ENCODER_SCALE = -500.0
 
-# Z braucht deutlich mehr Toleranz wegen Eigengewicht der Spindel
-# Mesa: FERROR=2.0 / MIN_FERROR=1.0
 FERROR     = 2.0
 MIN_FERROR = 1.0

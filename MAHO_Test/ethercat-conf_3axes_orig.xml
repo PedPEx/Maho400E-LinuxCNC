@@ -8,7 +8,110 @@
 		<slave idx="4" type="EL2809" name="EL2809-0"/>
 		<slave idx="5" type="EL2809" name="EL2809-1"/>
 		<slave idx="6" type="EL4034" name="EL4034"/>
-		<slave idx="7" type="FC302" name="FC302">
+		<slave idx="7" type="EL6224" name="EL6224">
+			<!-- Port 1: Siemens device, ch1 = output, ch0+ch2-7 = inputs -->
+			<modParam name="port1active"  value="true"/>
+			<modParam name="port1OutMask" value="0x02"/>
+			<!-- Port 2: not connected -->
+			<modParam name="port2active"  value="true"/>
+			<!-- Port 3: not connected -->
+			<modParam name="port3active"  value="false"/>
+			<!-- Port 4: not connected -->
+			<modParam name="port4active"  value="false"/>
+		</slave>
+		<slave idx="8" type="EL6002" name="EL6002"/>
+		<!--EL6002 Interface 2Ch. (RS232)-->
+		<slave idx="9" type="EP5101" name="EP5101-x">
+			<!-- 0x8000:01 Enable C reset (index pulse resets counter)       -->
+			<modParam name="enableCReset"       value="0"/>
+			<!-- 0x8000:02 Enable extern reset via external input            -->  
+			<modParam name="enableExtReset"     value="0"/>
+			<!-- 0x8000:03 Enable up/down counter (direction from B-track)   -->  
+			<modParam name="enableUpDown"       value="1"/>
+			<!-- 0x8000:04 Gate polarity (0=active LOW, 1=active HIGH)       -->  
+			<modParam name="gatePolarity"       value="0"/>
+			<!-- 0x8000:08 Disable input filter (0=active, 1=disabled)       -->  
+			<modParam name="disableFilter"      value="0"/>
+			<!-- 0x8000:0A Enable micro increments                           -->  
+			<modParam name="enableMicroInc"     value="0"/>
+			<!-- 0x8000:0E Reversion of rotation (0=normal, 1=inverted)      -->  
+			<modParam name="revRotation"        value="0"/>
+			<!-- 0x8000:10 Extern reset polarity (0=rising edge)             -->  
+			<modParam name="extResetPolarity"   value="0"/>
+			<!-- 0x8000:11 Frequency window                                  -->  
+			<!-- <modParam name="freqWindow"         value="0"/> -->
+			<!-- 0x8000:13 Frequency scaling                                 -->  
+			<!-- <modParam name="freqScaling"        value="0"/> -->
+			<!-- 0x8000:14 Period scaling                                    -->  
+			<!-- <modParam name="periodScaling"      value="0"/> -->
+			<!-- 0x8000:15 Frequency resolution                              -->  
+			<!-- <modParam name="freqResolution"     value="0"/> -->
+			<!-- 0x8000:16 Period resolution                                 -->  
+			<!-- <modParam name="periodResolution"   value="0"/> -->
+			<!-- 0x8000:17 Frequency wait time                               -->  
+			<!-- <modParam name="waitTime"           value="0"/> -->
+		</slave>
+		<slave idx="10" type="EP5101" name="EP5101-y">
+			<!-- 0x8000:01 Enable C reset (index pulse resets counter)       -->  
+			<modParam name="enableCReset"       value="0"/>
+			<!-- 0x8000:02 Enable extern reset via external input            -->  
+			<!-- <modParam name="enableExtReset"     value="0"/> -->
+			<!-- 0x8000:03 Enable up/down counter (direction from B-track)   -->  
+			<!-- <modParam name="enableUpDown"       value="1"/> -->
+			<!-- 0x8000:04 Gate polarity (0=active LOW, 1=active HIGH)       -->  
+			<!-- <modParam name="gatePolarity"       value="0"/> -->
+			<!-- 0x8000:08 Disable input filter (0=active, 1=disabled)       -->  
+			<!-- <modParam name="disableFilter"      value="0"/> -->
+			<!-- 0x8000:0A Enable micro increments                           -->  
+			<!-- <modParam name="enableMicroInc"     value="0"/> -->
+			<!-- 0x8000:0E Reversion of rotation (0=normal, 1=inverted)      -->  
+			<!-- <modParam name="revRotation"        value="0"/> -->
+			<!-- 0x8000:10 Extern reset polarity (0=rising edge)             -->  
+			<!-- <modParam name="extResetPolarity"   value="0"/> -->
+			<!-- 0x8000:11 Frequency window                                  -->  
+			<!-- <modParam name="freqWindow"         value="0"/> -->
+			<!-- 0x8000:13 Frequency scaling                                 -->  
+			<!-- <modParam name="freqScaling"        value="0"/> -->
+			<!-- 0x8000:14 Period scaling                                    -->  
+			<!-- <modParam name="periodScaling"      value="0"/> -->
+			<!-- 0x8000:15 Frequency resolution                              --> 
+			<!-- <modParam name="freqResolution"     value="0"/> -->
+			<!-- 0x8000:16 Period resolution                                 -->  
+			<!-- <modParam name="periodResolution"   value="0"/> -->
+			<!-- 0x8000:17 Frequency wait time                               -->  
+			<!-- <modParam name="waitTime"           value="0"/> -->
+		</slave>
+		<slave idx="11" type="EP5101" name="EP5101-z">
+			<!-- 0x8000:01 Enable C reset (index pulse resets counter)       -->  
+			<modParam name="enableCReset"       value="0"/>
+			<!-- 0x8000:02 Enable extern reset via external input            -->  
+			<!-- <modParam name="enableExtReset"     value="0"/> -->
+			<!-- 0x8000:03 Enable up/down counter (direction from B-track)   -->  
+			<!-- <modParam name="enableUpDown"       value="1"/> -->
+			<!-- 0x8000:04 Gate polarity (0=active LOW, 1=active HIGH)       -->  
+			<!-- <modParam name="gatePolarity"       value="0"/> -->
+			<!-- 0x8000:08 Disable input filter (0=active, 1=disabled)       -->  
+			<!-- <modParam name="disableFilter"      value="0"/> -->
+			<!-- 0x8000:0A Enable micro increments                           -->  
+			<!-- <modParam name="enableMicroInc"     value="0"/> -->
+			<!-- 0x8000:0E Reversion of rotation (0=normal, 1=inverted)      -->  
+			<!-- <modParam name="revRotation"        value="0"/> -->
+			<!-- 0x8000:10 Extern reset polarity (0=rising edge)             -->  
+			<!-- <modParam name="extResetPolarity"   value="0"/> -->
+			<!-- 0x8000:11 Frequency window                                  -->  
+			<!-- <modParam name="freqWindow"         value="0"/> -->
+			<!-- 0x8000:13 Frequency scaling                                 -->  
+			<!-- <modParam name="freqScaling"        value="0"/> -->
+			<!-- 0x8000:14 Period scaling                                    -->  
+			<!-- <modParam name="periodScaling"      value="0"/> -->
+			<!-- 0x8000:15 Frequency resolution                              --> 
+			<!-- <modParam name="freqResolution"     value="0"/> -->
+			<!-- 0x8000:16 Period resolution                                 -->  
+			<!-- <modParam name="periodResolution"   value="0"/> -->
+			<!-- 0x8000:17 Frequency wait time                               -->  
+			<!-- <modParam name="waitTime"           value="0"/> -->
+		</slave>
+		<slave idx="12" type="FC302" name="FC302">
 			<modParam name="accelDeltaSpeed"  value="5000"/>  <!-- Zaehler: 50,00 Hz Spanne -->
 			<modParam name="accelDeltaTime"   value="2000"/>  <!-- Nenner: 2,000 s          -->
 			<modParam name="decelDeltaSpeed"  value="5000"/>
@@ -20,96 +123,6 @@
 			<!-- FC302 par. 12-22.9 bestimmt welcher Sensor im letzten PDO-Slot steckt -->
   			<modParam name="tempSlotSource" value="1639"/>
 			<modParam name="sdoReadConfig" value="255"/>
-		</slave>
-		<slave idx="8" type="EP5101" name="EP5101-x">
-			<!-- 0x8000:01 Enable C reset (index pulse resets counter)       -->  
-			<modParam name="enableCReset"       value="0"/>
-			<!-- 0x8000:02 Enable extern reset via external input            -->  
-			<!-- <modParam name="enableExtReset"     value="0"/> -->
-			<!-- 0x8000:03 Enable up/down counter (direction from B-track)   -->  
-			<!-- <modParam name="enableUpDown"       value="0"/> -->
-			<!-- 0x8000:04 Gate polarity (0=active LOW, 1=active HIGH)       -->  
-			<!-- <modParam name="gatePolarity"       value="0"/> -->
-			<!-- 0x8000:08 Disable input filter (0=active, 1=disabled)       -->  
-			<!-- <modParam name="disableFilter"      value="0"/> -->
-			<!-- 0x8000:0A Enable micro increments                           -->  
-			<!-- <modParam name="enableMicroInc"     value="0"/> -->
-			<!-- 0x8000:0E Reversion of rotation (0=normal, 1=inverted)      -->  
-			<!-- <modParam name="revRotation"        value="0"/> -->
-			<!-- 0x8000:10 Extern reset polarity (0=rising edge)             -->  
-			<!-- <modParam name="extResetPolarity"   value="0"/> -->
-			<!-- 0x8000:11 Frequency window                                  -->  
-			<!-- <modParam name="freqWindow"         value="0"/> -->
-			<!-- 0x8000:13 Frequency scaling                                 -->  
-			<!-- <modParam name="freqScaling"        value="0"/> -->
-			<!-- 0x8000:14 Period scaling                                    -->  
-			<!-- <modParam name="periodScaling"      value="0"/> -->
-			<!-- 0x8000:15 Frequency resolution                              --> 
-			<!-- <modParam name="freqResolution"     value="0"/> -->
-			<!-- 0x8000:16 Period resolution                                 -->  
-			<!-- <modParam name="periodResolution"   value="0"/> -->
-			<!-- 0x8000:17 Frequency wait time                               -->  
-			<!-- <modParam name="waitTime"           value="0"/> -->
-		</slave>
-		<slave idx="9" type="EP5101" name="EP5101-y">
-			<!-- 0x8000:01 Enable C reset (index pulse resets counter)       -->  
-			<modParam name="enableCReset"       value="0"/>
-			<!-- 0x8000:02 Enable extern reset via external input            -->  
-			<!-- <modParam name="enableExtReset"     value="0"/> -->
-			<!-- 0x8000:03 Enable up/down counter (direction from B-track)   -->  
-			<!-- <modParam name="enableUpDown"       value="0"/> -->
-			<!-- 0x8000:04 Gate polarity (0=active LOW, 1=active HIGH)       -->  
-			<!-- <modParam name="gatePolarity"       value="0"/> -->
-			<!-- 0x8000:08 Disable input filter (0=active, 1=disabled)       -->  
-			<!-- <modParam name="disableFilter"      value="0"/> -->
-			<!-- 0x8000:0A Enable micro increments                           -->  
-			<!-- <modParam name="enableMicroInc"     value="0"/> -->
-			<!-- 0x8000:0E Reversion of rotation (0=normal, 1=inverted)      -->  
-			<!-- <modParam name="revRotation"        value="0"/> -->
-			<!-- 0x8000:10 Extern reset polarity (0=rising edge)             -->  
-			<!-- <modParam name="extResetPolarity"   value="0"/> -->
-			<!-- 0x8000:11 Frequency window                                  -->  
-			<!-- <modParam name="freqWindow"         value="0"/> -->
-			<!-- 0x8000:13 Frequency scaling                                 -->  
-			<!-- <modParam name="freqScaling"        value="0"/> -->
-			<!-- 0x8000:14 Period scaling                                    -->  
-			<!-- <modParam name="periodScaling"      value="0"/> -->
-			<!-- 0x8000:15 Frequency resolution                              --> 
-			<!-- <modParam name="freqResolution"     value="0"/> -->
-			<!-- 0x8000:16 Period resolution                                 -->  
-			<!-- <modParam name="periodResolution"   value="0"/> -->
-			<!-- 0x8000:17 Frequency wait time                               -->  
-			<!-- <modParam name="waitTime"           value="0"/> -->
-		</slave>
-		<slave idx="10" type="EP5101" name="EP5101-z">
-			<!-- 0x8000:01 Enable C reset (index pulse resets counter)       -->  
-			<modParam name="enableCReset"       value="0"/>
-			<!-- 0x8000:02 Enable extern reset via external input            -->  
-			<!-- <modParam name="enableExtReset"     value="0"/> -->
-			<!-- 0x8000:03 Enable up/down counter (direction from B-track)   -->  
-			<!-- <modParam name="enableUpDown"       value="0"/> -->
-			<!-- 0x8000:04 Gate polarity (0=active LOW, 1=active HIGH)       -->  
-			<!-- <modParam name="gatePolarity"       value="0"/> -->
-			<!-- 0x8000:08 Disable input filter (0=active, 1=disabled)       -->  
-			<!-- <modParam name="disableFilter"      value="0"/> -->
-			<!-- 0x8000:0A Enable micro increments                           -->  
-			<!-- <modParam name="enableMicroInc"     value="0"/> -->
-			<!-- 0x8000:0E Reversion of rotation (0=normal, 1=inverted)      -->  
-			<!-- <modParam name="revRotation"        value="0"/> -->
-			<!-- 0x8000:10 Extern reset polarity (0=rising edge)             -->  
-			<!-- <modParam name="extResetPolarity"   value="0"/> -->
-			<!-- 0x8000:11 Frequency window                                  -->  
-			<!-- <modParam name="freqWindow"         value="0"/> -->
-			<!-- 0x8000:13 Frequency scaling                                 -->  
-			<!-- <modParam name="freqScaling"        value="0"/> -->
-			<!-- 0x8000:14 Period scaling                                    -->  
-			<!-- <modParam name="periodScaling"      value="0"/> -->
-			<!-- 0x8000:15 Frequency resolution                              --> 
-			<!-- <modParam name="freqResolution"     value="0"/> -->
-			<!-- 0x8000:16 Period resolution                                 -->  
-			<!-- <modParam name="periodResolution"   value="0"/> -->
-			<!-- 0x8000:17 Frequency wait time                               -->  
-			<!-- <modParam name="waitTime"           value="0"/> -->
 		</slave>
 	</master>
 	<!-- Internal EtherCAT Master 1 - External Devices only! Removable Pendant, ... -->

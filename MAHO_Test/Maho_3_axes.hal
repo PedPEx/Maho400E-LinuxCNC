@@ -8,6 +8,11 @@ loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JO
 # Load 3 PID controllers for the X, Y, and Z axes
 loadrt pid names=pid.x,pid.y,pid.z
 
+# loadrt: two oneshots per axis
+loadrt oneshot names=oneshot.xrearm,oneshot.xsw,oneshot.yrearm,oneshot.ysw,oneshot.zrearm,oneshot.zsw
+loadrt not     names=not.xhome,not.yhome,not.zhome
+loadrt and2    names=and2.xhome,and2.yhome,and2.zhome
+
 loadusr -W lcec_conf ethercat-conf_3axes.xml
 loadrt lcec
 
@@ -19,23 +24,45 @@ loadrt lcec
 # 1. Read inputs -> 2. Calculate motion -> 3. Calculate PID -> 4. Write outputs
 addf lcec.read-all servo-thread
 
-addf motion-command-handler servo-thread
-addf motion-controller servo-thread
+# all six oneshots before motion controller
+addf oneshot.xrearm  servo-thread
+addf oneshot.xsw     servo-thread
+addf not.xhome       servo-thread
+addf and2.xhome      servo-thread
 
-addf pid.x.do-pid-calcs servo-thread
-addf pid.y.do-pid-calcs servo-thread
-addf pid.z.do-pid-calcs servo-thread
+addf oneshot.yrearm  servo-thread
+addf oneshot.ysw     servo-thread
+addf not.yhome       servo-thread
+addf and2.yhome      servo-thread
 
-addf lcec.write-all servo-thread
+addf oneshot.zrearm  servo-thread
+addf oneshot.zsw     servo-thread
+addf not.zhome       servo-thread
+addf and2.zhome      servo-thread
 
+addf motion-command-handler  servo-thread
+addf motion-controller       servo-thread
+
+addf pid.x.do-pid-calcs       servo-thread
+addf pid.y.do-pid-calcs       servo-thread
+addf pid.z.do-pid-calcs       servo-thread
+
+addf lcec.write-all           servo-thread
 
 #########################################
 # General signals
 #########################################
 
-net emc-enable => iocontrol.0.emc-enable-in
-sets emc-enable 1
+#net emc-enable => iocontrol.0.emc-enable-in
+#sets emc-enable 1
 
+net estop-ext iocontrol.0.emc-enable-in <=> lcec.m0.EL1819-0.din-3
+
+#loadrt and2 names=ncstart-condition
+#addf ncstart-condition servo-thread
+#net ncstart-btnin ncstart-condition.in0 <= lcec.m0.EL1819-0.din-2
+#net ncstart-allop ncstart-condition.in1 <= lcec.m0.all-op
+#net ncstart-out ncstart-condition.out => lcec.m0.EL2809-0.dout-1
 
 #########################################
 # Standard MAHO 3 Axes Configuration
