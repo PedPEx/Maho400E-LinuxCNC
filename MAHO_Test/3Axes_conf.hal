@@ -1,9 +1,15 @@
 #########################################
 # Axis X / Joint 0
-# Drive board 1 / slot 1 → EL4034 aout-0 / EP5101-x
-# OUTPUT_SCALE=+10, ENCODER_SCALE=-1000 (direction inverted)
-# Homing: EP5101 Latch-C (no index-enable, no physical switch)
+# Drive board 1 / slot 1 → EL4034 aout-0 / EL5021-x
+# OUTPUT_SCALE=+10, ENCODER_SCALE handled by bec-enc-x.scale
+# Homing: EL5021 Latch-C via bec_enc_homing component (two-pass)
 # enableCReset=0 must be set in ethercat-conf_3axes.xml!
+#
+# INI requirements for two-pass C-latch homing:
+#   HOME_USE_INDEX              = YES
+#   HOME_INDEX_NO_ENCODER_RESET = YES
+#   HOME_SEARCH_VEL             = -2.5   (fast, determines first-pass direction)
+#   HOME_LATCH_VEL              = -1.0   (slow, same sign → second pass same dir)
 #########################################
 
 setp pid.x.Pgain                    [JOINT_0]P
@@ -17,131 +23,132 @@ setp pid.x.deadband                 [JOINT_0]DEADBAND
 setp pid.x.maxoutput                [JOINT_0]MAX_OUTPUT
 setp pid.x.error-previous-target    true
 
-setp lcec.m0.EP5101-x.enc-pos-scale [JOINT_0]ENCODER_SCALE
+# Analog output scale (drive direction)
 setp lcec.m0.EL4034.aout-0-scale    [JOINT_0]OUTPUT_SCALE
 
-net x-enable     joint.0.amp-enable-out    =>  pid.x.enable lcec.m0.EL4034.aout-0-enable
-net x-pos-cmd    joint.0.motor-pos-cmd     =>  pid.x.command
-#net x-vel-cmd    ddt.x.out                 =>  pid.x.command-deriv
-net x-pos-fb     lcec.m0.EP5101-x.enc-pos  =>  pid.x.feedback joint.0.motor-pos-fb
-net x-output     pid.x.output              =>  lcec.m0.EL4034.aout-0-value
+# enc.pos-scale is no longer used here: position scaling is done inside
+# bec-enc-x via the 'scale' parameter. The lcec driver still reads counter
+# and latch values as raw UINT32 and passes them to the component.
 
-# Homing – Re-arm oneshot (short): resets ena-latch-c to re-arm EP5101
-setp oneshot.xrearm.width          0.020   # 20ms – long enough for EP5101 to reset latch
-setp oneshot.xrearm.retriggerable  0
+# --- bec_enc_homing parameters ---
+# scale: counts per machine unit (mm).
+# For Heidenhain LS403 (20 µm pitch) without interpolation: 1/0.000020 = 50000.
+# VERIFY by jogging a known distance and checking bec-enc-x.counts delta.
+# Sign controls direction: negative = encoder counts opposite to axis travel.
+# This replaces the former ENCODER_SCALE on enc.pos-scale.
+setp bec-enc-x.scale             [JOINT_0]ENCODER_SCALE
 
-# Homing – Home-sw hold oneshot (long): keeps home-sw-in TRUE during backoff
-setp oneshot.xsw.width             0.300   # 300ms – tune to match backoff distance
-setp oneshot.xsw.retriggerable     0
+# After second latch, preset terminal counter to home-count (default 0).
+setp bec-enc-x.reset-on-home     1
+setp bec-enc-x.home-count        0
 
-# Both oneshots triggered by latch-c-valid
-net x-latch-valid  lcec.m0.EP5101-x.enc-latch-c-valid  =>  oneshot.xrearm.in  oneshot.xsw.in
+# Arm pulse width in servo cycles. 2 cycles @ 1 kHz = 2 ms, sufficient for EL5021.
+setp bec-enc-x.latch-arm-cycles  2
 
-# ena-latch-c = joint.homing AND NOT(rearm_oneshot)
-net x-rearm-inv  oneshot.xrearm.out  =>  not.xhome.in
-net x-rearm-n    not.xhome.out       =>  and2.xhome.in0
-net x-homing     joint.0.homing      =>  and2.xhome.in1
-net x-ena-latch  and2.xhome.out      =>  lcec.m0.EP5101-x.enc-ena-latch-c
+# --- Encoder terminal → bec_enc_homing ---
+net x-raw-cnt      lcec.m0.EL5021-x.enc.counter-value  =>  bec-enc-x.raw-count
+net x-latch-val    lcec.m0.EL5021-x.enc.latch-value     =>  bec-enc-x.latch-value
+net x-latch-valid  lcec.m0.EL5021-x.enc.latch-c-valid   =>  bec-enc-x.latch-c-valid
 
-# home-sw-in driven by long oneshot
-net x-home-sw    oneshot.xsw.out     =>  joint.0.home-sw-in
+# --- bec_enc_homing → encoder terminal ---
+net x-latch-arm    bec-enc-x.enable-latch-c             =>  lcec.m0.EL5021-x.enc.enable-latch-c
+net x-cnt-set      bec-enc-x.set-counter                =>  lcec.m0.EL5021-x.enc.set-counter
+net x-cnt-setval   bec-enc-x.set-counter-value          =>  lcec.m0.EL5021-x.enc.set-counter-value
+
+# --- bec_enc_homing → LinuxCNC motion ---
+# position replaces the former lcec.m0.EL5021-x.enc.pos feedback path
+net x-pos-fb       bec-enc-x.position                   =>  pid.x.feedback  joint.0.motor-pos-fb
+
+# Bidirectional index-enable: motion sets TRUE to start homing,
+# component clears to FALSE after second latch (homing complete).
+net x-index-enable joint.0.index-enable                <=>  bec-enc-x.index-enable
+
+# --- motion → PID → drive ---
+net x-enable       joint.0.amp-enable-out               =>  pid.x.enable  lcec.m0.EL4034.aout-0-enable
+net x-pos-cmd      joint.0.motor-pos-cmd                =>  pid.x.command
+net x-output       pid.x.output                         =>  lcec.m0.EL4034.aout-0-value
 
 
 #########################################
 # Axis Y / Joint 1
-# Drive board 2 / slot 1 → EL4034 aout-1 / EP5101-y
-# OUTPUT_SCALE=-10 (inverted!), ENCODER_SCALE=-200 (different resolver + inverted!)
-# Homing: EP5101 Latch-C (no index-enable, no physical switch)
+# Drive board 2 / slot 1 → EL4034 aout-2 / EL5021-y
+# OUTPUT_SCALE=-10 (inverted), ENCODER_SCALE handled by bec-enc-y.scale
+# Homing: EL5021 Latch-C via bec_enc_homing component (two-pass)
 # enableCReset=0 must be set in ethercat-conf_3axes.xml!
 #########################################
 
-setp pid.y.Pgain                    [JOINT_0]P
-setp pid.y.Igain                    [JOINT_0]I
-setp pid.y.Dgain                    [JOINT_0]D
-setp pid.y.bias                     [JOINT_0]BIAS
-setp pid.y.FF0                      [JOINT_0]FF0
-setp pid.y.FF1                      [JOINT_0]FF1
-setp pid.y.FF2                      [JOINT_0]FF2
-setp pid.y.deadband                 [JOINT_0]DEADBAND
-setp pid.y.maxoutput                [JOINT_0]MAX_OUTPUT
+setp pid.y.Pgain                    [JOINT_1]P
+setp pid.y.Igain                    [JOINT_1]I
+setp pid.y.Dgain                    [JOINT_1]D
+setp pid.y.bias                     [JOINT_1]BIAS
+setp pid.y.FF0                      [JOINT_1]FF0
+setp pid.y.FF1                      [JOINT_1]FF1
+setp pid.y.FF2                      [JOINT_1]FF2
+setp pid.y.deadband                 [JOINT_1]DEADBAND
+setp pid.y.maxoutput                [JOINT_1]MAX_OUTPUT
 setp pid.y.error-previous-target    true
 
-setp lcec.m0.EP5101-y.enc-pos-scale [JOINT_0]ENCODER_SCALE
-setp lcec.m0.EL4034.aout-2-scale    [JOINT_0]OUTPUT_SCALE
+setp lcec.m0.EL4034.aout-2-scale    [JOINT_1]OUTPUT_SCALE
 
-net y-enable     joint.1.amp-enable-out    =>  pid.y.enable lcec.m0.EL4034.aout-2-enable
-net y-pos-cmd    joint.1.motor-pos-cmd     =>  pid.y.command
-#net y-vel-cmd    ddt.y.out                 =>  pid.y.command-deriv
-net y-pos-fb     lcec.m0.EP5101-y.enc-pos  =>  pid.y.feedback joint.1.motor-pos-fb
-net y-output     pid.y.output              =>  lcec.m0.EL4034.aout-2-value
+setp bec-enc-y.scale             [JOINT_1]ENCODER_SCALE
+setp bec-enc-y.reset-on-home     1
+setp bec-enc-y.home-count        0
+setp bec-enc-y.latch-arm-cycles  2
 
-# Homing – Re-arm oneshot (short): resets ena-latch-c to re-arm EP5101
-setp oneshot.yrearm.width          0.020   # 20ms – long enough for EP5101 to reset latch
-setp oneshot.yrearm.retriggerable  0
+net y-raw-cnt      lcec.m0.EL5021-y.enc.counter-value  =>  bec-enc-y.raw-count
+net y-latch-val    lcec.m0.EL5021-y.enc.latch-value     =>  bec-enc-y.latch-value
+net y-latch-valid  lcec.m0.EL5021-y.enc.latch-c-valid   =>  bec-enc-y.latch-c-valid
 
-# Homing – Home-sw hold oneshot (long): keeps home-sw-in TRUE during backoff
-setp oneshot.ysw.width             0.300   # 300ms – tune to match backoff distance
-setp oneshot.ysw.retriggerable     0
+net y-latch-arm    bec-enc-y.enable-latch-c             =>  lcec.m0.EL5021-y.enc.enable-latch-c
+net y-cnt-set      bec-enc-y.set-counter                =>  lcec.m0.EL5021-y.enc.set-counter
+net y-cnt-setval   bec-enc-y.set-counter-value          =>  lcec.m0.EL5021-y.enc.set-counter-value
 
-# Both oneshots triggered by latch-c-valid
-net y-latch-valid  lcec.m0.EP5101-y.enc-latch-c-valid  =>  oneshot.yrearm.in  oneshot.ysw.in
+net y-pos-fb       bec-enc-y.position                   =>  pid.y.feedback  joint.1.motor-pos-fb
+net y-index-enable joint.1.index-enable                <=>  bec-enc-y.index-enable
 
-# ena-latch-c = joint.homing AND NOT(rearm_oneshot)
-net y-rearm-inv  oneshot.yrearm.out  =>  not.yhome.in
-net y-rearm-n    not.yhome.out       =>  and2.yhome.in0
-net y-homing     joint.1.homing      =>  and2.yhome.in1
-net y-ena-latch  and2.yhome.out      =>  lcec.m0.EP5101-y.enc-ena-latch-c
-
-# home-sw-in driven by long oneshot
-net y-home-sw    oneshot.ysw.out     =>  joint.1.home-sw-in
-
+net y-enable       joint.1.amp-enable-out               =>  pid.y.enable  lcec.m0.EL4034.aout-2-enable
+net y-pos-cmd      joint.1.motor-pos-cmd                =>  pid.y.command
+net y-output       pid.y.output                         =>  lcec.m0.EL4034.aout-2-value
 
 
 #########################################
 # Axis Z / Joint 2
-# Drive board 1 / slot 2 → EL4034 aout-2 / EP5101-z
-# OUTPUT_SCALE=-10 (inverted!), ENCODER_SCALE=+1000
-# HOME_SEQUENCE=0 → Z is always homed FIRST, before X and Y!
-# Homing: EP5101 Latch-C (no index-enable, no physical switch)
+# Drive board 1 / slot 2 → EL4034 aout-1 / EL5021-z
+# OUTPUT_SCALE=+10, ENCODER_SCALE handled by bec-enc-z.scale
+# HOME_SEQUENCE=0 → Z is always homed FIRST
+# Homing: EL5021 Latch-C via bec_enc_homing component (two-pass)
 # enableCReset=0 must be set in ethercat-conf_3axes.xml!
 #########################################
 
-setp pid.z.Pgain                    [JOINT_0]P
-setp pid.z.Igain                    [JOINT_0]I
-setp pid.z.Dgain                    [JOINT_0]D
-setp pid.z.bias                     [JOINT_0]BIAS
-setp pid.z.FF0                      [JOINT_0]FF0
-setp pid.z.FF1                      [JOINT_0]FF1
-setp pid.z.FF2                      [JOINT_0]FF2
-setp pid.z.deadband                 [JOINT_0]DEADBAND
-setp pid.z.maxoutput                [JOINT_0]MAX_OUTPUT
+setp pid.z.Pgain                    [JOINT_2]P
+setp pid.z.Igain                    [JOINT_2]I
+setp pid.z.Dgain                    [JOINT_2]D
+setp pid.z.bias                     [JOINT_2]BIAS
+setp pid.z.FF0                      [JOINT_2]FF0
+setp pid.z.FF1                      [JOINT_2]FF1
+setp pid.z.FF2                      [JOINT_2]FF2
+setp pid.z.deadband                 [JOINT_2]DEADBAND
+setp pid.z.maxoutput                [JOINT_2]MAX_OUTPUT
 setp pid.z.error-previous-target    true
 
-setp lcec.m0.EP5101-z.enc-pos-scale [JOINT_0]ENCODER_SCALE
-setp lcec.m0.EL4034.aout-1-scale    [JOINT_0]OUTPUT_SCALE
+setp lcec.m0.EL4034.aout-1-scale    [JOINT_2]OUTPUT_SCALE
 
-net z-enable     joint.2.amp-enable-out    =>  pid.z.enable lcec.m0.EL4034.aout-1-enable
-net z-pos-cmd    joint.2.motor-pos-cmd     =>  pid.z.command
-#net z-vel-cmd    ddt.z.out                 =>  pid.z.command-deriv
-net z-pos-fb     lcec.m0.EP5101-z.enc-pos  =>  pid.z.feedback joint.2.motor-pos-fb
-net z-output     pid.z.output              =>  lcec.m0.EL4034.aout-1-value
+setp bec-enc-z.scale             [JOINT_2]ENCODER_SCALE
+setp bec-enc-z.reset-on-home     1
+setp bec-enc-z.home-count        0
+setp bec-enc-z.latch-arm-cycles  2
 
-# Homing – Re-arm oneshot (short): resets ena-latch-c to re-arm EP5101
-setp oneshot.zrearm.width          0.020   # 20ms – long enough for EP5101 to reset latch
-setp oneshot.zrearm.retriggerable  0
+net z-raw-cnt      lcec.m0.EL5021-z.enc.counter-value  =>  bec-enc-z.raw-count
+net z-latch-val    lcec.m0.EL5021-z.enc.latch-value     =>  bec-enc-z.latch-value
+net z-latch-valid  lcec.m0.EL5021-z.enc.latch-c-valid   =>  bec-enc-z.latch-c-valid
 
-# Homing – Home-sw hold oneshot (long): keeps home-sw-in TRUE during backoff
-setp oneshot.zsw.width             0.300   # 300ms – tune to match backoff distance
-setp oneshot.zsw.retriggerable     0
+net z-latch-arm    bec-enc-z.enable-latch-c             =>  lcec.m0.EL5021-z.enc.enable-latch-c
+net z-cnt-set      bec-enc-z.set-counter                =>  lcec.m0.EL5021-z.enc.set-counter
+net z-cnt-setval   bec-enc-z.set-counter-value          =>  lcec.m0.EL5021-z.enc.set-counter-value
 
-# Both oneshots triggered by latch-c-valid
-net z-latch-valid  lcec.m0.EP5101-z.enc-latch-c-valid  =>  oneshot.zrearm.in  oneshot.zsw.in
+net z-pos-fb       bec-enc-z.position                   =>  pid.z.feedback  joint.2.motor-pos-fb
+net z-index-enable joint.2.index-enable                <=>  bec-enc-z.index-enable
 
-# ena-latch-c = joint.homing AND NOT(rearm_oneshot)
-net z-rearm-inv  oneshot.zrearm.out  =>  not.zhome.in
-net z-rearm-n    not.zhome.out       =>  and2.zhome.in0
-net z-homing     joint.2.homing      =>  and2.zhome.in1
-net z-ena-latch  and2.zhome.out      =>  lcec.m0.EP5101-z.enc-ena-latch-c
-
-# home-sw-in driven by long oneshot
-net z-home-sw    oneshot.zsw.out     =>  joint.2.home-sw-in
+net z-enable       joint.2.amp-enable-out               =>  pid.z.enable  lcec.m0.EL4034.aout-1-enable
+net z-pos-cmd      joint.2.motor-pos-cmd                =>  pid.z.command
+net z-output       pid.z.output                         =>  lcec.m0.EL4034.aout-1-value

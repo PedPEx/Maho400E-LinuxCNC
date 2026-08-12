@@ -57,44 +57,40 @@ MIN_LIMIT        = -1.0
 MAX_LIMIT        = 400.0
 
 [JOINT_0]
-TYPE       = LINEAR
-MIN_LIMIT  = -1.0
-MAX_LIMIT  = 400.0
+TYPE             = LINEAR
+MAX_VELOCITY     = 41.667
+MAX_ACCELERATION = 50.0
+MIN_LIMIT        = -1.0
+MAX_LIMIT        = 400.0
 
-# --- Homing: EP5101 Latch-C ---
-# Kein physischer Schalter, kein Indexpuls-Protokoll (HOME_USE_INDEX entfernt)
-# SEARCH_VEL=0: Achse fährt direkt mit LATCH_VEL, kein Schaltersuchen
-# Ablauf: homing=TRUE → ena-latch-c=TRUE → C-Puls → latch-c-valid=TRUE
-#         → home-sw-in=TRUE → LinuxCNC setzt Maschinenpos. auf HOME_OFFSET
-HOME_SEQUENCE   = 1
-HOME_SEARCH_VEL = -2.5
-#HOME_USE_INDEX  = YES
-HOME_LATCH_VEL  = -1.0
-#HOME_FINAL_VEL  = 10.0
-HOME_OFFSET     = 0.0
-HOME            = 5.0
+# Two-pass C-latch homing
+HOME_SEQUENCE              = 1
+HOME_USE_INDEX             = YES
+HOME_INDEX_NO_ENCODER_RESET = YES
+# fast approach (mm/s), finds first latch
+HOME_SEARCH_VEL            = -2.5
+# slow re-approach (mm/s), same sign as SEARCH_VEL
+HOME_LATCH_VEL             = -1.0
+HOME_FINAL_VEL             = 10.0
+HOME_OFFSET                = 0.0
+HOME                       = 5.0
 
-# --- PID: Mesa-Werte (real abgestimmt) ---
-P       = 6.5
-I       = 0.0
-D       = 0.0
-BIAS    = 0.0
-FF0     = 0.0
-# FF1=0.220 statt 1.0 — 1.0 erzeugt massiven Überschwinger!
-FF1     = 0.220
-# FF2: Beschleunigungs-Feedforward verbessert Konturgenauigkeit
-FF2     = 0.0021
-# DEADBAND=0: Toleranzfenster läuft über MIN_FERROR
-DEADBAND    = 0.0
-MAX_OUTPUT  = 10.0
+P            = 6.5
+I            = 0.0
+D            = 0.0
+BIAS         = 0.0
+FF0          = 0.0
+FF1          = 0.220
+FF2          = 0.0021
+DEADBAND     = 0.0
+MAX_OUTPUT   = 10.0
 
-OUTPUT_SCALE  = 10.0
-# Negatives Vorzeichen: X-Encoder zählt entgegengesetzt zur Bewegungsrichtung
+OUTPUT_SCALE  =  10.0
+# Negative: X encoder counts opposite to axis travel direction
 ENCODER_SCALE = -500.0
 
-# Mesa-Toleranzen — für erste Inbetriebnahme großzügig lassen
-FERROR     = 0.5
-MIN_FERROR = 0.2
+FERROR       = 0.5
+MIN_FERROR   = 0.2
 
 
 # =========================================
@@ -121,36 +117,36 @@ MIN_LIMIT        = -1.0
 MAX_LIMIT        = 251.0
 
 [JOINT_1]
-TYPE       = LINEAR
-MIN_LIMIT  = -1.0
-MAX_LIMIT  = 251.0
+TYPE             = LINEAR
+MAX_VELOCITY     = 40.0
+MAX_ACCELERATION = 50.0
+MIN_LIMIT        = -1.0
+MAX_LIMIT        = 251.0
 
-# --- Homing: EP5101 Latch-C ---
-HOME_SEQUENCE   = 1
-HOME_SEARCH_VEL = 2.5
-#HOME_USE_INDEX  = YES
-HOME_LATCH_VEL  = 1.0
-#HOME_FINAL_VEL  = 10.0
-HOME_OFFSET     = 250.0
-HOME            = 245.0
+HOME_SEQUENCE              = 1
+HOME_USE_INDEX             = YES
+HOME_INDEX_NO_ENCODER_RESET = YES
+HOME_SEARCH_VEL            =  2.5
+HOME_LATCH_VEL             =  1.0
+HOME_FINAL_VEL             = 10.0
+HOME_OFFSET                = 250.0
+HOME                       = 245.0
 
-P       = 5.5
-I       = 0.0
-D       = 0.0
-BIAS    = 0.0
-FF0     = 0.0
-FF1     = 0.228
-FF2     = 0.0015
-DEADBAND    = 0.0
-MAX_OUTPUT  = 10.0
+P            = 5.5
+I            = 0.0
+D            = 0.0
+BIAS         = 0.0
+FF0          = 0.0
+FF1          = 0.228
+FF2          = 0.0015
+DEADBAND     = 0.0
+MAX_OUTPUT   = 10.0
 
-# Y-Antriebsrichtung invertiert — ACHTUNG: Achse läuft weg wenn falsch!
 OUTPUT_SCALE  = -10.0
-# Y-Encoder: invertiert — unbedingt vor IBN prüfen!
-ENCODER_SCALE = 500.0
+ENCODER_SCALE =  500.0
 
-FERROR     = 0.5
-MIN_FERROR = 0.2
+FERROR       = 0.5
+MIN_FERROR   = 0.2
 
 
 # =========================================
@@ -167,42 +163,39 @@ MIN_FERROR = 0.2
 
 [AXIS_Z]
 MAX_VELOCITY     = 41.667
-# Z mit Gegengewicht: Beschleunigung realistisch halten
 MAX_ACCELERATION = 50.0
 MIN_LIMIT        = -1.0
 MAX_LIMIT        = 376.0
 
 [JOINT_2]
-TYPE       = LINEAR
-MIN_LIMIT  = -1.0
-MAX_LIMIT  = 376.0
+TYPE             = LINEAR
+MAX_VELOCITY     = 41.667
+MAX_ACCELERATION = 50.0
+MIN_LIMIT        = -1.0
+MAX_LIMIT        = 376.0
 
-# --- Homing: EP5101 Latch-C ---
-# Z immer zuerst referenzieren!
-HOME_SEQUENCE   = 0
-HOME_SEARCH_VEL = 2.5
-# Positiv: Spindel fährt hoch zum Indexpuls am oberen Anschlag
-#HOME_USE_INDEX  = YES
-HOME_LATCH_VEL  = 1.0
-#HOME_FINAL_VEL  = 10.0
-# Mesa: Z-Position am Indexpuls = 375 mm (Spindel oben)
-HOME_OFFSET     = 375.0
-# Nach Referenz in sichere Höhe fahren
-HOME            = 370.0
+HOME_SEQUENCE              = 0
+HOME_USE_INDEX             = YES
+HOME_INDEX_NO_ENCODER_RESET = YES
+# positive: spindle moves up toward home mark
+HOME_SEARCH_VEL            =  2.5
+HOME_LATCH_VEL             =  1.0
+HOME_FINAL_VEL             = 10.0
+HOME_OFFSET                = 375.0
+HOME                       = 370.0
 
-# Z hat höheren P (Gewichtskraft, Bremse): Mesa 7.5
-P       = 7.5
-I       = 0.0
-D       = 0.0
-BIAS    = 0.0
-FF0     = 0.0
-FF1     = 0.218
-FF2     = 0.0020
-DEADBAND    = 0.0
-MAX_OUTPUT  = 10.0
+P            = 7.5
+I            = 0.0
+D            = 0.0
+BIAS         = 0.0
+FF0          = 0.0
+FF1          = 0.218
+FF2          = 0.0020
+DEADBAND     = 0.0
+MAX_OUTPUT   = 10.0
 
-OUTPUT_SCALE  = 10.0
+OUTPUT_SCALE  =  10.0
 ENCODER_SCALE = -500.0
 
-FERROR     = 2.0
-MIN_FERROR = 1.0
+FERROR       = 2.0
+MIN_FERROR   = 1.0
