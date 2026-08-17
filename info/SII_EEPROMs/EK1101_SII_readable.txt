@@ -1,0 +1,113 @@
+First print preamble and config
+Preamble:
+PDI Control: ................ 0x0d04
+PDI Config: ................. 0x0000
+Sync Impulse Length: ........ 0 ns (raw: 0x0000)
+PDI Config 2: ............... 0x00c0
+Configured Station Alias: ... 0x0000
+Checksum of Preamble: ....... 0x00b8 (ok)
+Identity:
+  Vendor ID: ................ 0x00000002
+  Product ID: ............... 0x044d2c52
+  Revision ID: .............. 0x00120000
+  Serial Number: ............ 0x00000000
+
+Default mailbox settings:
+  Bootstrap Mailbox:
+  Received Mailbox Offset: .. 0x0000
+  Received Mailbox Size: .... 0
+  Send Mailbox Offset: ...... 0x0000
+  Send Mailbox Size: ........ 0
+  Mailbox Settings:
+  Received Mailbox Offset: .. 0x0000
+  Received Mailbox Size: .... 0
+  Send Mailbox Offset: ...... 0x0000
+  Send Mailbox Size: ........ 0
+
+Supported Mailboxes:
+  CoE ....................... False
+  EoE ....................... False
+  FoE ....................... False
+  SoE ....................... False
+  VoE ....................... False
+
+EEPROM size: ................ 2048 bytes
+Version: .................... 1
+
+Print Categorie: Strings (0xa)
+  Size: 82 Bytes with 5 strings
+  ID   Size (Bytes)    String
+    1: (  6) ......... 'EK1101'
+    2: (  8) ......... 'SystemBk'
+    3: ( 14) ......... 'System Koppler'
+    4: ( 45) ......... 'EK1101 EtherCAT-Koppler (2A E-Bus, ID-Switch)'
+    5: (  2) ......... 'ID'
+
+Print Categorie: General (0x1e)
+  Size: 32 Bytes
+  Vendor Specific (Index of String)
+    Name  Index: 4: ............. EK1101 EtherCAT-Koppler (2A E-Bus, ID-Switch)
+    Group Index: 2: ............. SystemBk
+    Image Index: 0: ............. not set
+    Order Index: 1: ............. EK1101
+
+  CoE Details:
+    Enable SDO: .................. no
+    Enable SDO Info: ............. no
+    Enable PDO Assign: ........... no
+    Enable PDO Configuration: .... no
+    Enable Upload at Startup: .... no
+    Enable SDO complete access: .. no
+  FoE Details: ................... not enabled
+  EoE Details: ................... not enabled
+
+  Flag SafeOp: ................... not enabled
+  Flag notLRW: ................... not enabled
+  Flag MBox Data Link Layer ...... not enabled
+  Flag Ident AL Status ........... not enabled
+  Flag Ident Physical Memory ..... not enabled
+
+  CurrentOnEBus: ................. -2000 mA
+  Physical Ports:
+     Port 0: ..................... MII
+     Port 1: ..................... EBUS
+     Port 2: ..................... MII
+     Port 3: ..................... not used
+
+  Physical Memory Address ........ 0x0000
+
+Print Categorie: FMMU (0x28)
+  Size: 2 Bytes
+  Number of FMMUs: 2
+    FMMU0: used for Inputs
+    FMMU1: not used
+
+Print Categorie: SyncManager (0x29)
+  Size: 8 Bytes
+  Number of SyncManager: 1
+  SyncManager SM0
+    Physical Startaddress: ... 0x1000
+    Length: .................. 0
+    Control Register: ........ 0x00
+    Status Register: ......... 0x00
+    Enable byte: ............. 0x00
+    SM Type: ................. Process Data In
+
+Print Categorie: TX PDO (0x32)
+  Size: 16 Bytes
+  TxPDO:
+    PDO Index: .................. 0x1a00
+    Entries: .................... 1
+    SyncM: ...................... 0
+    Synchronization: ............ 0x00
+    Name Index: ................. 5
+    Flags ....................... 0x0010
+                                  PDO is Fixed
+
+      Entry 0:
+      Entry Index: .............. 0x6000
+      Subindex: ................. 0x01
+      String Index: ............. 5 (ID)
+      Data Type: ................ 0x06 (Index in CoE Object Dictionary)
+      Bitlength: ................ 16
+

@@ -68,7 +68,7 @@ HOME_SEQUENCE              = 1
 HOME_USE_INDEX             = YES
 HOME_INDEX_NO_ENCODER_RESET = YES
 # fast approach (mm/s), finds first latch
-HOME_SEARCH_VEL            = -2.5
+HOME_SEARCH_VEL            = 0.0
 # slow re-approach (mm/s), same sign as SEARCH_VEL
 HOME_LATCH_VEL             = -1.0
 HOME_FINAL_VEL             = 10.0
@@ -87,7 +87,7 @@ MAX_OUTPUT   = 10.0
 
 OUTPUT_SCALE  =  10.0
 # Negative: X encoder counts opposite to axis travel direction
-ENCODER_SCALE = -500.0
+ENCODER_SCALE = 51200.0
 
 FERROR       = 0.5
 MIN_FERROR   = 0.2
@@ -126,7 +126,7 @@ MAX_LIMIT        = 251.0
 HOME_SEQUENCE              = 1
 HOME_USE_INDEX             = YES
 HOME_INDEX_NO_ENCODER_RESET = YES
-HOME_SEARCH_VEL            =  2.5
+HOME_SEARCH_VEL            =  0.0
 HOME_LATCH_VEL             =  1.0
 HOME_FINAL_VEL             = 10.0
 HOME_OFFSET                = 250.0
@@ -143,7 +143,7 @@ DEADBAND     = 0.0
 MAX_OUTPUT   = 10.0
 
 OUTPUT_SCALE  = -10.0
-ENCODER_SCALE =  500.0
+ENCODER_SCALE = -51200.0
 
 FERROR       = 0.5
 MIN_FERROR   = 0.2
@@ -178,7 +178,7 @@ HOME_SEQUENCE              = 0
 HOME_USE_INDEX             = YES
 HOME_INDEX_NO_ENCODER_RESET = YES
 # positive: spindle moves up toward home mark
-HOME_SEARCH_VEL            =  2.5
+HOME_SEARCH_VEL            =  0.0
 HOME_LATCH_VEL             =  1.0
 HOME_FINAL_VEL             = 10.0
 HOME_OFFSET                = 375.0
@@ -194,8 +194,8 @@ FF2          = 0.0020
 DEADBAND     = 0.0
 MAX_OUTPUT   = 10.0
 
-OUTPUT_SCALE  =  10.0
-ENCODER_SCALE = -500.0
+OUTPUT_SCALE  =  -10.0
+ENCODER_SCALE = 51200.0
 
 FERROR       = 2.0
 MIN_FERROR   = 1.0

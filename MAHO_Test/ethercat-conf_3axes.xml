@@ -1,8 +1,10 @@
 <masters>
 	<!-- Internal EtherCAT Master 0 - Internal Key Busslaves only! -->
-	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="1" name="m0">
+	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="1" refClockSlaveIdx="1" name="m0">
 		<slave idx="0" type="EK1101" name="EK1101"/>
 		<slave idx="1" type="EL5021" name="EL5021-x">
+			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
+			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
 		    <!-- 8000:01  Enable counter reset via C input (BIT).
     		Keep false for the latch-C homing scheme.                        -->
       		<modParam name="enableCReset"          value="false"/>
@@ -17,6 +19,8 @@
 			<modParam name="analogResolution"      value="10"/>
 		</slave>
 		<slave idx="2" type="EL5021" name="EL5021-y">
+			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
+			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
 		    <!-- 8000:01  Enable counter reset via C input (BIT).
     		Keep false for the latch-C homing scheme.                        -->
       		<modParam name="enableCReset"          value="false"/>
@@ -31,6 +35,8 @@
 			<modParam name="analogResolution"      value="10"/>
 		</slave>
 		<slave idx="3" type="EL5021" name="EL5021-z">
+			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
+			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
 		    <!-- 8000:01  Enable counter reset via C input (BIT).
     		Keep false for the latch-C homing scheme.                        -->
       		<modParam name="enableCReset"          value="false"/>
@@ -45,6 +51,7 @@
 			<modParam name="analogResolution"      value="10"/>
 		</slave>
 		<slave idx="4" type="EL5002" name="EL5002">
+			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="0" sync1Cycle="*1" sync1Shift="15000"/>-->
 			<!-- ===== Channel 0 (base 0x8000) — SICK ATM60 spindle encoder ===== -->
 			<modParam name="ch0DisFrameErr"     value="false"/> <!-- 8000:01 BOOL  false=frame errors evaluated       -->
 			<modParam name="ch0EnPwrFailChk"    value="false"/> <!-- 8000:02 BOOL  encoder power-fail bit check        -->
@@ -70,7 +77,9 @@
 			<modParam name="ch1MinInhibitTime"  value="0"/>     <!-- 8010:13 U16   min. inhibit time [µs]               -->
 			<modParam name="ch1NoClkBursts"     value="1"/>     <!-- 8010:14 U16   clock bursts, min 1 (FW03+)          -->
 		</slave>
-		<slave idx="5" type="EL4034" name="EL4034"/>
+		<slave idx="5" type="EL4034" name="EL4034">
+			<dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="0" sync1Cycle="*1" sync1Shift="100000"/>
+		</slave>
 		<slave idx="6" type="EL1819" name="EL1819-0"/>
 		<slave idx="7" type="EL1819" name="EL1819-1"/>
 		<slave idx="8" type="EL2809" name="EL2809-0"/>

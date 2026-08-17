@@ -98,7 +98,7 @@ pin out u32  set_counter_value = 0 "Value to preset into the terminal counter (e
  * LinuxCNC motion interface
  * ========================================================================= */
 
-pin io  bit  index_enable = 0 "Bidirectional index-enable. Connect to joint.N.index-enable. Motion sets TRUE to start homing, component clears on second latch. Requires HOME_USE_INDEX=YES and HOME_INDEX_NO_ENCODER_RESET=YES.";
+pin io  bit  index_enable = 0 "Bidirectional index-enable. Connect to joint.N.index-enable. Motion sets TRUE to start homing, component clears on the first C-latch (single-pass index homing). Requires HOME_USE_INDEX=YES, HOME_INDEX_NO_ENCODER_RESET=YES and HOME_SEARCH_VEL=0.";
 pin out float position = 0.0 "Scaled encoder position in machine units. Connect to joint.N.motor-pos-fb.";
 pin out s32  counts = 0 "Signed encoder count relative to home reference. Diagnostic.";
 
@@ -295,16 +295,49 @@ FUNCTION(_)
         enable_latch_c = 1;     /* keep armed */
 
         if (latch_c_valid) {
-            /* First reference mark captured */
+            /* Reference mark captured.
+             *
+             * LinuxCNC's index-enable homing is a SINGLE-pass protocol:
+             * motion asserts index-enable once, moves the joint at
+             * HOME_LATCH_VEL, and expects index-enable to be cleared on the
+             * FIRST index found. It does NOT back off and re-cross the mark
+             * on its own (that only happens with a real home switch and
+             * HOME_SEARCH_VEL != 0). With HOME_SEARCH_VEL = 0 there is exactly
+             * one pass, so homing must complete here — waiting for a second
+             * latch would hang forever (index-enable never clears, axis never
+             * stops). The former two-pass states (FIRST_DONE / ARM_SECOND /
+             * WAIT_SECOND) are therefore unreachable in this mode. */
             hal_s32_t lv = (hal_s32_t)latch_value;
-            first_latch_count = lv;
+            first_latch_count  = lv;
+            second_latch_count = lv;   /* single pass: identical value */
 
             rtapi_print_msg(RTAPI_MSG_DBG,
-                "bec_enc_homing: first latch captured, count = %d\n", lv);
+                "bec_enc_homing: latch captured, count = %d — homing complete\n", lv);
 
-            /* Transition: de-arm, then immediately re-arm for second pass */
+            /* De-arm the latch hardware — no further events needed */
             enable_latch_c = 0;
-            v_state        = STATE_FIRST_DONE;
+
+            /* Establish the reference offset so position = 0 at the mark. */
+            v_ref_offset = lv;
+            v_have_ref   = 1;
+            homed        = 1;
+
+            /* Signal LinuxCNC: clear index-enable (homing complete). Motion
+             * reads the latched position, sets the joint home coordinate and
+             * stops the axis. */
+            index_enable = 0;
+
+            /* Optionally preset the terminal counter so raw-count matches the
+             * machine coordinate system after homing. */
+            if (reset_on_home) {
+                v_set_target       = (hal_u32_t)home_count;
+                set_counter_value  = v_set_target;
+                set_counter        = 1;
+                v_set_pulse_active = 1;
+                v_ref_offset       = (hal_s32_t)home_count;
+            }
+
+            v_state = STATE_COMPLETE;
         }
         break;
 
