@@ -38,9 +38,10 @@ setp lcec.m0.EL4034.aout-0-scale    [JOINT_0]OUTPUT_SCALE
 # This replaces the former ENCODER_SCALE on enc.pos-scale.
 setp bec-enc-x.scale             [JOINT_0]ENCODER_SCALE
 
-# After second latch, preset terminal counter to home-count (default 0).
-setp bec-enc-x.reset-on-home     1
-setp bec-enc-x.home-count        0
+# Do NOT preset the terminal counter during homing: the preset takes
+# effect one or more PDO cycles after the HAL-side bookkeeping, which
+# produces a feedback discontinuity and an immediate following error.
+setp bec-enc-x.reset-on-home     0
 
 # Arm pulse width in servo cycles. 2 cycles @ 1 kHz = 2 ms, sufficient for EL5021.
 setp bec-enc-x.latch-arm-cycles  2
@@ -91,8 +92,7 @@ setp pid.y.error-previous-target    true
 setp lcec.m0.EL4034.aout-2-scale    [JOINT_1]OUTPUT_SCALE
 
 setp bec-enc-y.scale             [JOINT_1]ENCODER_SCALE
-setp bec-enc-y.reset-on-home     1
-setp bec-enc-y.home-count        0
+setp bec-enc-y.reset-on-home     0
 setp bec-enc-y.latch-arm-cycles  2
 
 net y-raw-cnt      lcec.m0.EL5021-y.enc.counter-value  =>  bec-enc-y.raw-count
@@ -134,8 +134,7 @@ setp pid.z.error-previous-target    true
 setp lcec.m0.EL4034.aout-1-scale    [JOINT_2]OUTPUT_SCALE
 
 setp bec-enc-z.scale             [JOINT_2]ENCODER_SCALE
-setp bec-enc-z.reset-on-home     1
-setp bec-enc-z.home-count        0
+setp bec-enc-z.reset-on-home     0
 setp bec-enc-z.latch-arm-cycles  2
 
 net z-raw-cnt      lcec.m0.EL5021-z.enc.counter-value  =>  bec-enc-z.raw-count

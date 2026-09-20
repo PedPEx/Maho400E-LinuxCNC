@@ -1,0 +1,7 @@
+# HAL connections for the embedded faultmsg GladeVCP tab.
+# Passed to gladevcp via -H, so it runs AFTER the panel's HAL component is
+# finalized -> the faultmsg.* pins are guaranteed to exist here.
+# (The lcec.* pins already exist from the pre-GUI HAL.)
+
+net fault-lamp faultmsg.any-fault   => lcec.m0.EL1859.dout-2
+net ack-lamp   faultmsg.any-ackable => lcec.m0.EL1859.dout-1

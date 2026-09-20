@@ -1,0 +1,18 @@
+# ClassicLadder real-time part — sized for the interlock logic
+loadrt classicladder_rt numPhysInputs=40 numPhysOutputs=16 numBits=100 \
+       numTimers=16 numMonostables=16 numCounters=8 numRungs=30 \
+       numSections=8 numSymbols=200 numS32in=4 numS32out=4
+addf classicladder.0.refresh servo-thread
+
+
+# --- Bedingungen IN den Ladder (%I) ---
+#net safety-ok    lcec.m0.EL1918.safety-ok   => classicladder.0.in-00
+#net safe-error   lcec.m0.EL1918.safe-error  => classicladder.0.in-01
+# ... deine vielen Freigabe-Eingänge auf in-02, in-03, ...
+
+# --- Ergebnisse AUS dem Ladder (%Q) an die Safety-Std-Inputs ---
+net req-safeout1 classicladder.0.out-00 => lcec.m0.EL1918.safe-out1
+net req-safeout2 classicladder.0.out-01 => lcec.m0.EL1918.safe-out2
+
+
+loadusr classicladder --nogui MH400E.clp

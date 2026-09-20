@@ -98,7 +98,7 @@ pin out u32  set_counter_value = 0 "Value to preset into the terminal counter (e
  * LinuxCNC motion interface
  * ========================================================================= */
 
-pin io  bit  index_enable = 0 "Bidirectional index-enable. Connect to joint.N.index-enable. Motion sets TRUE to start homing, component clears on the first C-latch (single-pass index homing). Requires HOME_USE_INDEX=YES, HOME_INDEX_NO_ENCODER_RESET=YES and HOME_SEARCH_VEL=0.";
+pin io  bit  index_enable = 0 "Bidirectional index-enable. Connect to joint.N.index-enable. Motion sets TRUE to start homing, component clears on second latch. Requires HOME_USE_INDEX=YES and HOME_INDEX_NO_ENCODER_RESET=YES.";
 pin out float position = 0.0 "Scaled encoder position in machine units. Connect to joint.N.motor-pos-fb.";
 pin out s32  counts = 0 "Signed encoder count relative to home reference. Diagnostic.";
 
@@ -106,7 +106,7 @@ pin out s32  counts = 0 "Signed encoder count relative to home reference. Diagno
  * Status / diagnostic outputs
  * ========================================================================= */
 
-pin out u32  state_out = 0 "State machine state: 0=IDLE 1=ARM_FIRST 2=WAIT_FIRST 3=FIRST_DONE 4=ARM_SECOND 5=WAIT_SECOND 6=COMPLETE 7=ERROR";
+pin out u32  state_out = 0 "State machine state: 0=IDLE 1=ARM_FIRST 2=WAIT_FIRST 3=FIRST_DONE 4=ARM_SECOND 5=WAIT_SECOND 6=COMPLETE 7=ERROR 8=CLEAR";
 pin out bit  homed = 0 "TRUE after successful two-pass homing. Cleared when index-enable goes TRUE again.";
 pin out s32  first_latch_count = 0 "Signed count captured in first (fast) latch pass. Diagnostic.";
 pin out s32  second_latch_count = 0 "Signed count captured in second (slow/precise) latch pass. Diagnostic.";
@@ -116,7 +116,7 @@ pin out s32  second_latch_count = 0 "Signed count captured in second (slow/preci
  * ========================================================================= */
 
 param rw  float  scale = 1.0 "Encoder scale: counts per machine unit. E.g. 50000.0 for 20um pitch in mm. Must not be zero.";
-param rw  bit    reset_on_home = 1 "When TRUE, preset terminal counter to home-count after second latch. Default: TRUE.";
+param rw  bit    reset_on_home = 0 "Preset terminal counter to home-count after second latch. Default FALSE - enabling it introduces a feedback discontinuity during the homing handshake.";
 param rw  s32    home_count = 0 "Counter preset value written to terminal when reset-on-home is TRUE. Typically 0.";
 param rw  s32    latch_arm_cycles = 2 "Servo cycles to hold enable-latch-c TRUE when arming. Minimum 1. Default: 2.";
 
@@ -143,6 +143,10 @@ variable int      v_have_ref          = 0;
 variable int      v_set_pulse_active  = 0;
 variable unsigned v_set_target        = 0;
 variable int      v_prev_index_enable = 0;
+/* Set for exactly one cycle: publish the latched (exact) index position
+ * instead of the current position, so LinuxCNC samples the true mark. */
+variable int      v_publish_latch     = 0;
+variable int      v_publish_value     = 0;
 
 function _;
 license "GPL";
@@ -165,6 +169,11 @@ author  "MAHO MH400E LinuxCNC retrofit project";
 #define STATE_WAIT_SECOND   5
 #define STATE_COMPLETE      6
 #define STATE_ERROR         7
+#define STATE_CLEAR         8   /* de-assert arm, wait for stale latch to clear */
+
+/* Safety limit: give up waiting for a stale latch flag to clear after this
+ * many cycles and proceed anyway, so a stuck flag cannot deadlock homing. */
+#define CLEAR_TIMEOUT_CYCLES  50
 
 /* Position delta uses (hal_s32_t)(cur - prev) which gives the correct
  * signed two's complement result for any movement < 2^31 counts/cycle.     */
@@ -200,8 +209,15 @@ FUNCTION(_)
         hal_u32_t cur = raw_count;
 
         if (v_first_cycle) {
-            /* Initialise on very first cycle — no delta possible yet */
+            /* Initialise on very first cycle — no delta possible yet.
+             * CRITICAL: the accumulator must start at the CURRENT raw
+             * counter value, not at zero. The terminal latch register
+             * reports raw counter values, so accumulator and latch must
+             * share the same reference frame. Starting at zero causes a
+             * position jump of the full counter magnitude on the first
+             * latch event (typically several metres -> following error). */
             v_last_raw    = cur;
+            v_accum       = (int)cur;
             v_first_cycle = 0;
         } else {
             /* Two's-complement delta handles wrap-around correctly */
@@ -210,7 +226,9 @@ FUNCTION(_)
             v_last_raw = cur;
         }
 
-        /* Compute position relative to home reference (if established) */
+        /* Compute position relative to home reference (if established).
+         * May be overridden at the end of this cycle when the second latch
+         * fires — see step 6. */
         hal_s32_t rel = v_accum - v_ref_offset;
         counts   = rel;
         position = (float)rel / scale;
@@ -247,12 +265,16 @@ FUNCTION(_)
             if (v_state != STATE_ERROR) {
                 rtapi_print_msg(RTAPI_MSG_DBG,
                     "bec_enc_homing: homing requested — entering ARM_FIRST\n");
-                v_state   = STATE_ARM_FIRST;
-                v_arm_timer = (latch_arm_cycles > 0) ? latch_arm_cycles : 1;
+                v_state   = STATE_CLEAR;
+                v_arm_timer = CLEAR_TIMEOUT_CYCLES;
                 homed     = 0;
+                v_publish_latch = 0;
 
-                /* Clear any stale latch data by forcing a clean arm */
-                enable_latch_c = 1;
+                /* Discard any stale latch state left over from a previous
+                 * run or from power-up: de-assert the arm bit first so the
+                 * terminal clears latch-c-valid before we re-arm. The
+                 * ARM_FIRST state then drives enable-latch-c HIGH again. */
+                enable_latch_c = 0;
             }
         }
         v_prev_index_enable = cur_ie;
@@ -269,6 +291,35 @@ FUNCTION(_)
     case STATE_IDLE:
         enable_latch_c = 0;
         /* Nothing to do — wait for index-enable rising edge (see step 3) */
+        break;
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     * CLEAR: Hold enable-latch-c LOW until the terminal has withdrawn any
+     *        stale latch-c-valid flag. Without this, a latch event left
+     *        over from a previous homing run or from power-up would be
+     *        consumed immediately as if it were the first reference mark.
+     *        Bounded by CLEAR_TIMEOUT_CYCLES so a stuck flag cannot
+     *        deadlock the sequence.
+     * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    case STATE_CLEAR:
+        enable_latch_c = 0;
+        v_arm_timer--;
+
+        if (!latch_c_valid) {
+            /* Terminal has cleared the flag — safe to arm */
+            v_state     = STATE_ARM_FIRST;
+            v_arm_timer = (latch_arm_cycles > 0) ? latch_arm_cycles : 1;
+            rtapi_print_msg(RTAPI_MSG_DBG,
+                "bec_enc_homing: latch state clean, arming first pass\n");
+        } else if (v_arm_timer <= 0) {
+            /* Timeout — proceed anyway but warn the operator */
+            rtapi_print_msg(RTAPI_MSG_ERR,
+                "bec_enc_homing: latch-c-valid stuck HIGH after %d cycles — "
+                "arming anyway, check terminal wiring/config\n",
+                CLEAR_TIMEOUT_CYCLES);
+            v_state     = STATE_ARM_FIRST;
+            v_arm_timer = (latch_arm_cycles > 0) ? latch_arm_cycles : 1;
+        }
         break;
 
     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -295,49 +346,16 @@ FUNCTION(_)
         enable_latch_c = 1;     /* keep armed */
 
         if (latch_c_valid) {
-            /* Reference mark captured.
-             *
-             * LinuxCNC's index-enable homing is a SINGLE-pass protocol:
-             * motion asserts index-enable once, moves the joint at
-             * HOME_LATCH_VEL, and expects index-enable to be cleared on the
-             * FIRST index found. It does NOT back off and re-cross the mark
-             * on its own (that only happens with a real home switch and
-             * HOME_SEARCH_VEL != 0). With HOME_SEARCH_VEL = 0 there is exactly
-             * one pass, so homing must complete here — waiting for a second
-             * latch would hang forever (index-enable never clears, axis never
-             * stops). The former two-pass states (FIRST_DONE / ARM_SECOND /
-             * WAIT_SECOND) are therefore unreachable in this mode. */
+            /* First reference mark captured */
             hal_s32_t lv = (hal_s32_t)latch_value;
-            first_latch_count  = lv;
-            second_latch_count = lv;   /* single pass: identical value */
+            first_latch_count = lv;
 
             rtapi_print_msg(RTAPI_MSG_DBG,
-                "bec_enc_homing: latch captured, count = %d — homing complete\n", lv);
+                "bec_enc_homing: first latch captured, count = %d\n", lv);
 
-            /* De-arm the latch hardware — no further events needed */
+            /* Transition: de-arm, then immediately re-arm for second pass */
             enable_latch_c = 0;
-
-            /* Establish the reference offset so position = 0 at the mark. */
-            v_ref_offset = lv;
-            v_have_ref   = 1;
-            homed        = 1;
-
-            /* Signal LinuxCNC: clear index-enable (homing complete). Motion
-             * reads the latched position, sets the joint home coordinate and
-             * stops the axis. */
-            index_enable = 0;
-
-            /* Optionally preset the terminal counter so raw-count matches the
-             * machine coordinate system after homing. */
-            if (reset_on_home) {
-                v_set_target       = (hal_u32_t)home_count;
-                set_counter_value  = v_set_target;
-                set_counter        = 1;
-                v_set_pulse_active = 1;
-                v_ref_offset       = (hal_s32_t)home_count;
-            }
-
-            v_state = STATE_COMPLETE;
+            v_state        = STATE_FIRST_DONE;
         }
         break;
 
@@ -384,19 +402,35 @@ FUNCTION(_)
             /* De-arm the latch hardware — no further events needed */
             enable_latch_c = 0;
 
-            /* Establish the reference offset so position = 0 at home mark.
-             * v_accum at the latch moment equals (hal_s32_t)latch_value
-             * because the terminal and our accumulator stay in sync.
-             * We use lv directly as the reference offset.               */
-            v_ref_offset = lv;
+            /* IMPORTANT: with HOME_INDEX_NO_ENCODER_RESET=YES LinuxCNC
+             * samples motor-pos-fb in the very cycle where index-enable
+             * goes FALSE and derives the machine offset itself. The
+             * component must therefore NOT shift the position reference —
+             * doing so produces a step in the feedback and an immediate
+             * following error. v_ref_offset stays untouched here.
+             *
+             * To hand LinuxCNC the exact position of the reference mark
+             * rather than the position one cycle later, the latched value
+             * is published for this single cycle (see step 6 below). At
+             * HOME_LATCH_VEL the difference is well below one micron, so
+             * the one-cycle correction never approaches FERROR. */
             v_have_ref   = 1;
             homed        = 1;
+
+            /* Publish latched position to LinuxCNC in the next cycle */
+            v_publish_value = lv;
+            v_publish_latch = 1;
 
             /* Signal LinuxCNC: clear index-enable (homing complete) */
             index_enable = 0;
 
             /* Optionally preset the terminal counter so raw-count matches
-             * the machine coordinate system after homing.               */
+             * the machine coordinate system after homing.
+             * NOTE: default is OFF. Presetting the terminal counter during
+             * the homing handshake introduces a feedback discontinuity
+             * because the preset takes effect one or more PDO cycles later
+             * than the HAL-side bookkeeping. Only enable this if the raw
+             * counter value itself must match machine coordinates. */
             if (reset_on_home) {
                 v_set_target       = (hal_u32_t)home_count;
                 set_counter_value  = v_set_target;
@@ -450,4 +484,23 @@ FUNCTION(_)
      * 5. Update diagnostic state output pin
      * ------------------------------------------------------------------ */
     state_out = (hal_u32_t)v_state;
+
+    /* ------------------------------------------------------------------
+     * 6. Publish the exact latched position for this single cycle.
+     *
+     *    This must happen AFTER the state machine and in the SAME cycle in
+     *    which index-enable is cleared: motion-command-handler runs later
+     *    in the servo thread and samples motor-pos-fb exactly then. Doing
+     *    it in step 1 would publish one cycle too late and LinuxCNC would
+     *    latch the position of the following cycle instead of the mark.
+     *
+     *    The correction is the distance travelled in one servo cycle at
+     *    HOME_LATCH_VEL (sub-micron), far below any FERROR limit.
+     * ------------------------------------------------------------------ */
+    if (v_publish_latch) {
+        hal_s32_t rel_latched = v_publish_value - v_ref_offset;
+        counts   = rel_latched;
+        position = (float)rel_latched / scale;
+        v_publish_latch = 0;
+    }
 }

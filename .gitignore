@@ -7,3 +7,5 @@ position_mm.txt
 *.bak
 *.tbl
 *.expanded
+*__pycache__*
+*/FaultLogs*

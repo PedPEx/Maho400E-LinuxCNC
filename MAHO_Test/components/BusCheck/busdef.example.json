@@ -1,0 +1,37 @@
+{
+  "master": 0,
+  "slaves": [
+    {
+      "position": 0,
+      "name": "EK1914, 2 Ch. Safety Input/Output 24V,  TwinSAFE",
+      "vendor": "0x2",
+      "product": "0x77a2c52",
+      "revision": "0x120000",
+      "optional": false
+    },
+    {
+      "position": 1,
+      "name": "EL1918, 8K. Safety Eingang 24V, TwinSAFE",
+      "vendor": "0x2",
+      "product": "0x77e3052",
+      "revision": "0x100000",
+      "optional": false
+    },
+    {
+      "position": 2,
+      "name": "EL5002 2K. SSI Encoder",
+      "vendor": "0x2",
+      "product": "0x138a3052",
+      "revision": "0x140000",
+      "optional": false
+    },
+    {
+      "position": 3,
+      "name": "EL5021 1Ch. Sin/Cos Encoder",
+      "vendor": "0x2",
+      "product": "0x139d3052",
+      "revision": "0x150000",
+      "optional": false
+    }
+  ]
+}

@@ -19,7 +19,12 @@ MAX_LINEAR_VELOCITY = 41.667
 DEFAULT_LINEAR_VELOCITY = 16.667
 MAX_FEED_OVERRIDE = 1.5
 MIN_FEED_OVERRIDE = 0.0
-
+EMBED_TAB_NAME = Stoermeldungen
+EMBED_TAB_LOCATION = ntb_user_tabs
+EMBED_TAB_COMMAND = gladevcp -c faultmsg -x {XID} -u components/faulthandler/faultmsg.py -H components/faulthandler/faultmsg.hal -U logdir=/home/cnc/linuxcnc/configs/Maho400E-LinuxCNC/MAHO_Test/FaultLogs -U logdays=14 components/faulthandler/faultmsg.ui
+EMBED_TAB_NAME = Bus
+EMBED_TAB_LOCATION = ntb_user_tabs
+EMBED_TAB_COMMAND = gladevcp -c buscheck -x {XID} -u components/BusCheck/buscheck.py -H components/BusCheck/buscheck.hal -U cfg=components/BusCheck/busdef.json components/BusCheck/buscheck.ui
 [TASK]
 TASK = milltask
 CYCLE_TIME = 0.001

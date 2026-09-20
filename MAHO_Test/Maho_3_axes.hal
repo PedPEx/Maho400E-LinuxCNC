@@ -44,7 +44,7 @@ addf lcec.write-all            servo-thread
 # General signals
 #########################################
 
-net estop-ext iocontrol.0.emc-enable-in <=> lcec.m0.EL1819-0.din-3
+
 
 #########################################
 # Standard MAHO 3 Axes Configuration

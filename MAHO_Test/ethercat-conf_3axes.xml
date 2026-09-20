@@ -1,56 +1,19 @@
 <masters>
 	<!-- Internal EtherCAT Master 0 - Internal Key Busslaves only! -->
-	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="1" refClockSlaveIdx="1" name="m0">
-		<slave idx="0" type="EK1101" name="EK1101"/>
-		<slave idx="1" type="EL5021" name="EL5021-x">
-			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
-			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
-		    <!-- 8000:01  Enable counter reset via C input (BIT).
-    		Keep false for the latch-C homing scheme.                        -->
-      		<modParam name="enableCReset"          value="false"/>
-			<!-- 8000:0E  Reverse counting direction (BIT).
-			Prefer inverting via enc.pos-scale sign in HAL instead.          -->
-			<modParam name="reversionOfRotation"   value="false"/>
-			<!-- 8001:01  Enable frequency error detection (BIT). factory ON       -->
-			<modParam name="enableFrequencyError"  value="true"/>
-			<!-- 8001:02  Enable amplitude error detection (BIT). factory ON       -->
-			<modParam name="enableAmplitudeError"  value="true"/>
-			<!-- 8001:11  Period resolution in bits (U32). 10 -> fmax = 250 kHz    -->
-			<modParam name="analogResolution"      value="10"/>
+	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="1" refClockSlaveIdx="2" name="m0">
+		<slave idx="0" type="EK1914" name="EK1914"/>
+		<slave idx="1" type="EL1918" name="EL1918">
+			<modParam name="fsoeSlaveIdx" value="0"/>
+			<!-- Standard-Inputs: 0xf788 -->
+			<modParam name="stdInName" value="err-ack"/>
+			<modParam name="stdInName" value="run"/>
+			<modParam name="stdInName" value="safe-out1"/>
+			<modParam name="stdInName" value="safe-out2"/>
+			<!-- Standard-Outputs: 0xf688 -->
+			<modParam name="stdOutName" value="safety-ok"/>
+			<modParam name="stdOutName" value="safe-error"/>
 		</slave>
-		<slave idx="2" type="EL5021" name="EL5021-y">
-			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
-			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
-		    <!-- 8000:01  Enable counter reset via C input (BIT).
-    		Keep false for the latch-C homing scheme.                        -->
-      		<modParam name="enableCReset"          value="false"/>
-			<!-- 8000:0E  Reverse counting direction (BIT).
-			Prefer inverting via enc.pos-scale sign in HAL instead.          -->
-			<modParam name="reversionOfRotation"   value="false"/>
-			<!-- 8001:01  Enable frequency error detection (BIT). factory ON       -->
-			<modParam name="enableFrequencyError"  value="true"/>
-			<!-- 8001:02  Enable amplitude error detection (BIT). factory ON       -->
-			<modParam name="enableAmplitudeError"  value="true"/>
-			<!-- 8001:11  Period resolution in bits (U32). 10 -> fmax = 250 kHz    -->
-			<modParam name="analogResolution"      value="10"/>
-		</slave>
-		<slave idx="3" type="EL5021" name="EL5021-z">
-			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
-			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
-		    <!-- 8000:01  Enable counter reset via C input (BIT).
-    		Keep false for the latch-C homing scheme.                        -->
-      		<modParam name="enableCReset"          value="false"/>
-			<!-- 8000:0E  Reverse counting direction (BIT).
-			Prefer inverting via enc.pos-scale sign in HAL instead.          -->
-			<modParam name="reversionOfRotation"   value="false"/>
-			<!-- 8001:01  Enable frequency error detection (BIT). factory ON       -->
-			<modParam name="enableFrequencyError"  value="true"/>
-			<!-- 8001:02  Enable amplitude error detection (BIT). factory ON       -->
-			<modParam name="enableAmplitudeError"  value="true"/>
-			<!-- 8001:11  Period resolution in bits (U32). 10 -> fmax = 250 kHz    -->
-			<modParam name="analogResolution"      value="10"/>
-		</slave>
-		<slave idx="4" type="EL5002" name="EL5002">
+		<slave idx="2" type="EL5002" name="EL5002">
 			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="0" sync1Cycle="*1" sync1Shift="15000"/>-->
 			<!-- ===== Channel 0 (base 0x8000) — SICK ATM60 spindle encoder ===== -->
 			<modParam name="ch0DisFrameErr"     value="false"/> <!-- 8000:01 BOOL  false=frame errors evaluated       -->
@@ -77,16 +40,77 @@
 			<modParam name="ch1MinInhibitTime"  value="0"/>     <!-- 8010:13 U16   min. inhibit time [µs]               -->
 			<modParam name="ch1NoClkBursts"     value="1"/>     <!-- 8010:14 U16   clock bursts, min 1 (FW03+)          -->
 		</slave>
-		<slave idx="5" type="EL4034" name="EL4034">
+		<slave idx="3" type="EL5021" name="EL5021-x">
+			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
+			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
+		    <!-- 8000:01  Enable counter reset via C input (BIT).
+    		Keep false for the latch-C homing scheme.                        -->
+      		<modParam name="enableCReset"          value="false"/>
+			<!-- 8000:0E  Reverse counting direction (BIT).
+			Prefer inverting via enc.pos-scale sign in HAL instead.          -->
+			<modParam name="reversionOfRotation"   value="false"/>
+			<!-- 8001:01  Enable frequency error detection (BIT). factory ON       -->
+			<modParam name="enableFrequencyError"  value="true"/>
+			<!-- 8001:02  Enable amplitude error detection (BIT). factory ON       -->
+			<modParam name="enableAmplitudeError"  value="true"/>
+			<!-- 8001:11  Period resolution in bits (U32). 10 -> fmax = 250 kHz    -->
+			<modParam name="analogResolution"      value="10"/>
+		</slave>
+		<slave idx="4" type="EL5021" name="EL5021-y">
+			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
+			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
+		    <!-- 8000:01  Enable counter reset via C input (BIT).
+    		Keep false for the latch-C homing scheme.                        -->
+      		<modParam name="enableCReset"          value="false"/>
+			<!-- 8000:0E  Reverse counting direction (BIT).
+			Prefer inverting via enc.pos-scale sign in HAL instead.          -->
+			<modParam name="reversionOfRotation"   value="false"/>
+			<!-- 8001:01  Enable frequency error detection (BIT). factory ON       -->
+			<modParam name="enableFrequencyError"  value="true"/>
+			<!-- 8001:02  Enable amplitude error detection (BIT). factory ON       -->
+			<modParam name="enableAmplitudeError"  value="true"/>
+			<!-- 8001:11  Period resolution in bits (U32). 10 -> fmax = 250 kHz    -->
+			<modParam name="analogResolution"      value="10"/>
+		</slave>
+		<slave idx="5" type="EL5021" name="EL5021-z">
+			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
+			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
+		    <!-- 8000:01  Enable counter reset via C input (BIT).
+    		Keep false for the latch-C homing scheme.                        -->
+      		<modParam name="enableCReset"          value="false"/>
+			<!-- 8000:0E  Reverse counting direction (BIT).
+			Prefer inverting via enc.pos-scale sign in HAL instead.          -->
+			<modParam name="reversionOfRotation"   value="false"/>
+			<!-- 8001:01  Enable frequency error detection (BIT). factory ON       -->
+			<modParam name="enableFrequencyError"  value="true"/>
+			<!-- 8001:02  Enable amplitude error detection (BIT). factory ON       -->
+			<modParam name="enableAmplitudeError"  value="true"/>
+			<!-- 8001:11  Period resolution in bits (U32). 10 -> fmax = 250 kHz    -->
+			<modParam name="analogResolution"      value="10"/>
+		</slave>
+		<slave idx="6" type="EL9410" name="EL9410-DI"/>
+		<slave idx="7" type="EL1819" name="EL1819-0"/>
+		<slave idx="8" type="EL1819" name="EL1819-1"/>
+		<slave idx="9" type="EL1859" name="EL1859"/>
+		<slave idx="10" type="generic" vid="0x00000002" pid="0x23963052" name="EL9110-DO">
+			<syncManager idx="0" dir="in">
+				<pdo idx="1a00">
+					<pdoEntry idx="6000" subIdx="01" bitLen="1" halPin="PowerOk" halType="bit"/>
+				</pdo>
+			</syncManager>
+		</slave>
+		<slave idx="11" type="EL2809" name="EL2809"/>
+		<slave idx="12" type="EL4034" name="EL4034">
 			<dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="0" sync1Cycle="*1" sync1Shift="100000"/>
 		</slave>
-		<slave idx="6" type="EL1819" name="EL1819-0"/>
-		<slave idx="7" type="EL1819" name="EL1819-1"/>
-		<slave idx="8" type="EL2809" name="EL2809-0"/>
-		<slave idx="9" type="EL2809" name="EL2809-1"/>
-		<slave idx="10" type="EK1100" name="EK1100"/>
-		<slave idx="11" type="EL1859" name="EL1859"/>
-		<slave idx="12" type="EL7332" name="EL7332-0">
+		<slave idx="13" type="generic" vid="0x00000002" pid="0x23963052" name="EL9110-Mot">
+			<syncManager idx="0" dir="in">
+				<pdo idx="1a00">
+					<pdoEntry idx="6000" subIdx="01" bitLen="1" halPin="PowerOk" halType="bit"/>
+				</pdo>
+			</syncManager>
+		</slave>
+		<slave idx="14" type="EL7332" name="EL7332-0">
 			<!-- ================= Channel 1 ================= -->
 			<modParam name="ch1_enable"               value="true"/>       <!-- gated with HAL enable pin       -->
 			<modParam name="ch1_mode"                 value="velocity"/>   <!-- velocity | chopper (8022:01)    -->
@@ -138,7 +162,7 @@
 			<modParam name="warning_temp"             value="80"/>         <!-- °C   (F80F:04)                  -->
 			<modParam name="switchoff_temp"           value="100"/>        <!-- °C   (F80F:05)                  -->
 		</slave>
-		<slave idx="13" type="EL7332" name="EL7332-1">
+		<slave idx="15" type="EL7332" name="EL7332-1">
 			<!-- ================= Channel 1 ================= -->
 			<modParam name="ch1_enable"               value="true"/>       <!-- gated with HAL enable pin       -->
 			<modParam name="ch1_mode"                 value="velocity"/>   <!-- velocity | chopper (8022:01)    -->
@@ -190,15 +214,15 @@
 			<modParam name="warning_temp"             value="80"/>         <!-- °C   (F80F:04)                  -->
 			<modParam name="switchoff_temp"           value="100"/>        <!-- °C   (F80F:05)                  -->
 		</slave>
-		<slave idx="14" type="FC302" name="FC302">
-			<modParam name="accelDeltaSpeed"  value="5000"/>  <!-- Zaehler: 50,00 Hz Spanne -->
-			<modParam name="accelDeltaTime"   value="2000"/>  <!-- Nenner: 2,000 s          -->
+		<slave idx="16" type="FC302" name="FC302">
+			<!--<modParam name="accelDeltaSpeed"  value="5000"/>
+			<modParam name="accelDeltaTime"   value="2000"/>
 			<modParam name="decelDeltaSpeed"  value="5000"/>
 			<modParam name="decelDeltaTime"   value="2000"/>
 			<modParam name="vlDimNumerator"   value="1"/>
-			<modParam name="vlDimDenominator" value="1"/>
-			<modParam name="jogRampTime"      value="1000"/>  <!-- par. 3-80: Jog-Rampe            -->
-			<modParam name="qstopRampTime"    value="200"/>   <!-- par. 3-81: Quick-Stop-Rampe     -->
+			<modParam name="vlDimDenominator" value="1"/>-->
+			<!-- <modParam name="jogRampTime"      value="1000"/>   par. 3-80: Jog-Rampe            -->
+			<!-- <modParam name="qstopRampTime"    value="200"/>   par. 3-81: Quick-Stop-Rampe     -->
 			<!-- FC302 par. 12-22.9 bestimmt welcher Sensor im letzten PDO-Slot steckt -->
   			<modParam name="tempSlotSource" value="1639"/>
 			<modParam name="sdoReadConfig" value="255"/>

@@ -1,0 +1,389 @@
+loadrt faultlatch count=51
+loadrt and2 count=17
+
+addf faultlatch.0 servo-thread
+addf faultlatch.1 servo-thread
+addf faultlatch.2 servo-thread
+addf faultlatch.3 servo-thread
+addf faultlatch.4 servo-thread
+addf faultlatch.5 servo-thread
+addf faultlatch.6 servo-thread
+addf faultlatch.7 servo-thread
+addf faultlatch.8 servo-thread
+addf faultlatch.9 servo-thread
+addf faultlatch.10 servo-thread
+addf faultlatch.11 servo-thread
+addf faultlatch.12 servo-thread
+addf faultlatch.13 servo-thread
+addf faultlatch.14 servo-thread
+addf faultlatch.15 servo-thread
+addf faultlatch.16 servo-thread
+addf faultlatch.17 servo-thread
+addf faultlatch.18 servo-thread
+addf faultlatch.19 servo-thread
+addf faultlatch.20 servo-thread
+addf faultlatch.21 servo-thread
+addf faultlatch.22 servo-thread
+addf faultlatch.23 servo-thread
+addf faultlatch.24 servo-thread
+addf faultlatch.25 servo-thread
+addf faultlatch.26 servo-thread
+addf faultlatch.27 servo-thread
+addf faultlatch.28 servo-thread
+addf faultlatch.29 servo-thread
+addf faultlatch.30 servo-thread
+addf faultlatch.31 servo-thread
+addf faultlatch.32 servo-thread
+addf faultlatch.33 servo-thread
+addf faultlatch.34 servo-thread
+addf faultlatch.35 servo-thread
+addf faultlatch.36 servo-thread
+addf faultlatch.37 servo-thread
+addf faultlatch.38 servo-thread
+addf faultlatch.39 servo-thread
+addf faultlatch.40 servo-thread
+addf faultlatch.41 servo-thread
+addf faultlatch.42 servo-thread
+addf faultlatch.43 servo-thread
+addf faultlatch.44 servo-thread
+addf faultlatch.45 servo-thread
+addf faultlatch.46 servo-thread
+addf faultlatch.47 servo-thread
+addf faultlatch.48 servo-thread
+addf faultlatch.49 servo-thread
+addf faultlatch.50 servo-thread
+
+addf and2.0 servo-thread
+addf and2.1 servo-thread
+addf and2.2 servo-thread
+addf and2.3 servo-thread
+addf and2.4 servo-thread
+addf and2.5 servo-thread
+addf and2.6 servo-thread
+addf and2.7 servo-thread
+addf and2.8 servo-thread
+addf and2.9 servo-thread
+addf and2.10 servo-thread
+addf and2.11 servo-thread
+addf and2.12 servo-thread
+addf and2.13 servo-thread
+addf and2.14 servo-thread
+addf and2.15 servo-thread
+addf and2.16 servo-thread
+
+### Slaves Online AND in OP
+## Slave 0
+net ek1914-oper    lcec.m0.EK1914.slave-oper   => and2.0.in0
+net ek1914-online  lcec.m0.EK1914.slave-online => and2.0.in1
+net ek1914-ready   and2.0.out                  => faultlatch.34.monitor
+setp faultlatch.34.id 110
+net startup-gate faultlatch.34.inhibit
+net gate-ek1914 faultlatch.34.fault-interlock  => faultlatch.6.inhibit faultlatch.7.inhibit faultlatch.8.inhibit faultlatch.9.inhibit
+## Slave 1
+net el1918-oper    lcec.m0.EL1918.slave-oper   => and2.1.in0
+net el1918-online  lcec.m0.EL1918.slave-online => and2.1.in1
+net el1918-ready   and2.1.out                  => faultlatch.35.monitor
+setp faultlatch.35.id 111
+net startup-gate faultlatch.35.inhibit
+net gate-el1918 faultlatch.35.fault-interlock  => faultlatch.3.inhibit faultlatch.4.inhibit faultlatch.5.inhibit faultlatch.10.inhibit faultlatch.11.inhibit faultlatch.12.inhibit faultlatch.13.inhibit
+## Slave 2
+net el5002-oper    lcec.m0.EL5002.slave-oper   => and2.2.in0
+net el5002-online  lcec.m0.EL5002.slave-online => and2.2.in1
+net el5002-ready   and2.2.out                  => faultlatch.36.monitor
+setp faultlatch.36.id 112
+net startup-gate faultlatch.36.inhibit
+#net gate-el5002 faultlatch.36.fault-interlock  => faultlatch.3.inhibit faultlatch.4.inhibit faultlatch.5.inhibit faultlatch.10.inhibit faultlatch.11.inhibit faultlatch.12.inhibit faultlatch.13.inhibit
+## Slave 3
+net el5021-x-oper    lcec.m0.EL5021-x.slave-oper   => and2.3.in0
+net el5021-x-online  lcec.m0.EL5021-x.slave-online => and2.3.in1
+net el5021-x-ready   and2.3.out                    => faultlatch.37.monitor
+setp faultlatch.37.id 113
+net startup-gate faultlatch.37.inhibit
+#net gate-el5021-x faultlatch.37.fault-interlock => faultlatch.32.inhibit
+## Slave 4
+net el5021-y-oper    lcec.m0.EL5021-y.slave-oper   => and2.4.in0
+net el5021-y-online  lcec.m0.EL5021-y.slave-online => and2.4.in1
+net el5021-y-ready   and2.4.out                    => faultlatch.38.monitor
+setp faultlatch.38.id 114
+net startup-gate faultlatch.38.inhibit
+#net gate-el5021-y faultlatch.38.fault-interlock => faultlatch.32.inhibit
+## Slave 5
+net el5021-z-oper    lcec.m0.EL5021-z.slave-oper   => and2.5.in0
+net el5021-z-online  lcec.m0.EL5021-z.slave-online => and2.5.in1
+net el5021-z-ready   and2.5.out                    => faultlatch.39.monitor
+setp faultlatch.39.id 115
+net startup-gate faultlatch.39.inhibit
+#net gate-el5021-z faultlatch.39.fault-interlock => faultlatch.32.inhibit
+## Slave 6
+net EL9410-DI-oper      lcec.m0.EL9410-DI.slave-oper     => and2.6.in0
+net EL9410-DI-online    lcec.m0.EL9410-DI.slave-online   => and2.6.in1
+net EL9410-DI-ready     and2.6.out                    => faultlatch.40.monitor
+setp faultlatch.40.id 116
+net startup-gate faultlatch.40.inhibit
+#net gate-EL9410-DI faultlatch.40.fault-interlock => faultlatch.32.inhibit
+## Slave 7
+net el1819-0-oper    lcec.m0.EL1819-0.slave-oper   => and2.7.in0
+net el1819-0-online  lcec.m0.EL1819-0.slave-online => and2.7.in1
+net el1819-0-ready   and2.7.out                    => faultlatch.41.monitor
+setp faultlatch.41.id 117
+net startup-gate faultlatch.41.inhibit
+net gate-el1819-0 faultlatch.41.fault-interlock => faultlatch.15.inhibit faultlatch.16.inhibit faultlatch.17.inhibit faultlatch.18.inhibit faultlatch.19.inhibit faultlatch.20.inhibit faultlatch.21.inhibit faultlatch.22.inhibit faultlatch.27.inhibit faultlatch.28.inhibit
+## Slave 8
+net el1819-1-oper    lcec.m0.EL1819-1.slave-oper   => and2.8.in0
+net el1819-1-online  lcec.m0.EL1819-1.slave-online => and2.8.in1
+net el1819-1-ready   and2.8.out                    => faultlatch.42.monitor
+setp faultlatch.42.id 118
+net startup-gate faultlatch.42.inhibit
+net gate-el1819-1 faultlatch.42.fault-interlock => faultlatch.32.inhibit
+## Slave 9
+net el1859-oper      lcec.m0.EL1859.slave-oper     => and2.9.in0
+net el1859-online    lcec.m0.EL1859.slave-online   => and2.9.in1
+net el1859-ready     and2.9.out                    => faultlatch.43.monitor
+setp faultlatch.43.id 119
+net startup-gate faultlatch.43.inhibit
+#net gate-el1859 faultlatch.43.fault-interlock => faultlatch.15.inhibit
+## Slave 10
+net el9110-DO-oper    lcec.m0.EL9110-DO.slave-oper   => and2.10.in0
+net el9110-DO-online  lcec.m0.EL9110-DO.slave-online => and2.10.in1
+net el9110-DO-ready   and2.10.out                   => faultlatch.44.monitor
+setp faultlatch.44.id 120
+net startup-gate faultlatch.44.inhibit
+#net gate-el9110-DO faultlatch.44.fault-interlock => faultlatch.15.inhibit
+## Slave 11
+net el2809-oper      lcec.m0.EL2809.slave-oper     => and2.11.in0
+net el2809-online    lcec.m0.EL2809.slave-online   => and2.11.in1
+net el2809-ready     and2.11.out                   => faultlatch.45.monitor
+setp faultlatch.45.id 121
+net startup-gate faultlatch.45.inhibit
+#net gate-el2809 faultlatch.45.fault-interlock => faultlatch.15.inhibit
+## Slave 12
+net el4034-oper      lcec.m0.EL4034.slave-oper     => and2.12.in0
+net el4034-online    lcec.m0.EL4034.slave-online   => and2.12.in1
+net el4034-ready     and2.12.out                   => faultlatch.46.monitor
+setp faultlatch.46.id 122
+net startup-gate faultlatch.46.inhibit
+#net gate-el4034 faultlatch.46.fault-interlock => faultlatch.15.inhibit
+## Slave 13
+net el9110-Mot-oper    lcec.m0.EL9110-Mot.slave-oper   => and2.13.in0
+net el9110-Mot-online  lcec.m0.EL9110-Mot.slave-online => and2.13.in1
+net el9110-Mot-ready   and2.13.out                   => faultlatch.47.monitor
+setp faultlatch.47.id 123
+net startup-gate faultlatch.47.inhibit
+#net gate-el9110-Mot faultlatch.47.fault-interlock => faultlatch.15.inhibit
+## Slave 14
+net el7332-0-oper    lcec.m0.EL7332-0.slave-oper   => and2.14.in0
+net el7332-0-online  lcec.m0.EL7332-0.slave-online => and2.14.in1
+net el7332-0-ready   and2.14.out                   => faultlatch.48.monitor
+setp faultlatch.48.id 124
+net startup-gate faultlatch.48.inhibit
+#net gate-el7332-0 faultlatch.48.fault-interlock => faultlatch.15.inhibit
+## Slave 15
+net el7332-1-oper    lcec.m0.EL7332-1.slave-oper   => and2.15.in0
+net el7332-1-online  lcec.m0.EL7332-1.slave-online => and2.15.in1
+net el7332-1-ready   and2.15.out                   => faultlatch.49.monitor
+setp faultlatch.49.id 125
+net startup-gate faultlatch.49.inhibit
+#net gate-el7332-1 faultlatch.49.fault-interlock => faultlatch.15.inhibit
+## Slave 16
+net fc302-oper       lcec.m0.FC302.slave-oper      => and2.16.in0
+net fc302-online     lcec.m0.FC302.slave-online    => and2.16.in1
+net fc302-ready      and2.16.out                   => faultlatch.50.monitor
+setp faultlatch.50.id 126
+net startup-gate faultlatch.50.inhibit
+#net gate-fc302 faultlatch.50.fault-interlock => faultlatch.15.inhibit
+
+
+# Startup-Meldung
+setp faultlatch.33.id 199
+setp faultlatch.33.startup 1        # latcht einmal beim Boot, manuell quittierbar
+net startup-gate faultlatch.33.fault-interlock
+
+# ----- ID 100  [alarm]  EtherCAT-Bus ohne Funktion  (faultlatch.0) -----
+setp faultlatch.0.id 100
+#   monitor <= buscheck.bus-alive   (wired in buscheck.hal, post-GUI)
+
+# ----- ID 101  [alarm]  EtherCAT-Slave fehlt  (faultlatch.1) -----
+setp faultlatch.1.id 101
+#   monitor <= buscheck.slaves-complete   (wired in buscheck.hal, post-GUI)
+
+# ----- ID 102  [alarm]  EtherCAT-Slave nicht OP  (faultlatch.2) -----
+setp faultlatch.2.id 102
+#   monitor <= buscheck.all-op   (wired in buscheck.hal, post-GUI)
+
+# ----- ID 201  [warning]  SafetyPLC: keine Freigabe  (faultlatch.3) -----
+setp faultlatch.3.id 201
+net cond-201  lcec.m0.EL1918.safety-ok  => faultlatch.3.monitor
+
+# ----- ID 202  [warning]  SafetyPLC: Error  (faultlatch.4) -----
+setp faultlatch.4.id 202
+#net cond-202  lcec.m0.EL1918.safety-ok  => faultlatch.4.monitor
+
+# ----- ID 203  [warning]  Reserve  (faultlatch.5) -----
+setp faultlatch.5.id 203
+#net cond-203  <SIGNAL: HIGH=OK>  => faultlatch.5.monitor
+
+# ----- ID 251  [alarm]  Endschalter X  (faultlatch.6) -----
+setp faultlatch.6.id 251
+net cond-251  lcec.m0.EK1914.din-0  => faultlatch.6.monitor
+
+# ----- ID 252  [alarm]  Endschalter Y  (faultlatch.7) -----
+setp faultlatch.7.id 252
+net cond-252  lcec.m0.EK1914.din-1  => faultlatch.7.monitor
+
+# ----- ID 253  [alarm]  Endschalter Z  (faultlatch.8) -----
+setp faultlatch.8.id 253
+net cond-253  lcec.m0.EK1914.din-2  => faultlatch.8.monitor
+
+# ----- ID 254  [alarm]  NotHalt Bedienpult betaetigt  (faultlatch.9) -----
+setp faultlatch.9.id 254
+net cond-254  lcec.m0.EK1914.fsoe-in-0  => faultlatch.9.monitor
+
+# ----- ID 255  [warning]  Indramat nicht betriebsbereit  (faultlatch.10) -----
+setp faultlatch.10.id 255
+net cond-255  lcec.m0.EL1918.local.in-4  => faultlatch.10.monitor
+
+# ----- ID 256  [alarm]  Sicherung HMI ausgeloest  (faultlatch.11) -----
+setp faultlatch.11.id 256
+net cond-256  lcec.m0.EL1918.local.in-5  => faultlatch.11.monitor
+
+# ----- ID 257  [alarm]  Sicherung DC-Kreise ausgeloest  (faultlatch.12) -----
+setp faultlatch.12.id 257
+net cond-257  lcec.m0.EL1918.local.in-6  => faultlatch.12.monitor
+
+# ----- ID 258  [alarm]  Bremsen Manuell  (faultlatch.13) -----
+setp faultlatch.13.id 258
+net cond-258  lcec.m0.EL1918.local.in-7  => faultlatch.13.monitor
+
+# ----- ID 259  [alarm]  Reserve  (faultlatch.14) -----
+setp faultlatch.14.id 259
+#net cond-259  <SIGNAL: HIGH=OK>  => faultlatch.14.monitor
+
+# ----- ID 600  [alarm]  Motorschutzschalter Frequenzumrichter  (faultlatch.15) -----
+setp faultlatch.15.id 600
+net cond-600  lcec.m0.EL1819-0.din-0  => faultlatch.15.monitor
+
+# ----- ID 601  [alarm]  Motorschutzschalter Kuehlmittelpumpe  (faultlatch.16) -----
+setp faultlatch.16.id 601
+net cond-601  lcec.m0.EL1819-0.din-1  => faultlatch.16.monitor
+
+# ----- ID 602  [alarm]  Motorschutzschalter Hydraulikpumpe  (faultlatch.17) -----
+setp faultlatch.17.id 602
+net cond-602  lcec.m0.EL1819-0.din-2  => faultlatch.17.monitor
+
+# ----- ID 603  [alarm]  Trafoschutzschalter DC-Motoren  (faultlatch.18) -----
+setp faultlatch.18.id 603
+net cond-603  lcec.m0.EL1819-0.din-3  => faultlatch.18.monitor
+
+# ----- ID 604  [alarm]  Trafoschutzschalter 110 V System  (faultlatch.19) -----
+setp faultlatch.19.id 604
+net cond-604  lcec.m0.EL1819-0.din-4  => faultlatch.19.monitor
+
+# ----- ID 605  [alarm]  Motorschutzschalter Indramat Logikversorgung  (faultlatch.20) -----
+setp faultlatch.20.id 605
+net cond-605  lcec.m0.EL1819-0.din-5  => faultlatch.20.monitor
+
+# ----- ID 606  [alarm]  Sicherung 110 V: Motorbremse  (faultlatch.21) -----
+setp faultlatch.21.id 606
+net cond-606  lcec.m0.EL1819-0.din-6  => faultlatch.21.monitor
+
+# ----- ID 607  [alarm]  Sicherung 110 V: Zentralschmierung  (faultlatch.22) -----
+setp faultlatch.22.id 607
+net cond-607  lcec.m0.EL1819-0.din-7  => faultlatch.22.monitor
+
+# ----- ID 608  [warning]  Hydraulikpumpe: Fehler  (faultlatch.23) -----
+setp faultlatch.23.id 608
+net cond-608  lcec.m0.EL1819-0.din-8  => faultlatch.23.monitor
+
+# ----- ID 609  [warning]  Zentralschmierung: Fehler  (faultlatch.24) -----
+setp faultlatch.24.id 609
+net cond-609  lcec.m0.EL1819-0.din-9  => faultlatch.24.monitor
+
+# ----- ID 610  [info]  Hydraulikpumpe: Druck erreicht  (faultlatch.25) -----
+setp faultlatch.25.id 610
+setp faultlatch.25.auto-clear-s 5
+net cond-610  lcec.m0.EL1819-0.din-10  => faultlatch.25.monitor
+
+# ----- ID 611  [info]  Hydraulikpumpe: Pumpe laeuft  (faultlatch.26) -----
+setp faultlatch.26.id 611
+setp faultlatch.26.auto-clear-s 5
+net cond-611  lcec.m0.EL1819-0.din-10-not  => faultlatch.26.monitor
+
+# ----- ID 612  [alarm]  Uebertemperatur DC Achsmotoren  (faultlatch.27) -----
+setp faultlatch.27.id 612
+net cond-612  lcec.m0.EL1819-0.din-11  => faultlatch.27.monitor
+
+# ----- ID 613  [alarm]  Uebertemperatur Transformator  (faultlatch.28) -----
+setp faultlatch.28.id 613
+net cond-613  lcec.m0.EL1819-0.din-12  => faultlatch.28.monitor
+
+# ----- ID 614  [alarm]  Reserve ID614  (faultlatch.29) -----
+setp faultlatch.29.id 614
+#net cond-614  <SIGNAL: HIGH=OK>  => faultlatch.29.monitor
+
+# ----- ID 615  [alarm]  Reserve ID615  (faultlatch.30) -----
+setp faultlatch.30.id 615
+#net cond-615  <SIGNAL: HIGH=OK>  => faultlatch.30.monitor
+
+# ----- ID 616  [alarm]  Reserve ID616  (faultlatch.31) -----
+setp faultlatch.31.id 616
+#net cond-616  <SIGNAL: HIGH=OK>  => faultlatch.31.monitor
+
+# ----- ID 617  [alarm]  Indramatfreigabe Manuell  (faultlatch.32) -----
+setp faultlatch.32.id 617
+net cond-617  lcec.m0.EL1859.din-2  => faultlatch.32.monitor
+
+# ----- Acknowledge button to every instance (falling edge = ack) -----
+# NOTE: if the button reads HIGH when pressed, the falling edge is on
+#       RELEASE. Invert din-1 (or use the NC contact) for clear-on-press.
+net ack-btn lcec.m0.EL1859.din-1
+net ack-btn faultlatch.0.error-ack
+net ack-btn faultlatch.1.error-ack
+net ack-btn faultlatch.2.error-ack
+net ack-btn faultlatch.3.error-ack
+net ack-btn faultlatch.4.error-ack
+net ack-btn faultlatch.5.error-ack
+net ack-btn faultlatch.6.error-ack
+net ack-btn faultlatch.7.error-ack
+net ack-btn faultlatch.8.error-ack
+net ack-btn faultlatch.9.error-ack
+net ack-btn faultlatch.10.error-ack
+net ack-btn faultlatch.11.error-ack
+net ack-btn faultlatch.12.error-ack
+net ack-btn faultlatch.13.error-ack
+net ack-btn faultlatch.14.error-ack
+net ack-btn faultlatch.15.error-ack
+net ack-btn faultlatch.16.error-ack
+net ack-btn faultlatch.17.error-ack
+net ack-btn faultlatch.18.error-ack
+net ack-btn faultlatch.19.error-ack
+net ack-btn faultlatch.20.error-ack
+net ack-btn faultlatch.21.error-ack
+net ack-btn faultlatch.22.error-ack
+net ack-btn faultlatch.23.error-ack
+net ack-btn faultlatch.24.error-ack
+net ack-btn faultlatch.25.error-ack
+net ack-btn faultlatch.26.error-ack
+net ack-btn faultlatch.27.error-ack
+net ack-btn faultlatch.28.error-ack
+net ack-btn faultlatch.29.error-ack
+net ack-btn faultlatch.30.error-ack
+net ack-btn faultlatch.31.error-ack
+net ack-btn faultlatch.32.error-ack
+net ack-btn faultlatch.33.error-ack
+net ack-btn faultlatch.34.error-ack
+net ack-btn faultlatch.35.error-ack
+net ack-btn faultlatch.36.error-ack
+net ack-btn faultlatch.37.error-ack
+net ack-btn faultlatch.38.error-ack
+net ack-btn faultlatch.39.error-ack
+net ack-btn faultlatch.40.error-ack
+net ack-btn faultlatch.41.error-ack
+net ack-btn faultlatch.42.error-ack
+net ack-btn faultlatch.43.error-ack
+net ack-btn faultlatch.44.error-ack
+net ack-btn faultlatch.45.error-ack
+net ack-btn faultlatch.46.error-ack
+net ack-btn faultlatch.47.error-ack
+net ack-btn faultlatch.48.error-ack
+net ack-btn faultlatch.49.error-ack
+net ack-btn faultlatch.50.error-ack

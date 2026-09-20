@@ -1,0 +1,103 @@
+component faultlatch "Latching fault block: acknowledge, priority gate (enable) + startup/slave gate (inhibit), monitor invert, self-clear and severity; fault-interlock passes an active inhibit through";
+
+description """
+Generic, count-instantiable fault latch for a fault/interlock matrix in HAL
+(conditions usually formed in ClassicLadder).
+
+Gates (a NEW fault latches only while the block is 'armed'):
+  armed = (enable LOW) AND (inhibit LOW)
+  enable  - ACTIVE LOW. Fault PRIORITISATION: drive it from a higher-priority
+            block's fault-interlock so that block suppresses NEW messages here.
+  inhibit - ACTIVE HIGH. Startup / slave-ready gate: drive it from an upstream
+            block's fault-interlock to hold this block off.
+An ALREADY latched fault persists regardless of the gates and stays
+acknowledgeable, so a root cause is never lost.
+
+fault-interlock = latched OR inhibit. Besides signalling this block's own
+fault, it PASSES A RECEIVED INHIBIT THROUGH, so a gate propagates down a chain
+even across a block that is itself inhibited (and therefore cannot latch).
+Chain it to a downstream 'inhibit' for a startup/slave-ready cascade, or to a
+downstream 'enable' for prioritisation.
+
+startup (param): latch ONCE at boot (independent of monitor), immediately
+  acknowledgeable, stays clear after the acknowledge. Use one such block as the
+  "initial acknowledge required" message and route its fault-interlock to the
+  inhibit inputs it should gate.
+
+invert (pin): negate 'monitor' so a LOW = ok signal can be wired directly.
+
+auto-clear (info): auto-clear-s > 0 self-clears a latched fault that many
+  seconds after the cause is gone; clear-remaining counts it down for the HMI.
+
+NON-SAFE: diagnostics / release logic only. The safety function stays in the
+EL1918 (safeEstop -> safeAnd). Never rely on these pins for a protective stop.
+""";
+
+pin in bit monitor = 1 "Monitored condition: HIGH = ok, LOW = fault (unless invert).";
+pin in bit invert = 0 "If TRUE, negate 'monitor' (for LOW = ok signals).";
+pin in bit error-ack "Acknowledge: FALLING edge clears a latched fault while the cause is gone.";
+pin in bit enable "Priority gate, ACTIVE LOW: LOW = armed, HIGH = suppress new latches + force ok low.";
+pin in bit inhibit = 0 "Startup/slave gate, ACTIVE HIGH: HIGH = suppress new latches + force ok low.";
+pin in s32 level = -1 "Optional severity override (0=info,1=warning,2=alarm). -1 = from message file.";
+pin in float auto-clear-s = 0 "If >0: self-clear a latched fault this many seconds after the cause is gone (info).";
+
+pin out bit errack-possible "HIGH when a fault is latched and its cause is gone.";
+pin out bit fault "HIGH while a fault is latched. Message trigger for the HMI.";
+pin out bit fault-interlock "= latched OR inhibit. Chain to downstream inhibit (gate cascade) or enable (prioritisation); passes an active inhibit through.";
+pin out bit ok "HIGH when the block is armed and fault-free.";
+pin out float clear-remaining "Seconds until auto-clear fires; 0 when inactive.";
+
+param rw u32 id = 0 "Message id: key into the external message file.";
+param rw bit startup = 0 "If TRUE, latch once at boot (initial-acknowledge block).";
+
+variable int latched = 0;
+variable int ack_prev = 0;
+variable int started = 0;
+variable double clear_acc = 0;
+
+function _ ;
+license "GPL";
+;;
+
+FUNCTION(_) {
+    double period_s = period * 1e-9;
+    int armed = (!enable) && (!inhibit);
+    int mon;
+
+    if (startup) {
+        if (!started) {
+            latched = 1;
+            started = 1;
+        }
+        mon = 1;
+    } else {
+        mon = invert ? !monitor : monitor;
+        if (armed && !mon) {
+            latched = 1;
+        }
+    }
+
+    if (ack_prev && !error_ack && mon) {
+        latched = 0;
+    }
+    ack_prev = error_ack;
+
+    if (latched && mon && auto_clear_s > 0) {
+        clear_acc += period_s;
+        if (clear_acc >= auto_clear_s) {
+            latched = 0;
+            clear_acc = 0;
+        }
+    } else {
+        clear_acc = 0;
+    }
+
+    fault = latched;
+    // fault-interlock also passes an active inhibit through, so a gate keeps
+    // propagating down the chain across an inhibited (non-latching) block.
+    fault_interlock = latched || inhibit;
+    errack_possible = latched && mon;
+    ok = armed && !latched;
+    clear_remaining = (auto_clear_s > 0 && latched && mon)
+                      ? (auto_clear_s - clear_acc) : 0.0;
+}

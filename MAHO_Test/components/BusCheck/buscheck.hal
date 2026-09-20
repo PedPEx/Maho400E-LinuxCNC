@@ -1,0 +1,11 @@
+# HAL wiring for the buscheck GladeVCP tab.
+# Passed to gladevcp via -H, so it runs AFTER the buscheck.* pins exist.
+#
+# Bridges the bus state into the operator Stoermeldungen queue via the three
+# bus fault-latch instances (IDs 100/101/102 = faultlatch.0/1/2), which are
+# created (loadrt faultlatch) in faulthandler.hal BEFORE the GUI. buscheck
+# ok-pins are HIGH = ok, exactly what faultlatch.monitor expects.
+
+net bus-alive     buscheck.bus-alive       => faultlatch.0.monitor
+net bus-complete  buscheck.slaves-complete => faultlatch.1.monitor
+net bus-all-op    buscheck.all-op          => faultlatch.2.monitor
