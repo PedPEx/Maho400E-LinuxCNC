@@ -11,8 +11,8 @@ addf classicladder.0.refresh servo-thread
 # ... deine vielen Freigabe-Eingänge auf in-02, in-03, ...
 
 # --- Ergebnisse AUS dem Ladder (%Q) an die Safety-Std-Inputs ---
-net req-safeout1 classicladder.0.out-00 => lcec.m0.EL1918.safe-out1
-net req-safeout2 classicladder.0.out-01 => lcec.m0.EL1918.safe-out2
+#net req-safeout1 classicladder.0.out-00 => lcec.m0.EL1918.safe-out1
+#net req-safeout2 classicladder.0.out-01 => lcec.m0.EL1918.safe-out2
 
 
 loadusr classicladder --nogui MH400E.clp

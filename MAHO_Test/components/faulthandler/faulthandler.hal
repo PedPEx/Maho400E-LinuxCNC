@@ -1,4 +1,4 @@
-loadrt faultlatch count=51
+loadrt faultlatch count=54
 loadrt and2 count=17
 
 addf faultlatch.0 servo-thread
@@ -52,6 +52,9 @@ addf faultlatch.47 servo-thread
 addf faultlatch.48 servo-thread
 addf faultlatch.49 servo-thread
 addf faultlatch.50 servo-thread
+addf faultlatch.51 servo-thread
+addf faultlatch.52 servo-thread
+addf faultlatch.53 servo-thread
 
 addf and2.0 servo-thread
 addf and2.1 servo-thread
@@ -332,6 +335,21 @@ setp faultlatch.31.id 616
 setp faultlatch.32.id 617
 net cond-617  lcec.m0.EL1859.din-2  => faultlatch.32.monitor
 
+# ----- ID 620  [alarm]  FC302 Spindel: Fehler  (faultlatch.51) -----
+setp faultlatch.51.id 620
+net startup-gate faultlatch.51.inhibit
+#   monitor <= fc302-spindle.health-ok   (wired in components/spindle/fc302_spindle.hal)
+
+# ----- ID 630  [alarm]  MH400E Getriebe: Schaltfehler  (faultlatch.52) -----
+setp faultlatch.52.id 630
+net startup-gate faultlatch.52.inhibit
+#   monitor <= mh400e-gearbox-el7332.health-ok   (wired in components/Gearbox/mh400e_gearbox_el7332.hal)
+
+# ----- ID 640  [alarm]  MH400E Spindelsteuerung: Fehler  (faultlatch.53) -----
+setp faultlatch.53.id 640
+net startup-gate faultlatch.53.inhibit
+#   monitor <= mh400e-spindle-master.health-ok   (wired in components/spindle/mh400e_spindle_master.hal)
+
 # ----- Acknowledge button to every instance (falling edge = ack) -----
 # NOTE: if the button reads HIGH when pressed, the falling edge is on
 #       RELEASE. Invert din-1 (or use the NC contact) for clear-on-press.
@@ -387,3 +405,6 @@ net ack-btn faultlatch.47.error-ack
 net ack-btn faultlatch.48.error-ack
 net ack-btn faultlatch.49.error-ack
 net ack-btn faultlatch.50.error-ack
+net ack-btn faultlatch.51.error-ack
+net ack-btn faultlatch.52.error-ack
+net ack-btn faultlatch.53.error-ack

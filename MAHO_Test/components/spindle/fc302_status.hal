@@ -1,0 +1,81 @@
+# ============================================================================
+# fc302_status.hal      ->  components/spindle/fc302_status.hal
+#
+# Wiring for the FC302 status panel (GladeVCP component "fc302panel").
+#
+# This file is loaded by gladevcp ITSELF via the -H option in the INI:
+#
+#   [DISPLAY]
+#   EMBED_TAB_NAME    = FC302
+#   EMBED_TAB_COMMAND = gladevcp -c fc302panel -x {XID} -u components/spindle/fc302_status_handler.py -H components/spindle/fc302_status.hal components/spindle/fc302_status.glade
+#
+# That is deliberate:
+#   * gladevcp builds the panel (the handler creates the HAL pins) and only
+#     THEN runs this file, so the pins always exist.  A POSTGUI_HALFILE can
+#     run before an embedded gladevcp tab has registered its pins and then
+#     fails with "pin does not exist".
+#   * Commenting out the EMBED_TAB lines disables the panel AND its wiring in
+#     one go - nothing here is left dangling.
+#
+# Everything below is READ-ONLY display.  Pins that the spindle component
+# already uses are NOT re-netted here; the panel simply attaches to the
+# existing signals as an additional SINK (one source, many sinks).
+# ============================================================================
+
+# ===========================================================================
+# 1. Signals shared with fc302_spindle.hal  (panel = extra sink)
+# ===========================================================================
+net fc302-status      => fc302panel.statusword
+net fc302-ctrl        => fc302panel.controlword
+net fc302-target-vl   => fc302panel.srv-target-vl
+net fc302-fb-rpm      => fc302panel.Infos-RO-PDO.feedback-rpm
+net fc302-torque-pct  => fc302panel.Infos-RO-PDO.torque-pct-highres
+net fc302-t-card      => fc302panel.Infos-RO-PDO.ctrl-card-temp
+net fc302-t-heatsink  => fc302panel.Infos-RO.heatsink-temp
+net fc302-t-motor     => fc302panel.Infos-RO.kty-temperature
+
+# Slave state - sourced in 3Axes_conf.hal.  If those signals should not exist
+# in your config, these two lines create sourceless signals: harmless, the
+# panel then just shows the default text.
+net fc302-online      => fc302panel.slave-online
+net fc302-oper        => fc302panel.slave-oper
+
+# ===========================================================================
+# 2. Pins only the panel uses  (new signals)
+# ===========================================================================
+
+# Mode of operation.  If this errors with "already linked", the old cia402
+# block is still present in 3Axes_conf.hal - remove it and this line works.
+net fc302-modes-op    lcec.m0.FC302.modes-op-display               => fc302panel.modes-op
+
+# Cyclic process data (TxPDO)
+net fc302-actual-vl   lcec.m0.FC302.srv-actual-vl                  => fc302panel.srv-actual-vl
+net fc302-speed-rpm   lcec.m0.FC302.Infos-RO-PDO.speed-rpm         => fc302panel.Infos-RO-PDO.speed-rpm
+net fc302-power-kw    lcec.m0.FC302.Infos-RO-PDO.power-kw          => fc302panel.Infos-RO-PDO.power-kw
+net fc302-torque-nm   lcec.m0.FC302.Infos-RO-PDO.torque-nm         => fc302panel.Infos-RO-PDO.torque-nm
+net fc302-brake-avg   lcec.m0.FC302.Infos-RO-PDO.brake-energy-avg  => fc302panel.Infos-RO-PDO.brake-energy-avg
+net fc302-dc-link     lcec.m0.FC302.Infos-RO-PDO.dc-link-voltage   => fc302panel.Infos-RO-PDO.dc-link-voltage
+
+# Acyclic SDO data (Infos-RO).  The handler always creates these panel pins,
+# regardless of sdoReadConfig in the EtherCAT XML, so this file never fails.
+# Bits that are disabled in the XML simply keep reading 0 and the panel shows
+# "Deaktiviert" for them.
+net fc302-motor-therm lcec.m0.FC302.Infos-RO.motor-thermal-pct     => fc302panel.Infos-RO.motor-thermal-pct
+net fc302-inv-therm   lcec.m0.FC302.Infos-RO.inverter-thermal-pct  => fc302panel.Infos-RO.inverter-thermal-pct
+net fc302-kwh         lcec.m0.FC302.Infos-RO.kwh-counter           => fc302panel.Infos-RO.kwh-counter
+net fc302-op-hours    lcec.m0.FC302.Infos-RO.operating-hours       => fc302panel.Infos-RO.operating-hours
+net fc302-run-hours   lcec.m0.FC302.Infos-RO.running-hours         => fc302panel.Infos-RO.running-hours
+net fc302-sdo-card-t  lcec.m0.FC302.Infos-RO.ctrl-card-temp        => fc302panel.Infos-RO.ctrl-card-temp
+net fc302-sdo-busy    lcec.m0.FC302.Infos-RO.sdo-busy              => fc302panel.Infos-RO.sdo-busy
+
+# ===========================================================================
+# 3. State of the spindle component itself
+#
+# Shown next to the raw drive data so a fault can be read off the same page.
+# spindle-stopped and at-speed are SOURCED in fc302_spindle.hal, so the panel
+# attaches to the existing signals instead of creating its own.
+# ===========================================================================
+net fc302-spdl-error    fc302-spindle.error         => fc302panel.spindle-error
+net fc302-spdl-fault    fc302-spindle.fault-code    => fc302panel.spindle-fault-code
+net fc302-spdl-stopped                              => fc302panel.spindle-stopped
+net fc302-at-speed                                  => fc302panel.spindle-at-speed

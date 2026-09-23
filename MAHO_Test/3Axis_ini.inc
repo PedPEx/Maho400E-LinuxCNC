@@ -25,6 +25,11 @@ EMBED_TAB_COMMAND = gladevcp -c faultmsg -x {XID} -u components/faulthandler/fau
 EMBED_TAB_NAME = Bus
 EMBED_TAB_LOCATION = ntb_user_tabs
 EMBED_TAB_COMMAND = gladevcp -c buscheck -x {XID} -u components/BusCheck/buscheck.py -H components/BusCheck/buscheck.hal -U cfg=components/BusCheck/busdef.json components/BusCheck/buscheck.ui
+EMBED_TAB_NAME    = FC302
+EMBED_TAB_COMMAND = gladevcp -c fc302panel -x {XID} -u components/spindle/fc302_status_handler.py -H components/spindle/fc302_status.hal components/spindle/fc302_status.glade
+EMBED_TAB_NAME    = Getriebe
+EMBED_TAB_COMMAND = gladevcp -c mh400e_gearbox_panel -x {XID} -u components/gearbox/mh400e_gearbox_panel.py -H components/gearbox/mh400e_gearbox_panel.hal components/gearbox/mh400e_gearbox_panel.ui
+
 [TASK]
 TASK = milltask
 CYCLE_TIME = 0.001
@@ -43,8 +48,10 @@ EMCMOT = motmod
 SERVO_PERIOD = 1000000
 
 [SPINDLE_0]
-MAX_FORWARD_VELOCITY = 4500
-INCREMENT = 10
+MIN_FORWARD_VELOCITY = 8
+MAX_FORWARD_VELOCITY = 4400
+MIN_REVERSE_VELOCITY = 8
+MAX_REVERSE_VELOCITY = 4400
 
 # =========================================
 # Achse X / Joint 0

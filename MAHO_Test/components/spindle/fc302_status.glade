@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.0"/>
+
+  <object class="GtkWindow" id="window1">
+    <property name="visible">True</property>
+    <child>
+
+      <object class="GtkScrolledWindow" id="scrolledwindow1">
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+        <property name="hscrollbar-policy">automatic</property>
+        <property name="vscrollbar-policy">automatic</property>
+        <child>
+          
+          <object class="GtkViewport" id="viewport1">
+            <property name="visible">True</property>
+            <child>
+
+              <object class="GtkBox" id="toplevel_box">
+                <property name="visible">True</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">6</property>
+                <property name="margin">8</property>
+
+        <child>
+          <object class="GtkBox" id="row_overview">
+            <property name="visible">True</property>
+            <property name="orientation">horizontal</property>
+            <property name="spacing">6</property>
+            <property name="homogeneous">True</property>
+
+            <child>
+              <object class="GtkFrame">
+                <property name="visible">True</property>
+                <property name="label">Slave</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">4</property>
+                    <property name="margin">6</property>
+                    <child>
+                      <object class="GtkLabel" id="lbl_slave_status">
+                        <property name="visible">True</property>
+                        <property name="label">–</property>
+                        <property name="xalign">0.5</property>
+                        <attributes>
+                          <attribute name="weight" value="bold"/>
+                          <attribute name="scale" value="1.2"/>
+                        </attributes>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="lbl_slave_state">
+                        <property name="visible">True</property>
+                        <property name="label">–</property>
+                        <property name="xalign">0.5</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkFrame">
+                <property name="visible">True</property>
+                <property name="label">Mode of Operation (0x6061)</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">4</property>
+                    <property name="margin">6</property>
+                    <child>
+                      <object class="GtkLabel" id="lbl_mode_num">
+                        <property name="visible">True</property>
+                        <property name="label">–</property>
+                        <property name="xalign">0.5</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="lbl_mode_name">
+                        <property name="visible">True</property>
+                        <property name="label">–</property>
+                        <property name="xalign">0.5</property>
+                        <attributes>
+                          <attribute name="weight" value="bold"/>
+                        </attributes>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkFrame">
+                <property name="visible">True</property>
+                <property name="label">CiA 402 State Machine</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">4</property>
+                    <property name="margin">6</property>
+                    <child>
+                      <object class="GtkLabel" id="lbl_state">
+                        <property name="visible">True</property>
+                        <property name="label">–</property>
+                        <property name="xalign">0.5</property>
+                        <attributes>
+                          <attribute name="weight" value="bold"/>
+                          <attribute name="scale" value="1.1"/>
+                        </attributes>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="lbl_sw_hex">
+                        <property name="visible">True</property>
+                        <property name="label">SW: 0x0000</property>
+                        <property name="xalign">0.5</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkFrame">
+            <property name="visible">True</property>
+            <property name="label">StatusWord (0x6041)</property>
+            <child>
+              <object class="GtkGrid" id="grid_sw">
+                <property name="visible">True</property>
+                <property name="row-spacing">4</property>
+                <property name="column-spacing">4</property>
+                <property name="margin">6</property>
+
+                <child><object class="GtkLabel" id="sw_hdr_15"><property name="visible">True</property><property name="label">15</property><property name="width-chars">4</property></object><packing><property name="left-attach">0</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_14"><property name="visible">True</property><property name="label">14</property><property name="width-chars">4</property></object><packing><property name="left-attach">1</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_13"><property name="visible">True</property><property name="label">13</property><property name="width-chars">4</property></object><packing><property name="left-attach">2</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_12"><property name="visible">True</property><property name="label">12</property><property name="width-chars">4</property></object><packing><property name="left-attach">3</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_11"><property name="visible">True</property><property name="label">11</property><property name="width-chars">4</property></object><packing><property name="left-attach">4</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_10"><property name="visible">True</property><property name="label">10</property><property name="width-chars">4</property></object><packing><property name="left-attach">5</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_9"><property name="visible">True</property><property name="label"> 9</property><property name="width-chars">4</property></object><packing><property name="left-attach">6</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_8"><property name="visible">True</property><property name="label"> 8</property><property name="width-chars">4</property></object><packing><property name="left-attach">7</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_7"><property name="visible">True</property><property name="label"> 7</property><property name="width-chars">4</property></object><packing><property name="left-attach">8</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_6"><property name="visible">True</property><property name="label"> 6</property><property name="width-chars">4</property></object><packing><property name="left-attach">9</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_5"><property name="visible">True</property><property name="label"> 5</property><property name="width-chars">4</property></object><packing><property name="left-attach">10</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_4"><property name="visible">True</property><property name="label"> 4</property><property name="width-chars">4</property></object><packing><property name="left-attach">11</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_3"><property name="visible">True</property><property name="label"> 3</property><property name="width-chars">4</property></object><packing><property name="left-attach">12</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_2"><property name="visible">True</property><property name="label"> 2</property><property name="width-chars">4</property></object><packing><property name="left-attach">13</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_1"><property name="visible">True</property><property name="label"> 1</property><property name="width-chars">4</property></object><packing><property name="left-attach">14</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="sw_hdr_0"><property name="visible">True</property><property name="label"> 0</property><property name="width-chars">4</property></object><packing><property name="left-attach">15</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel" id="sw_bit_15"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">0</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_14"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">1</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_13"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">2</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_12"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">3</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_11"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">4</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_10"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">5</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_9"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">6</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_8"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">7</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_7"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">8</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_6"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">9</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_5"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">10</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_4"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">11</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_3"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">12</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_2"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">13</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_1"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">14</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="sw_bit_0"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">15</property><property name="top-attach">1</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">0</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">1</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">2</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">3</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Int.Lim</property><property name="width-chars">6</property><property name="angle">90</property></object><packing><property name="left-attach">4</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Tgt.Rch</property><property name="width-chars">6</property><property name="angle">90</property></object><packing><property name="left-attach">5</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Remote</property><property name="width-chars">6</property><property name="angle">90</property></object><packing><property name="left-attach">6</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">7</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Warning</property><property name="width-chars">7</property><property name="angle">90</property></object><packing><property name="left-attach">8</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">SOn.Dis</property><property name="width-chars">7</property><property name="angle">90</property></object><packing><property name="left-attach">9</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">QStop</property><property name="width-chars">6</property><property name="angle">90</property></object><packing><property name="left-attach">10</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">VoltEna</property><property name="width-chars">7</property><property name="angle">90</property></object><packing><property name="left-attach">11</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Fault</property><property name="width-chars">6</property><property name="angle">90</property></object><packing><property name="left-attach">12</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">OpEna</property><property name="width-chars">6</property><property name="angle">90</property></object><packing><property name="left-attach">13</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">SwitchOn</property><property name="width-chars">8</property><property name="angle">90</property></object><packing><property name="left-attach">14</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">RdySOn</property><property name="width-chars">7</property><property name="angle">90</property></object><packing><property name="left-attach">15</property><property name="top-attach">2</property></packing></child>
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkFrame">
+            <property name="visible">True</property>
+            <property name="label">ControlWord (0x6040)</property>
+            <child>
+              <object class="GtkGrid" id="grid_cw">
+                <property name="visible">True</property>
+                <property name="row-spacing">4</property>
+                <property name="column-spacing">4</property>
+                <property name="margin">6</property>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">15</property><property name="width-chars">4</property></object><packing><property name="left-attach">0</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">14</property><property name="width-chars">4</property></object><packing><property name="left-attach">1</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">13</property><property name="width-chars">4</property></object><packing><property name="left-attach">2</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">12</property><property name="width-chars">4</property></object><packing><property name="left-attach">3</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">11</property><property name="width-chars">4</property></object><packing><property name="left-attach">4</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">10</property><property name="width-chars">4</property></object><packing><property name="left-attach">5</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label"> 9</property><property name="width-chars">4</property></object><packing><property name="left-attach">6</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label"> 8</property><property name="width-chars">4</property></object><packing><property name="left-attach">7</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label"> 7</property><property name="width-chars">4</property></object><packing><property name="left-attach">8</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label"> 6</property><property name="width-chars">4</property></object><packing><property name="left-attach">9</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label"> 5</property><property name="width-chars">4</property></object><packing><property name="left-attach">10</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label"> 4</property><property name="width-chars">4</property></object><packing><property name="left-attach">11</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label"> 3</property><property name="width-chars">4</property></object><packing><property name="left-attach">12</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label"> 2</property><property name="width-chars">4</property></object><packing><property name="left-attach">13</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label"> 1</property><property name="width-chars">4</property></object><packing><property name="left-attach">14</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label"> 0</property><property name="width-chars">4</property></object><packing><property name="left-attach">15</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel" id="cw_bit_15"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">0</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_14"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">1</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_13"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">2</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_12"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">3</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_11"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">4</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_10"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">5</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_9"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">6</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_8"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">7</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_7"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">8</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_6"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">9</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_5"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">10</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_4"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">11</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_3"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">12</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_2"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">13</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_1"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">14</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="cw_bit_0"><property name="visible">True</property><property name="label">0</property><property name="width-chars">4</property></object><packing><property name="left-attach">15</property><property name="top-attach">1</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">0</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">1</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">2</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">3</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">4</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">5</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">–</property><property name="width-chars">4</property><property name="angle">90</property></object><packing><property name="left-attach">6</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Halt</property><property name="width-chars">5</property><property name="angle">90</property></object><packing><property name="left-attach">7</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">FltRst</property><property name="width-chars">7</property><property name="angle">90</property></object><packing><property name="left-attach">8</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">RmpEna</property><property name="width-chars">7</property><property name="angle">90</property></object><packing><property name="left-attach">9</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">RmpHld</property><property name="width-chars">7</property><property name="angle">90</property></object><packing><property name="left-attach">10</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">RmpZero</property><property name="width-chars">8</property><property name="angle">90</property></object><packing><property name="left-attach">11</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">EnaOp</property><property name="width-chars">6</property><property name="angle">90</property></object><packing><property name="left-attach">12</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">QStop</property><property name="width-chars">6</property><property name="angle">90</property></object><packing><property name="left-attach">13</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">EnaVolt</property><property name="width-chars">7</property><property name="angle">90</property></object><packing><property name="left-attach">14</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">SwitchOn</property><property name="width-chars">8</property><property name="angle">90</property></object><packing><property name="left-attach">15</property><property name="top-attach">2</property></packing></child>
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkFrame">
+            <property name="visible">True</property>
+            <property name="label">Zyklische Prozessdaten (TxPDO / RxPDO)</property>
+            <child>
+              <object class="GtkGrid" id="grid_pdo">
+                <property name="visible">True</property>
+                <property name="row-spacing">4</property>
+                <property name="column-spacing">16</property>
+                <property name="margin">8</property>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Target VL:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_pdo_target_vl"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">1</property><property name="top-attach">0</property></packing></child>
+                
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Actual VL:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_pdo_actual_vl"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">1</property><property name="top-attach">1</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">DC Link Spannung:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_pdo_dc_link"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">1</property><property name="top-attach">2</property></packing></child>
+
+                <child><object class="GtkLabel" id="lbl_pdo_temp_slot_title"><property name="visible">False</property><property name="label">Temp (PDO):</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">3</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_pdo_temp_slot_val"><property name="visible">False</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">1</property><property name="top-attach">3</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Drehzahl Soll:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_pdo_speed"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">3</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Drehzahl Ist:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_pdo_feedback"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">3</property><property name="top-attach">1</property></packing></child>
+                
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Brake Energy Avg:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_pdo_brake"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">3</property><property name="top-attach">2</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Leistung:</property><property name="xalign">0</property></object><packing><property name="left-attach">4</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_pdo_power"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">5</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Drehmoment:</property><property name="xalign">0</property></object><packing><property name="left-attach">4</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_pdo_torque"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">5</property><property name="top-attach">1</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Drehmoment %:</property><property name="xalign">0</property></object><packing><property name="left-attach">4</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_pdo_torque_pct"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">5</property><property name="top-attach">2</property></packing></child>
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkFrame">
+            <property name="visible">True</property>
+            <property name="label">Azyklische SDO Daten (Infos-RO)</property>
+            <child>
+              <object class="GtkGrid" id="grid_sdo">
+                <property name="visible">True</property>
+                <property name="row-spacing">4</property>
+                <property name="column-spacing">16</property>
+                <property name="margin">8</property>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Motor Thermisch:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_sdo_motor_thermal"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">1</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">KTY Temperatur:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_sdo_kty_temp"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">1</property><property name="top-attach">1</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Kühlkörper Temp:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_sdo_heatsink_temp"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">1</property><property name="top-attach">2</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Umrichter Thermisch:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">3</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_sdo_inverter_thermal"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">1</property><property name="top-attach">3</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Steuerkarte Temp:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">4</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_sdo_ctrl_card_temp"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">1</property><property name="top-attach">4</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Betriebsstunden:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_sdo_operating_hours"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">3</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Laufzeit Stunden:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_sdo_running_hours"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">3</property><property name="top-attach">1</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">kWh Zähler:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_sdo_kwh_counter"><property name="visible">True</property><property name="label">–</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">3</property><property name="top-attach">2</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">SDO Status:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">3</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_sdo_busy"><property name="visible">True</property><property name="label">IDLE</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">3</property><property name="top-attach">3</property></packing></child>
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkFrame">
+            <property name="visible">True</property>
+            <property name="label">Spindelkomponente (fc302-spindle)</property>
+            <child>
+              <object class="GtkGrid" id="grid_spdl">
+                <property name="visible">True</property>
+                <property name="row-spacing">4</property>
+                <property name="column-spacing">16</property>
+                <property name="margin">8</property>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Fehlercode:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_spdl_fault"><property name="visible">True</property><property name="label">-</property><property name="xalign">0</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">1</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Spindel:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_spdl_stopped"><property name="visible">True</property><property name="label">-</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">3</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">Drehzahl erreicht:</property><property name="xalign">0</property></object><packing><property name="left-attach">4</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_spdl_atspeed"><property name="visible">True</property><property name="label">-</property><attributes><attribute name="weight" value="bold"/></attributes></object><packing><property name="left-attach">5</property><property name="top-attach">0</property></packing></child>
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkFrame">
+            <property name="visible">True</property>
+            <property name="label">XML Startup Parameter (modParams)</property>
+            <child>
+              <object class="GtkGrid" id="grid_mp">
+                <property name="visible">True</property>
+                <property name="row-spacing">2</property>
+                <property name="column-spacing">16</property>
+                <property name="margin">8</property>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">accelDeltaSpeed:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_accelDeltaSpeed"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">1</property><property name="top-attach">0</property></packing></child>
+                
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">accelDeltaTime:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_accelDeltaTime"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">1</property><property name="top-attach">1</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">decelDeltaSpeed:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_decelDeltaSpeed"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">1</property><property name="top-attach">2</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">decelDeltaTime:</property><property name="xalign">0</property></object><packing><property name="left-attach">0</property><property name="top-attach">3</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_decelDeltaTime"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">1</property><property name="top-attach">3</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">vlDimNumerator:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_vlDimNumerator"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">3</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">vlDimDenominator:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_vlDimDenominator"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">3</property><property name="top-attach">1</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">ramp1Up:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_ramp1Up"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">3</property><property name="top-attach">2</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">ramp1Down:</property><property name="xalign">0</property></object><packing><property name="left-attach">2</property><property name="top-attach">3</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_ramp1Down"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">3</property><property name="top-attach">3</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">ramp2Up:</property><property name="xalign">0</property></object><packing><property name="left-attach">4</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_ramp2Up"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">5</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">ramp2Down:</property><property name="xalign">0</property></object><packing><property name="left-attach">4</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_ramp2Down"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">5</property><property name="top-attach">1</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">jogRampTime:</property><property name="xalign">0</property></object><packing><property name="left-attach">4</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_jogRampTime"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">5</property><property name="top-attach">2</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">qstopRampTime:</property><property name="xalign">0</property></object><packing><property name="left-attach">4</property><property name="top-attach">3</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_qstopRampTime"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">5</property><property name="top-attach">3</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">busJog1Speed:</property><property name="xalign">0</property></object><packing><property name="left-attach">6</property><property name="top-attach">0</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_busJog1Speed"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">7</property><property name="top-attach">0</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">busJog2Speed:</property><property name="xalign">0</property></object><packing><property name="left-attach">6</property><property name="top-attach">1</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_busJog2Speed"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">7</property><property name="top-attach">1</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">digitalRelayCtrl:</property><property name="xalign">0</property></object><packing><property name="left-attach">6</property><property name="top-attach">2</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_digitalRelayCtrl"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">7</property><property name="top-attach">2</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">sdoReadConfig:</property><property name="xalign">0</property></object><packing><property name="left-attach">6</property><property name="top-attach">3</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_sdoReadConfig"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">7</property><property name="top-attach">3</property></packing></child>
+
+                <child><object class="GtkLabel"><property name="visible">True</property><property name="label">tempSlotSource:</property><property name="xalign">0</property></object><packing><property name="left-attach">6</property><property name="top-attach">4</property></packing></child>
+                <child><object class="GtkLabel" id="lbl_mp_tempSlotSource"><property name="visible">True</property><property name="label">–</property></object><packing><property name="left-attach">7</property><property name="top-attach">4</property></packing></child>
+              </object>
+            </child>
+          </object>
+        </child>
+
+            </object> </child>
+          </object> </child>
+      </object> </child>
+  </object> </interface>

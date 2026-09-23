@@ -94,7 +94,7 @@
       "name": "EL2809 16K. Dig. Ausgang 24V, 0.5A",
       "vendor": "0x2",
       "product": "0xaf93052",
-      "revision": "0x110000",
+      "revision": "0x120000",
       "optional": false
     },
     {

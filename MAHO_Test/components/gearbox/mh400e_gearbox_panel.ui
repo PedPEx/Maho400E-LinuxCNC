@@ -1,0 +1,1016 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MAHO MH400E gearbox status panel - GladeVCP / GTK3 - generated -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="title">MH400E Getriebe</property>
+    <property name="border_width">6</property>
+    <child>
+      <object class="GtkBox" id="root">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+        <child>
+          <object class="GtkFrame">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label_xalign">0.0</property>
+            <property name="shadow_type">in</property>
+            <child type="label">
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="xalign">0.0</property>
+                <property name="label">&lt;b&gt;Gangstatus&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="orientation">horizontal</property>
+                <property name="spacing">24</property>
+                <property name="border_width">10</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">1</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="xalign">0.0</property>
+                        <property name="label">&lt;span size="small" foreground="#9a9a9a"&gt;Aktueller Gang&lt;/span&gt;</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="lbl-gear">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="xalign">0.0</property>
+                        <property name="width_chars">15</property>
+                        <property name="label">&lt;span size="xx-large" weight="bold"&gt;---&lt;/span&gt;</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">1</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="xalign">0.0</property>
+                        <property name="label">&lt;span size="small" foreground="#9a9a9a"&gt;Zielgang&lt;/span&gt;</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="lbl-target">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="xalign">0.0</property>
+                        <property name="width_chars">15</property>
+                        <property name="label">&lt;span size="xx-large" weight="bold"&gt;---&lt;/span&gt;</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSeparator">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">4</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="shift-active">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Gangwechsel läuft</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="health-ok">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">green</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="lbl-fault">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="width_chars">44</property>
+                            <property name="label">kein Fehler</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">horizontal</property>
+            <property name="spacing">6</property>
+            <property name="homogeneous">True</property>
+            <child>
+              <object class="GtkFrame">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label_xalign">0.0</property>
+                <property name="shadow_type">in</property>
+                <child type="label">
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="xalign">0.0</property>
+                    <property name="label">&lt;b&gt;Eingangsstufe&lt;/b&gt;</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">4</property>
+                    <property name="border_width">8</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="in-left">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">red</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Links</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="in-center">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">blue</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Mitte</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="in-right">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Rechts</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="in-lcenter">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">orange</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Links-Mitte</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="in-motor">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Motor</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="HAL_Label" id="in-vel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">1.0</property>
+                            <property name="width_chars">7</property>
+                            <property name="label_pin_type">1</property>
+                            <property name="text_template">%+.2f</property>
+                            <property name="label">---</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkFrame">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label_xalign">0.0</property>
+                <property name="shadow_type">in</property>
+                <child type="label">
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="xalign">0.0</property>
+                    <property name="label">&lt;b&gt;Mittelstufe&lt;/b&gt;</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">4</property>
+                    <property name="border_width">8</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="mid-left">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">red</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Links</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="mid-center">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">blue</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Mitte</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="mid-right">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Rechts</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="mid-lcenter">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">orange</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Links-Mitte</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="mid-motor">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Motor</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="HAL_Label" id="mid-vel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">1.0</property>
+                            <property name="width_chars">7</property>
+                            <property name="label_pin_type">1</property>
+                            <property name="text_template">%+.2f</property>
+                            <property name="label">---</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkFrame">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label_xalign">0.0</property>
+                <property name="shadow_type">in</property>
+                <child type="label">
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="xalign">0.0</property>
+                    <property name="label">&lt;b&gt;Vorgelege&lt;/b&gt;</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">4</property>
+                    <property name="border_width">8</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="back-left">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">white</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Links</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="back-center">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">blue</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Mitte</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="back-right">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">green</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Rechts</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="back-lcenter">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">orange</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Links-Mitte</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">7</property>
+                        <child>
+                          <object class="HAL_LED" id="back-motor">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">8</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Motor</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="HAL_Label" id="back-vel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">1.0</property>
+                            <property name="width_chars">7</property>
+                            <property name="label_pin_type">1</property>
+                            <property name="text_template">%+.2f</property>
+                            <property name="label">---</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">horizontal</property>
+            <property name="spacing">6</property>
+            <property name="homogeneous">True</property>
+            <child>
+              <object class="GtkFrame">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label_xalign">0.0</property>
+                <property name="shadow_type">in</property>
+                <child type="label">
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="xalign">0.0</property>
+                    <property name="label">&lt;b&gt;Spindel-Schnittstelle&lt;/b&gt;</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">3</property>
+                    <property name="border_width">8</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="HAL_LED" id="spdl-stopped">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">7</property>
+                            <property name="on_color">green</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Spindel steht</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="HAL_LED" id="spdl-stop-req">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">7</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Stopp angefordert</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="HAL_LED" id="spdl-at-speed">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">7</property>
+                            <property name="on_color">green</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Freigabe (at-speed)</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="HAL_LED" id="tw-request">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">7</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">Twitch angefordert</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="HAL_LED" id="tw-external">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">7</property>
+                            <property name="on_color">blue</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">externes Twitching aktiv</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkFrame">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label_xalign">0.0</property>
+                <property name="shadow_type">in</property>
+                <child type="label">
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="xalign">0.0</property>
+                    <property name="label">&lt;b&gt;Legacy-Ausgänge (Relaisplatine)&lt;/b&gt;</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">3</property>
+                    <property name="border_width">8</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="HAL_LED" id="lg-start">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">7</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">start-gear-shift</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="HAL_LED" id="lg-reverse">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">7</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">reverse-direction (nach links)</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="HAL_LED" id="lg-lowspeed">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">7</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">motor-lowspeed</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="HAL_LED" id="lg-tw-cw">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">7</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">twitch-cw</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="HAL_LED" id="lg-tw-ccw">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="led_shape">0</property>
+                            <property name="led_size">7</property>
+                            <property name="on_color">yellow</property>
+                            <property name="off_color">#303030</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0.0</property>
+                            <property name="label">twitch-ccw</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

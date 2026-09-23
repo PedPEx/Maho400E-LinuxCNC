@@ -1,0 +1,134 @@
+# ---------------------------------------------------------------------------
+# MAHO MH400E superordinate spindle control
+#
+# components/spindle/mh400e_spindle_master.hal
+#
+# Load order in the INI - this file must come AFTER both subordinate
+# components, their pins have to exist first:
+#
+#   [HAL]
+#   HALFILE = faulthandler/faulthandler.hal
+#   HALFILE = components/spindle/fc302_spindle.hal
+#   HALFILE = components/Gearbox/mh400e_gearbox_el7332.hal
+#   HALFILE = components/spindle/mh400e_spindle_master.hal
+#
+# Signals consumed here and where they are sourced:
+#   gb-current-rpm, gb-shifting, gb-health   -> mh400e_gearbox_el7332.hal
+#   fc302-at-speed, fc302-spdl-stopped,
+#   fc302-fb-rpm, fc302-drive-rdy, drive-ready -> fc302_spindle.hal
+#
+# Signals sourced here:
+#   gear-request     -> mh400e_gearbox_el7332.spindle-speed-in-abs
+#   drive-cmd-rpm    -> fc302-spindle.speed-cmd
+#   drive-activate   -> fc302-spindle.activate
+#   spdl-at-speed    -> spindle.0.at-speed
+#   spdl-fb-rpm      -> spindle.0.speed-in
+# ---------------------------------------------------------------------------
+
+loadrt mh400e_spindle_master
+addf mh400e-spindle-master servo-thread
+
+# ---------------------------------------------------------------------------
+# parameters
+#
+# Gear ratios follow from the motor's nominal speed and the gear table:
+#
+#      gear   ratio    gear   ratio    gear   ratio
+#        80   35.50     500    5.68    2000    1.42
+#       100   28.40     630    4.51    2500    1.14
+#       125   22.72     800    3.55    3150    0.90
+#       160   17.75    1000    2.84    4000    0.71
+#       200   14.20    1250    2.27
+#       250   11.36    1600    1.78
+#       315    9.02
+#       400    7.10
+#
+# Example: M3 S433 rounds up to gear 500, ratio 5.68, motor 433 * 5.68 = 2459.
+#
+# With motor-min-rpm at 300 the slowest spindle speed is 8.5 rpm in gear 80;
+# with overspeed-pct at 10 the fastest is 4400 rpm in gear 4000.
+# ---------------------------------------------------------------------------
+
+setp mh400e-spindle-master.motor-nominal-rpm   2840.0
+setp mh400e-spindle-master.overspeed-pct         10.0
+setp mh400e-spindle-master.motor-min-rpm        300.0
+setp mh400e-spindle-master.shift-timeout        120.0
+
+# 0 = always round the request up to the next gear (the documented behaviour).
+# 1 = keep the gear already engaged whenever it can serve the request within
+#     its overspeed allowance, which avoids slow gear changes.
+setp mh400e-spindle-master.prefer-current-gear      0
+
+# ---------------------------------------------------------------------------
+# LinuxCNC side
+#
+# spindle.0.speed-out is SIGNED and already has the spindle override applied,
+# so M4 and the override knob need no extra logic.
+# ---------------------------------------------------------------------------
+
+net spdl-on       spindle.0.on        => mh400e-spindle-master.spindle-on
+net spdl-cmd-rpm  spindle.0.speed-out => mh400e-spindle-master.spindle-speed-cmd
+
+net spdl-at-speed mh400e-spindle-master.at-speed       => spindle.0.at-speed
+net spdl-fb-rpm   mh400e-spindle-master.spindle-rpm-fb => spindle.0.speed-in
+
+net machine-is-on => mh400e-spindle-master.machine-on
+net ack-btn       => mh400e-spindle-master.fault-reset
+
+# ---------------------------------------------------------------------------
+# gearbox side
+#
+# gear-request replaces the old direct link from spindle.0.speed-out-abs.
+# It only ever changes while the spindle is stopped, which is what keeps the
+# gearbox from starting a shift under a turning spindle.
+# ---------------------------------------------------------------------------
+
+net gear-request   mh400e-spindle-master.gear-speed-request
+
+net gb-current-rpm => mh400e-spindle-master.gear-current-rpm
+net gb-shifting    => mh400e-spindle-master.gear-shift-active
+net gb-health      => mh400e-spindle-master.gear-health-ok
+
+# ---------------------------------------------------------------------------
+# drive side
+#
+# drive-cmd-rpm carries the MOTOR speed, not the spindle speed.
+# fc302-spindle.twitch stays wired to the gearbox directly; twitching brings
+# the power stage up without activate.
+#
+# "drive-ready" is the signal that carries fc302-spindle.drive-active - the
+# name predates this component and is kept because the rest of the
+# configuration uses it in place of the old cia402.0.stat-op-enabled.
+# The genuinely-ready flag is fc302-drive-rdy.
+# ---------------------------------------------------------------------------
+
+net drive-cmd-rpm  mh400e-spindle-master.drive-speed-cmd => fc302-spindle.speed-cmd
+net drive-activate mh400e-spindle-master.drive-activate  => fc302-spindle.activate
+
+net fc302-at-speed     => mh400e-spindle-master.drive-at-speed
+net drive-ready        => mh400e-spindle-master.drive-active
+net fc302-drive-rdy    => mh400e-spindle-master.drive-ready
+net fc302-spdl-stopped => mh400e-spindle-master.spindle-stopped
+net fc302-fb-rpm       => mh400e-spindle-master.drive-feedback-rpm
+
+# ---------------------------------------------------------------------------
+# fault handling
+#
+# In faulthandler.hal, in the style of the existing entries:
+#
+#   loadrt faultlatch count=54          # was 53
+#   # ----- ID 640  [alarm]  Spindelsteuerung: Fehler  (faultlatch.53) -----
+#   setp faultlatch.53.id 640
+#   net startup-gate faultlatch.53.inhibit
+#   #   monitor <= mh400e-spindle-master.health-ok   (wired below)
+#
+# and in faults.json:
+#
+#   "640": { "instance": 53, "level": "error",
+#            "title": "Spindelsteuerung: Fehler",
+#            "details": "mh400e-spindle-master.fault-code: 1 = Gangwechsel
+#                        nicht abgeschlossen, 2 = Getriebefehler waehrend
+#                        des Wechsels." }
+# ---------------------------------------------------------------------------
+
+net sm-health mh400e-spindle-master.health-ok => faultlatch.53.monitor

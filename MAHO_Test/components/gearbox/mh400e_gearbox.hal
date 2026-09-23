@@ -1,0 +1,179 @@
+# ---------------------------------------------------------------------------
+# MAHO MH400E original gearbox
+#
+# components/Gearbox/mh400e_gearbox_el7332.hal
+#
+# Loaded from the INI with:
+#   [HAL]
+#   HALFILE = components/Gearbox/mh400e_gearbox_el7332.hal
+#
+# The component replaces the original relay board.  Cam switches come from the
+# EL1819-1, the three 24 V DC shaft motors are driven by the two EL7332.
+#
+# WHO DRIVES spindle-speed-in-abs:
+#   Since mh400e_spindle_master exists, the gear request comes from the master
+#   (signal gear-request), NOT from spindle.0.speed-out-abs.  That is what
+#   keeps the gearbox from starting a shift under a turning spindle: the
+#   master holds its request constant while the spindle runs and only changes
+#   it after an M5.
+#
+# Terminal pin names were taken from the running system:
+#   lcec.m0.EL7332-<n>.ch<c>.velocity-cmd   float, -1.0 .. +1.0
+#   lcec.m0.EL7332-<n>.ch<c>.enable         bit
+# ---------------------------------------------------------------------------
+
+loadrt mh400e_gearbox_el7332
+
+# the HAL name uses hyphens, the module name underscores
+addf mh400e-gearbox-el7332 servo-thread
+
+# ---------------------------------------------------------------------------
+# parameters
+# ---------------------------------------------------------------------------
+
+# Duty for normal travel and for the slow approach of a center position.
+# The range is 0.0 .. 1.0 and the component clamps to it, so anything above
+# 1.0 is simply full speed - but it also makes the legacy motor-lowspeed
+# output stick permanently, because that is derived from
+# "current duty < motor-velocity".
+setp mh400e-gearbox-el7332.motor-velocity        1.0
+setp mh400e-gearbox-el7332.motor-velocity-slow   0.45
+
+# Overrun: keep nudging the shaft after its cam switch has closed so the dog
+# clutch seats fully.  Applies to the LEFT and RIGHT end positions only, never
+# to the narrow center detent.
+setp mh400e-gearbox-el7332.overrun-time          0.25
+setp mh400e-gearbox-el7332.overrun-velocity      0.4
+
+# 0 = a positive velocity moves a shaft towards its "right" cam switch.
+# This is the verified setting for this machine.  Set to 1 only if the
+# motor wiring is reversed.
+setp mh400e-gearbox-el7332.invert-direction      0
+
+setp mh400e-gearbox-el7332.stage-timeout         25.0
+setp mh400e-gearbox-el7332.spindle-stop-timeout  20.0
+setp mh400e-gearbox-el7332.max-retries           3
+setp mh400e-gearbox-el7332.estop-on-fault        0
+
+# 1 = the FC302 spindle component performs the twitching (this machine).
+# 0 = the legacy twitch-cw / twitch-ccw outputs are driven instead.
+# A signal rather than a setp, so the status panel can show the real value
+# and a single "sets gb-ext-twitch 0" switches both.
+net gb-ext-twitch mh400e-gearbox-el7332.external-twitch-enable
+sets gb-ext-twitch 1
+
+# ---------------------------------------------------------------------------
+# cam switches, EL1819-1
+#   din-0  Vorgelege Rechts        11S1     din-6   Mittelstufe Mitte     11S8
+#   din-1  Vorgelege Links         11S2     din-7   Mittelstufe Li-Mitte  11S10
+#   din-2  Vorgelege Mitte         11S3     din-8   Eingangsstufe Rechts  11S11
+#   din-3  Vorgelege Links-Mitte   11S5     din-9   Eingangsstufe Links   11S12
+#   din-4  Mittelstufe Rechts      11S6     din-10  Eingangsstufe Mitte   11S13
+#   din-5  Mittelstufe Links       11S7     din-11  Eingangsstufe Li-Mitte 11S15
+# ---------------------------------------------------------------------------
+
+net gb-back-right   lcec.m0.EL1819-1.din-0  => mh400e-gearbox-el7332.reducer-right
+net gb-back-left    lcec.m0.EL1819-1.din-1  => mh400e-gearbox-el7332.reducer-left
+net gb-back-center  lcec.m0.EL1819-1.din-2  => mh400e-gearbox-el7332.reducer-center
+net gb-back-lcenter lcec.m0.EL1819-1.din-3  => mh400e-gearbox-el7332.reducer-left-center
+
+net gb-mid-right    lcec.m0.EL1819-1.din-4  => mh400e-gearbox-el7332.middle-right
+net gb-mid-left     lcec.m0.EL1819-1.din-5  => mh400e-gearbox-el7332.middle-left
+net gb-mid-center   lcec.m0.EL1819-1.din-6  => mh400e-gearbox-el7332.middle-center
+net gb-mid-lcenter  lcec.m0.EL1819-1.din-7  => mh400e-gearbox-el7332.middle-left-center
+
+net gb-in-right     lcec.m0.EL1819-1.din-8  => mh400e-gearbox-el7332.input-right
+net gb-in-left      lcec.m0.EL1819-1.din-9  => mh400e-gearbox-el7332.input-left
+net gb-in-center    lcec.m0.EL1819-1.din-10 => mh400e-gearbox-el7332.input-center
+net gb-in-lcenter   lcec.m0.EL1819-1.din-11 => mh400e-gearbox-el7332.input-left-center
+
+# ---------------------------------------------------------------------------
+# shaft motors
+#   EL7332-0 ch1 = Vorgelege (backgear)
+#   EL7332-0 ch2 = Mittelstufe (midrange)
+#   EL7332-1 ch1 = Eingangsstufe (input stage)
+# Only ever one motor runs at a time.
+# ---------------------------------------------------------------------------
+
+net gb-back-vel  mh400e-gearbox-el7332.backgear-velocity => lcec.m0.EL7332-0.ch1.velocity-cmd
+net gb-back-en   mh400e-gearbox-el7332.backgear-enable   => lcec.m0.EL7332-0.ch1.enable
+
+net gb-mid-vel   mh400e-gearbox-el7332.midrange-velocity => lcec.m0.EL7332-0.ch2.velocity-cmd
+net gb-mid-en    mh400e-gearbox-el7332.midrange-enable   => lcec.m0.EL7332-0.ch2.enable
+
+net gb-in-vel    mh400e-gearbox-el7332.input-velocity    => lcec.m0.EL7332-1.ch1.velocity-cmd
+net gb-in-en     mh400e-gearbox-el7332.input-enable      => lcec.m0.EL7332-1.ch1.enable
+
+# EL7332-1 ch2 is unused.
+
+# Optional: clear a terminal latch on the acknowledge button.
+# net ack-btn => lcec.m0.EL7332-0.ch1.reset
+# net ack-btn => lcec.m0.EL7332-0.ch2.reset
+# net ack-btn => lcec.m0.EL7332-1.ch1.reset
+
+# ---------------------------------------------------------------------------
+# spindle interface
+#
+# gear-request is SOURCED by mh400e_spindle_master.hal, this is a pure sink.
+# fc302-spdl-stopped is sourced by fc302_spindle.hal, also a pure sink.
+# The twitch request is ours and goes straight to the drive component - it
+# activates the FC302 power stage on its own, no "activate" needed.
+# ---------------------------------------------------------------------------
+
+net gear-request                                      => mh400e-gearbox-el7332.spindle-speed-in-abs
+net fc302-spdl-stopped                                => mh400e-gearbox-el7332.spindle-stopped
+net gb-twitch-request mh400e-gearbox-el7332.twitch-request => fc302-spindle.twitch
+
+# ---------------------------------------------------------------------------
+# machine state, emergency stop, acknowledge
+# ---------------------------------------------------------------------------
+
+net machine-is-on   => mh400e-gearbox-el7332.machine-on
+net estop-out       => mh400e-gearbox-el7332.estop-in
+net ack-btn         => mh400e-gearbox-el7332.fault-reset
+
+# ---------------------------------------------------------------------------
+# status signals
+#
+# Sourced HERE rather than in the optional status panel, because the master
+# needs current-rpm and shift-in-progress and must keep working with the panel
+# switched off.  The panel attaches to these as additional sinks.
+# ---------------------------------------------------------------------------
+
+net gb-current-rpm  mh400e-gearbox-el7332.current-rpm
+net gb-target-rpm   mh400e-gearbox-el7332.target-rpm
+net gb-shifting     mh400e-gearbox-el7332.shift-in-progress
+net gb-fault-code   mh400e-gearbox-el7332.fault-code
+net gb-stop-spindle mh400e-gearbox-el7332.stop-spindle
+net gb-at-speed     mh400e-gearbox-el7332.spindle-at-speed
+
+# HIGH = healthy, feeds the central fault handler and the master.
+net gb-health       mh400e-gearbox-el7332.health-ok => faultlatch.52.monitor
+
+# ---------------------------------------------------------------------------
+# Notes
+#
+# 1. Fault handler wiring, in faulthandler.hal:
+#
+#      loadrt faultlatch count=53          # was 52
+#      # ----- ID 630  [alarm]  MH400E Getriebe: Schaltfehler  (faultlatch.52)
+#      setp faultlatch.52.id 630
+#      net startup-gate faultlatch.52.inhibit
+#      #   monitor <= mh400e-gearbox-el7332.health-ok   (wired above)
+#
+#    and in faults.json:
+#
+#      "630": { "instance": 52, "level": "error",
+#               "title": "MH400E Getriebe: Schaltfehler",
+#               "details": "mh400e-gearbox-el7332.fault-code: 1 = Welle hat
+#                           Zielposition nicht erreicht, 2 = Welle blockiert,
+#                           3 = Spindel kam nicht zum Stillstand." }
+#
+# 2. The legacy relay-style outputs (motor-lowspeed, reducer-motor,
+#    midrange-motor, input-stage-motor, reverse-direction, start-gear-shift,
+#    twitch-cw, twitch-ccw) are still driven and may be left unconnected.
+#    The status panel picks them up.
+#
+# 3. spindle.0.at-speed is NOT wired here.  It comes from the master, which
+#    combines the drive's target-reached with "no gear change in progress".
+# ---------------------------------------------------------------------------

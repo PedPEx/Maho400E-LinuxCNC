@@ -1,0 +1,537 @@
+/*
+ * mh400e_spindle_master.comp
+ *
+ * Superordinate spindle control for the MAHO MH400E retrofit.  This is the
+ * third of three components and the only one LinuxCNC itself talks to:
+ *
+ *     spindle.0.*  <->  mh400e_spindle_master  <->  mh400e_gearbox_el7332
+ *                                              <->  fc302_spindle
+ *
+ * The other two stay unchanged and keep working standalone:
+ *   - mh400e_gearbox_el7332 engages a gear and reports which one is in
+ *   - fc302_spindle         runs the Danfoss FC302 and does the twitching
+ *
+ * What this component adds is the arbitration between them.
+ *
+ * Operating principle
+ * -------------------
+ * The gearbox offers 18 fixed spindle speeds, the FC302 is continuously
+ * variable.  A requested speed is therefore served in two steps:
+ *
+ *   1. Pick the gear.  The LOWEST gear whose nominal speed is at or above the
+ *      request, i.e. the request is rounded UP:
+ *
+ *          M3 S433  ->  gear 500
+ *
+ *   2. Let the drive make up the difference.  Every gear has a fixed ratio
+ *      against the motor's nominal speed:
+ *
+ *          ratio      = motor-nominal-rpm / gear-nominal-rpm
+ *          motor rpm  = requested spindle rpm * ratio
+ *
+ *      For the example above: 2840 / 500 = 5.68, and 433 * 5.68 = 2459 rpm at
+ *      the motor.  The spindle then turns at exactly the requested 433 rpm.
+ *
+ * Because the request is rounded up, the drive normally runs at or below its
+ * nominal speed.  Field weakening above nominal is allowed up to
+ * overspeed-pct, which covers two cases: a speed request above the highest
+ * gear, and the spindle override being turned up while the spindle runs.
+ *
+ * Gear changes and the running spindle
+ * ------------------------------------
+ * A gear can only be changed with the spindle stopped, so once the spindle is
+ * running the engaged gear is LOCKED.  Speed changes while running - a new S
+ * word, the spindle override - are served by the drive alone, clamped to what
+ * the engaged gear allows.  If the new speed would need a different gear, the
+ * component says so on gear-change-pending but does not act on it; the change
+ * happens at the next M3 after an M5.
+ *
+ * The sequence for M3 Sxxx therefore is:
+ *
+ *   spindle-on rises -> pick gear -> ask the gearbox to engage it (the drive
+ *   stays off, the gearbox twitches the spindle through fc302_spindle on its
+ *   own) -> gear reported engaged -> activate the drive at the scaled motor
+ *   speed -> at-speed once the drive reports target reached
+ *
+ * at-speed is held FALSE for the whole gear change, so a program started with
+ * M3 waits for the shift to finish before the first cut.
+ *
+ * Spindle feedback
+ * ----------------
+ * spindle-rpm-fb is computed back from the drive's motor feedback through the
+ * engaged ratio.  It is good enough for a display and for at-speed, but it is
+ * not a position feedback.  Rigid tapping will need the spindle encoder that
+ * is still to be fitted; once it is there, take the feedback from the encoder
+ * instead and leave the rest of this component alone.
+ *
+ * Fault codes (pin fault-code, s32):
+ *   0  No fault
+ *   1  Gear change did not complete within shift-timeout
+ *   2  Gearbox reported a fault while a shift was being waited for
+ *
+ * health-ok (HIGH = OK) goes to a faultlatch.N.monitor of the central fault
+ * handler, same as the other two components.
+ *
+ * Author: Patrick
+ * License: GPL
+ */
+
+component mh400e_spindle_master
+    "MAHO MH400E superordinate spindle control: gear selection, gear change sequencing and continuous speed trim through the FC302";
+author "Patrick";
+license "GPL";
+
+/* ======================================================================
+ * LinuxCNC side
+ * ====================================================================== */
+
+pin in bit spindle_on = 0
+    "Spindle run request. Connect to spindle.0.on. A gear change is only ever started while this is FALSE or while the spindle has not been started yet.";
+
+pin in float spindle_speed_cmd = 0
+    "Requested spindle speed in rpm, signed (+ = M3/CW, - = M4/CCW), spindle override already applied. Connect to spindle.0.speed-out.";
+
+pin in bit machine_on = 1
+    "Machine is switched on (F2). While FALSE the drive is kept off and the state machine is held in idle. Left unconnected it defaults to TRUE.";
+
+pin in bit fault_reset = 0
+    "Rising edge clears a latched fault of this component.";
+
+pin out bit at_speed = 0
+    "TRUE only while the spindle actually runs at the requested speed: drive active, drive reporting target reached, no gear change in progress. Connect to spindle.0.at-speed.";
+
+pin out float spindle_rpm_fb = 0
+    "Spindle speed in rpm calculated back from the motor feedback through the engaged gear ratio. Suitable for display, not for threading. Connect to spindle.0.speed-in if no encoder is fitted yet.";
+
+/* ======================================================================
+ * Gearbox side (mh400e_gearbox_el7332)
+ * ====================================================================== */
+
+pin out float gear_speed_request = 0
+    "Nominal speed of the gear that shall be engaged, in rpm. Connect to mh400e-gearbox-el7332.spindle-speed-in-abs. Held constant while the spindle runs so the gearbox cannot start a shift.";
+
+pin in s32 gear_current_rpm = 0
+    "Nominal speed of the gear currently engaged, 0 while a shaft sits between detents. Connect to mh400e-gearbox-el7332.current-rpm.";
+
+pin in bit gear_shift_active = 0
+    "TRUE while the gearbox is shifting. Connect to mh400e-gearbox-el7332.shift-in-progress.";
+
+pin in bit gear_health_ok = 1
+    "Health of the gearbox component, HIGH = OK. Connect to mh400e-gearbox-el7332.health-ok.";
+
+/* ======================================================================
+ * Drive side (fc302_spindle)
+ * ====================================================================== */
+
+pin out float drive_speed_cmd = 0
+    "MOTOR speed setpoint in rpm, signed. This is the spindle speed multiplied by the engaged gear ratio, not the spindle speed. Connect to fc302-spindle.speed-cmd.";
+
+pin out bit drive_activate = 0
+    "Request the power stage. Connect to fc302-spindle.activate. Stays FALSE during a gear change; the gearbox drives fc302-spindle.twitch directly and that activates the drive on its own.";
+
+pin in bit drive_at_speed = 0
+    "Drive reports target reached (status word bit 10). Connect to fc302-spindle.at-speed.";
+
+pin in bit drive_active = 0
+    "Drive power stage is on. Connect to fc302-spindle.drive-active.";
+
+pin in bit drive_ready = 0
+    "Drive is ready (SWITCHED ON or better). Connect to fc302-spindle.drive-ready.";
+
+pin in bit spindle_stopped = 0
+    "Spindle stands still. Connect to fc302-spindle.spindle-stopped.";
+
+pin in s32 drive_feedback_rpm = 0
+    "Actual MOTOR speed in rpm. Connect to the same lcec pin fc302_spindle uses, lcec.<m>.FC302.Infos-RO-PDO.feedback-rpm.";
+
+/* ======================================================================
+ * Status
+ * ====================================================================== */
+
+pin out s32 selected_gear = 0
+    "Nominal speed in rpm of the gear this component wants, 0 while nothing is requested.";
+
+pin out s32 engaged_gear = 0
+    "Nominal speed in rpm of the gear the gearbox reports as engaged.";
+
+pin out s32 motor_rpm_cmd = 0
+    "Motor speed setpoint in rpm, rounded, same value as drive-speed-cmd.";
+
+pin out float gear_ratio = 0
+    "Ratio of the engaged gear, motor-nominal-rpm divided by the gear's nominal spindle speed. 0 while no gear is engaged.";
+
+pin out float spindle_rpm_target = 0
+    "Spindle speed the component is actually aiming for after clamping, in rpm. Differs from the request when speed-limited is set.";
+
+pin out bit gear_change_pending = 0
+    "TRUE while the spindle runs and the requested speed would need a different gear. The change is deferred until the spindle is stopped with M5.";
+
+pin out bit speed_limited = 0
+    "TRUE while the requested speed had to be clamped, either to the overspeed ceiling of the engaged gear or up to the minimum motor speed.";
+
+pin out s32 state = 0
+    "State machine: 0 idle, 1 waiting for the gear change, 2 running, 9 fault.";
+
+pin out s32 fault_code = 0
+    "Active fault code, 0 = no fault. See the component header.";
+
+pin out bit health_ok = 1
+    "Healthy flag for the central fault handler, HIGH = OK. Wire to a faultlatch.N.monitor input.";
+
+/* ======================================================================
+ * Parameters
+ * ====================================================================== */
+
+param rw float motor_nominal_rpm = 2840.0
+    "Nominal speed of the spindle motor in rpm. Together with the gear table this defines every gear ratio: ratio = motor-nominal-rpm / gear nominal speed.";
+
+param rw float overspeed_pct = 10.0
+    "How far above its nominal speed a gear may be driven, in percent. Covers a speed request above the highest gear and the spindle override being turned up while running.";
+
+param rw float motor_min_rpm = 300.0
+    "Lowest motor speed in rpm the drive is asked for while the spindle runs. Below this the motor loses torque, so a lower request is raised to this value and speed-limited is set.";
+
+param rw float shift_timeout = 120.0
+    "Seconds a gear change may take before fault 1 is raised. This is only a backstop, the gearbox raises its own fault much earlier.";
+
+param rw bit prefer_current_gear = 0
+    "When TRUE, a gear change is skipped if the gear already engaged can serve the requested speed within its overspeed allowance. Saves slow gear changes at the cost of running in a lower gear than the rounding rule would pick. Default FALSE, which is the documented rounding-up behaviour.";
+
+function _;
+option singleton yes;
+
+;;
+
+#include <rtapi_math.h>
+
+/* ======================================================================
+ * Gear table
+ *
+ * Same nominal speeds as in mh400e_gearbox_el7332.  Only the speeds are
+ * needed here, the cam switch masks stay in the gearbox component.  Index 0
+ * is neutral and is never selected.
+ * ====================================================================== */
+
+#define NUM_GEARS 19
+
+static const int g_gear_rpm[NUM_GEARS] = {
+    0, 80, 100, 125, 160, 200, 250, 315, 400, 500,
+    630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000
+};
+
+#define FIRST_GEAR 1
+#define LAST_GEAR  (NUM_GEARS - 1)
+
+/* ---------------------------------------------------------------------- */
+
+#define ST_IDLE   0
+#define ST_SHIFT  1
+#define ST_RUN    2
+#define ST_FAULT  9
+
+#define FAULT_NONE          0
+#define FAULT_SHIFT_TIMEOUT 1
+#define FAULT_GEARBOX       2
+
+static int       g_state       = ST_IDLE;
+static int       g_target_rpm  = 0;    /* nominal speed of the wanted gear */
+static long long g_shift_timer = 0;
+static bool      g_last_reset  = false;
+static bool      g_last_machine = true;
+
+/* ======================================================================
+ * Helpers
+ * ====================================================================== */
+
+/* Index of a gear by its nominal speed, -1 if that speed is not a gear. */
+static int gear_index_of(int rpm)
+{
+    int i;
+    for (i = FIRST_GEAR; i <= LAST_GEAR; i++)
+    {
+        if (g_gear_rpm[i] == rpm)
+            return i;
+    }
+    return -1;
+}
+
+/* The lowest gear whose nominal speed reaches the request: the request is
+ * rounded UP.  A request above the highest gear stays in the highest gear and
+ * is served by the overspeed allowance. */
+static int gear_round_up(double req_abs)
+{
+    int i;
+    for (i = FIRST_GEAR; i <= LAST_GEAR; i++)
+    {
+        if ((double)g_gear_rpm[i] >= req_abs - 0.001)
+            return i;
+    }
+    return LAST_GEAR;
+}
+
+/* Highest spindle speed a gear may be driven at. */
+static double gear_ceiling(struct __comp_state *__comp_inst, int index)
+{
+    return (double)g_gear_rpm[index] * (1.0 + overspeed_pct / 100.0);
+}
+
+/* Pick the gear for a request, optionally keeping the one already engaged. */
+static int choose_gear(struct __comp_state *__comp_inst, double req_abs,
+                       int current_rpm)
+{
+    if (prefer_current_gear)
+    {
+        int ci = gear_index_of(current_rpm);
+        if (ci > 0 && req_abs <= gear_ceiling(__comp_inst, ci))
+        {
+            double motor = motor_nominal_rpm * req_abs / (double)g_gear_rpm[ci];
+            if (motor >= motor_min_rpm)
+                return ci;
+        }
+    }
+    return gear_round_up(req_abs);
+}
+
+static void raise_fault(struct __comp_state *__comp_inst, int code,
+                        const char *msg)
+{
+    if (fault_code != 0)
+        return;
+
+    rtapi_print_msg(RTAPI_MSG_ERR,
+        "mh400e_spindle_master: fault %d - %s\n", code, msg);
+
+    fault_code     = code;
+    health_ok      = false;
+    g_state        = ST_FAULT;
+    drive_activate = false;
+    drive_speed_cmd = 0.0;
+    motor_rpm_cmd  = 0;
+    at_speed       = false;
+}
+
+static void go_idle(struct __comp_state *__comp_inst)
+{
+    g_state        = ST_IDLE;
+    g_shift_timer  = 0;
+    drive_activate = false;
+    drive_speed_cmd = 0.0;
+    motor_rpm_cmd  = 0;
+    at_speed       = false;
+    speed_limited  = false;
+    gear_change_pending = false;
+    spindle_rpm_target  = 0.0;
+}
+
+/* ======================================================================
+ * Main
+ * ====================================================================== */
+FUNCTION(_)
+{
+    double req      = spindle_speed_cmd;
+    double req_abs  = fabs(req);
+    double sign     = (req < 0.0) ? -1.0 : 1.0;
+    bool   want_run = spindle_on && (req_abs >= 1.0);
+    int    engaged_index;
+
+    engaged_gear  = gear_current_rpm;
+    engaged_index = gear_index_of(gear_current_rpm);
+
+    gear_ratio = (engaged_index > 0)
+               ? motor_nominal_rpm / (double)g_gear_rpm[engaged_index]
+               : 0.0;
+
+    /* ---- spindle feedback through the engaged ratio ---- */
+    spindle_rpm_fb = (gear_ratio > 0.0)
+                   ? (double)drive_feedback_rpm / gear_ratio
+                   : 0.0;
+
+    /* ---- fault reset, rising edge ---- */
+    if (fault_reset && !g_last_reset)
+    {
+        if (fault_code != 0)
+        {
+            rtapi_print_msg(RTAPI_MSG_INFO,
+                "mh400e_spindle_master: fault %d cleared\n", fault_code);
+        }
+        fault_code = 0;
+        health_ok  = true;
+        if (g_state == ST_FAULT)
+            go_idle(__comp_inst);
+    }
+    g_last_reset = fault_reset;
+
+    /* ---- machine off ---- */
+    if (!machine_on)
+    {
+        if (g_last_machine && g_state != ST_FAULT)
+            go_idle(__comp_inst);
+        else
+        {
+            drive_activate  = false;
+            drive_speed_cmd = 0.0;
+            motor_rpm_cmd   = 0;
+            at_speed        = false;
+        }
+        g_last_machine = false;
+        return;
+    }
+    g_last_machine = true;
+
+    if (g_state == ST_FAULT)
+    {
+        drive_activate  = false;
+        drive_speed_cmd = 0.0;
+        motor_rpm_cmd   = 0;
+        at_speed        = false;
+        return;
+    }
+
+    switch (g_state)
+    {
+        /* ------------------------------------------------------------ */
+        case ST_IDLE:
+        {
+            drive_activate  = false;
+            drive_speed_cmd = 0.0;
+            motor_rpm_cmd   = 0;
+            at_speed        = false;
+            speed_limited   = false;
+            gear_change_pending = false;
+            spindle_rpm_target  = 0.0;
+
+            if (!want_run)
+            {
+                /* No request: leave gear-speed-request as it is.  Asking for
+                 * 0 would be a request to shift into neutral, which is never
+                 * wanted, and the gearbox ignores it anyway. */
+                selected_gear = 0;
+                break;
+            }
+
+            {
+                int gi = choose_gear(__comp_inst, req_abs, gear_current_rpm);
+
+                g_target_rpm       = g_gear_rpm[gi];
+                selected_gear      = g_target_rpm;
+                gear_speed_request = (double)g_target_rpm;
+
+                if ((gear_current_rpm == g_target_rpm) && !gear_shift_active)
+                {
+                    g_state = ST_RUN;       /* right gear already in */
+                }
+                else
+                {
+                    g_shift_timer = 0;
+                    g_state       = ST_SHIFT;
+                }
+            }
+            break;
+        }
+
+        /* ------------------------------------------------------------ */
+        case ST_SHIFT:
+        {
+            /* The drive must not be activated here.  The gearbox asks
+             * fc302_spindle for twitching directly, and that brings the power
+             * stage up on its own for as long as the jog needs it. */
+            drive_activate  = false;
+            drive_speed_cmd = 0.0;
+            motor_rpm_cmd   = 0;
+            at_speed        = false;
+
+            gear_speed_request = (double)g_target_rpm;
+            selected_gear      = g_target_rpm;
+
+            if (!gear_health_ok)
+            {
+                raise_fault(__comp_inst, FAULT_GEARBOX,
+                            "gearbox reported a fault during the gear change");
+                break;
+            }
+
+            g_shift_timer += period;
+            if ((shift_timeout > 0.0) &&
+                (g_shift_timer > (long long)(shift_timeout * 1e9)))
+            {
+                raise_fault(__comp_inst, FAULT_SHIFT_TIMEOUT,
+                            "gear change did not complete in time");
+                break;
+            }
+
+            if (!gear_shift_active && (gear_current_rpm == g_target_rpm))
+            {
+                /* Shift finished.  If the operator withdrew the request in the
+                 * meantime we simply stay stopped in the new gear. */
+                g_state = want_run ? ST_RUN : ST_IDLE;
+            }
+            break;
+        }
+
+        /* ------------------------------------------------------------ */
+        case ST_RUN:
+        {
+            double ceiling, target, motor;
+            int    gi = engaged_index;
+
+            /* Losing the gear under our feet must never keep the drive on. */
+            if ((gi <= 0) || (g_gear_rpm[gi] != g_target_rpm) ||
+                gear_shift_active)
+            {
+                go_idle(__comp_inst);
+                break;
+            }
+
+            if (!want_run)
+            {
+                go_idle(__comp_inst);
+                break;
+            }
+
+            /* Hold the gear: an unchanged request means the gearbox never
+             * starts a shift while the spindle turns. */
+            gear_speed_request = (double)g_target_rpm;
+            selected_gear      = g_target_rpm;
+
+            /* Would the current request need a different gear?  Report it,
+             * but defer it until the spindle has been stopped. */
+            gear_change_pending =
+                (choose_gear(__comp_inst, req_abs, gear_current_rpm) != gi);
+
+            /* ---- clamp the spindle speed to what this gear allows ---- */
+            ceiling = gear_ceiling(__comp_inst, gi);
+            target  = req_abs;
+            speed_limited = false;
+
+            if (target > ceiling)
+            {
+                target        = ceiling;
+                speed_limited = true;
+            }
+
+            /* ---- scale to the motor ---- */
+            motor = motor_nominal_rpm * target / (double)g_gear_rpm[gi];
+
+            if (motor < motor_min_rpm)
+            {
+                motor         = motor_min_rpm;
+                target        = motor * (double)g_gear_rpm[gi] / motor_nominal_rpm;
+                speed_limited = true;
+            }
+
+            spindle_rpm_target = target;
+            drive_speed_cmd    = sign * motor;
+            motor_rpm_cmd      = (int)(sign * motor + (sign > 0 ? 0.5 : -0.5));
+            drive_activate     = true;
+
+            at_speed = drive_active && drive_at_speed;
+            break;
+        }
+
+        default:
+            go_idle(__comp_inst);
+            break;
+    }
+
+    state = g_state;
+}

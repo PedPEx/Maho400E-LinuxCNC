@@ -11,6 +11,9 @@ loadrt pid names=pid.x,pid.y,pid.z
 # Beckhoff encoder homing adapter – one instance per axis
 loadrt bec_enc_homing names=bec-enc-x,bec-enc-y,bec-enc-z
 
+# Load CiA402 HAL driver for Danfoss VFD
+loadrt cia402 count=1
+
 loadusr -W lcec_conf ethercat-conf_3axes.xml
 loadrt lcec
 
@@ -26,6 +29,7 @@ loadrt lcec
 #   5. lcec.write-all     – push HAL outputs to PDO
 
 addf lcec.read-all             servo-thread
+addf cia402.0.read-all         servo-thread
 
 addf bec-enc-x                 servo-thread
 addf bec-enc-y                 servo-thread
@@ -38,13 +42,15 @@ addf pid.x.do-pid-calcs        servo-thread
 addf pid.y.do-pid-calcs        servo-thread
 addf pid.z.do-pid-calcs        servo-thread
 
+addf cia402.0.write-all        servo-thread
 addf lcec.write-all            servo-thread
 
 #########################################
 # General signals
 #########################################
 
-
+loadrt conv_u32_s32
+addf   conv-u32-s32.0   servo-thread
 
 #########################################
 # Standard MAHO 3 Axes Configuration

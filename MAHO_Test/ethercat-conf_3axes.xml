@@ -1,5 +1,13 @@
 <masters>
 	<!-- Internal EtherCAT Master 0 - Internal Key Busslaves only! -->
+		<!--DC note: ESI <OpMode> maps to lcec as follows —
+			AssignActivate        -> assignActivate
+			CycleTimeSync0 Factor -> sync0Cycle ("*1" = 1 x appTimePeriod)
+			ShiftTimeSync0        -> sync0Shift
+			ShiftTimeSync1        -> sync1Cycle  (!), sync1Shift stays 0
+			IgH writes sync1Cycle verbatim to register 0x09A4, which the ESC reads as the
+			SYNC1 delay after SYNC0. Passing the offset as sync1Shift has no effect, and
+			sync1Cycle="*1" makes SYNC1 coincide with the next SYNC0 -> AL 0x002C. 			-->
 	<master idx="0" appTimePeriod="1000000" refClockSyncCycles="1" refClockSlaveIdx="2" name="m0">
 		<slave idx="0" type="EK1914" name="EK1914"/>
 		<slave idx="1" type="EL1918" name="EL1918">
@@ -14,7 +22,8 @@
 			<modParam name="stdOutName" value="safe-error"/>
 		</slave>
 		<slave idx="2" type="EL5002" name="EL5002">
-			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="0" sync1Cycle="*1" sync1Shift="15000"/>-->
+			<!-- EL5002 (slave 2): DC per Beckhoff ESI (OpMode "DC") — SYNC0 on cycle start, SYNC1 +15us -->
+			<dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="0" sync1Cycle="15000" sync1Shift="0"/>
 			<!-- ===== Channel 0 (base 0x8000) — SICK ATM60 spindle encoder ===== -->
 			<modParam name="ch0DisFrameErr"     value="false"/> <!-- 8000:01 BOOL  false=frame errors evaluated       -->
 			<modParam name="ch0EnPwrFailChk"    value="false"/> <!-- 8000:02 BOOL  encoder power-fail bit check        -->
@@ -41,8 +50,8 @@
 			<modParam name="ch1NoClkBursts"     value="1"/>     <!-- 8010:14 U16   clock bursts, min 1 (FW03+)          -->
 		</slave>
 		<slave idx="3" type="EL5021" name="EL5021-x">
-			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
-			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
+			<!-- EL5021: DC per Beckhoff ESI (OpMode "DC") — SYNC0 -65us pre-trigger, SYNC1 +25us -->
+			<dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-65000" sync1Cycle="25000" sync1Shift="0"/>
 		    <!-- 8000:01  Enable counter reset via C input (BIT).
     		Keep false for the latch-C homing scheme.                        -->
       		<modParam name="enableCReset"          value="false"/>
@@ -57,8 +66,8 @@
 			<modParam name="analogResolution"      value="10"/>
 		</slave>
 		<slave idx="4" type="EL5021" name="EL5021-y">
-			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
-			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
+			<!-- EL5021: DC per Beckhoff ESI (OpMode "DC") — SYNC0 -65us pre-trigger, SYNC1 +25us -->
+			<dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-65000" sync1Cycle="25000" sync1Shift="0"/>
 		    <!-- 8000:01  Enable counter reset via C input (BIT).
     		Keep false for the latch-C homing scheme.                        -->
       		<modParam name="enableCReset"          value="false"/>
@@ -73,8 +82,8 @@
 			<modParam name="analogResolution"      value="10"/>
 		</slave>
 		<slave idx="5" type="EL5021" name="EL5021-z">
-			<!-- EL5021: DC-Synchron per Beckhoff ESI — SYNC0 -30.6us pre-trigger + SYNC1 +25us -->
-			<!-- <dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-30600" sync1Cycle="*1" sync1Shift="25000"/>-->
+			<!-- EL5021: DC per Beckhoff ESI (OpMode "DC") — SYNC0 -65us pre-trigger, SYNC1 +25us -->
+			<dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="-65000" sync1Cycle="25000" sync1Shift="0"/>
 		    <!-- 8000:01  Enable counter reset via C input (BIT).
     		Keep false for the latch-C homing scheme.                        -->
       		<modParam name="enableCReset"          value="false"/>
@@ -101,7 +110,8 @@
 		</slave>
 		<slave idx="11" type="EL2809" name="EL2809"/>
 		<slave idx="12" type="EL4034" name="EL4034">
-			<dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="0" sync1Cycle="*1" sync1Shift="100000"/>
+			<!-- EL4034: DC per Beckhoff ESI (OpMode "DC") — SYNC0 on cycle start, SYNC1 +100us -->
+			<dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="0" sync1Cycle="100000" sync1Shift="0"/>
 		</slave>
 		<slave idx="13" type="generic" vid="0x00000002" pid="0x23963052" name="EL9110-Mot">
 			<syncManager idx="0" dir="in">

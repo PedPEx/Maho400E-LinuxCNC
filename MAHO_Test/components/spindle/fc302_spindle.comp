@@ -1,0 +1,699 @@
+/*
+ * fc302_spindle.comp
+ *
+ * LinuxCNC HAL component for the MAHO MH400E spindle drive (Danfoss FC302 on
+ * EtherCAT via lcec).
+ *
+ * Scope of this component (one of several that will interlock later):
+ *   - CiA402 state machine for the FC302, driven directly through
+ *     srv-cia-controlword / srv-cia-statusword.  This gives the TWO-STAGE
+ *     behaviour that the cia402 HAL component cannot provide, because that one
+ *     only exposes a single "enable" pin which always goes straight to
+ *     OPERATION ENABLED:
+ *         enable   -> drive is brought up to SWITCHED ON   (ready, power stage OFF)
+ *         activate -> drive is brought to OPERATION ENABLED (power stage ON)
+ *         twitch   -> same as activate, but for the gearbox (see below)
+ *   - Speed setpoint generation (pass-through, or twitching)
+ *   - Twitching: alternating CW/CCW jog with independent phase times, used by
+ *     the gearbox to help the dog clutches mesh
+ *   - Supervision: commanded speed actually reached, drive/motor temperatures,
+ *     optional torque (overload / blocked gearbox) limit
+ *   - spindle-stopped generation from the REAL feedback speed
+ *
+ * Why the drive state machine lives here:
+ *   cia402.0 offers only .enable (-> OPERATION ENABLED).  Holding the drive at
+ *   SWITCHED ON (mains applied, output stage disabled) requires control over
+ *   controlword bit 3, so this component emits the controlword itself.  Wire
+ *   this component's controlword output to lcec.<m>.FC302.srv-cia-controlword
+ *   instead of cia402.0.controlword.
+ *
+ * Why twitch activates the power stage on its own:
+ *   Twitching IS spindle motion, so the component that owns the motion must
+ *   also own the power stage for it.  A gear shift happens precisely when no
+ *   MDI speed request is pending, so "activate" is FALSE at that moment.
+ *   Requiring the gearbox to assert "activate" would make it depend on a
+ *   FC302 specific pin and it would no longer be a drop-in replacement for the
+ *   original relay based gearbox component.  The power stage therefore runs
+ *   when the drive is enabled AND either activate OR twitch is asserted:
+ *
+ *       power stage = enable && (activate || twitch)
+ *
+ *   "enable" stays the hard release: without machine-on (F2) nothing turns.
+ *
+ * spindle-stopped during twitching:
+ *   The gearbox waits for spindle-stopped before it starts a shift, and the
+ *   spindle then coasts for several seconds after each twitch burst.  Taken
+ *   literally, "the spindle is turning" would block the next shift for that
+ *   whole coast-down.  spindle-stopped therefore means "the spindle is not
+ *   running under a speed command": it is held TRUE while twitch is asserted
+ *   and for twitch-settle-time-s afterwards, and is honest at all other times.
+ *
+ * Supervision rationale:
+ *   With a gear not properly engaged the FC302 was observed pushing ~7 A at
+ *   full torque while the spindle only turned ~200 rpm.  That is damaging to
+ *   the gearbox.  Two independent guards catch this:
+ *     1. Target reached: the drive must set status word bit 10 within
+ *        rpm-settle-time-s (the motor is allowed that long to ramp).  Staying
+ *        un-reached longer raises fault 1.  The tolerance window is the
+ *        drive's own, so no speed arithmetic happens in this component.
+ *     2. Torque limit (optional, faster): |torque-pct| above torque-limit-pct
+ *        for longer than torque-limit-time-s raises fault 2.
+ *
+ * Fault reporting:
+ *   health-ok (HIGH = OK) is fed to a faultlatch.N.monitor of the central
+ *   fault handler, which owns the warning / acknowledge lamps, the latching
+ *   and the acknowledge logic.  This component does not drive lamps itself.
+ *
+ * Fault codes (pin fault-code, s32):
+ *   0  No fault
+ *   1  Target speed not reached within settle time (blocked / slipping)
+ *   2  Torque limit exceeded (overload, e.g. gear not engaged)
+ *   3  Control card over temperature       (only while machine-on)
+ *   4  Heatsink (power stage) over temperature (only while machine-on)
+ *   5  Motor over temperature (KTY)        (only while machine-on)
+ *   6  Drive reported a CiA402 FAULT state (only while machine-on)
+ *   7  Drive not in remote mode            (only while machine-on)
+ *
+ *   All of 3..7 are evaluated only after machine-on plus the startup grace
+ *   period.  Before the EtherCAT bus reaches OP the temperature PDOs read 0
+ *   or garbage, which used to latch a spurious over-temperature fault; a
+ *   reading of exactly 0 degC is additionally treated as "no valid
+ *   measurement yet" and never raises a fault.
+ *
+ * On any fault the speed setpoint is forced to 0 and the drive is dropped back
+ * to SWITCHED ON (power stage off).  The fault latches until fault-reset.
+ *
+ * Author: Patrick
+ * License: GPL
+ */
+
+component fc302_spindle
+    "MAHO MH400E spindle drive control for Danfoss FC302: CiA402 state machine, twitching, speed and thermal supervision";
+author "Patrick";
+license "GPL";
+
+/* ======================================================================
+ * Control inputs
+ * ====================================================================== */
+
+pin in bit enable = 0
+    "Bring the drive up to SWITCHED ON: mains applied, drive ready, power stage still OFF. FALSE disables voltage. This is the hard release for both activate and twitch.";
+
+pin in bit activate = 0
+    "Bring the drive to OPERATION ENABLED: power stage active and following the speed setpoint. Requires enable.";
+
+pin in bit twitch = 0
+    "Twitch mode for the gearbox. While TRUE the speed-cmd input is ignored and the spindle is jogged alternately CW/CCW at twitch-speed. Activates the power stage on its own (requires enable, but NOT activate), because a gear shift happens while no MDI speed request is pending.";
+
+pin in bit fault_reset = 0
+    "Rising edge clears a latched fault and, if the drive itself is in CiA402 FAULT state, issues a fault reset to it.";
+
+pin in bit machine_on = 0
+    "Machine is switched on (F2). Drive-side faults (temperatures, CiA402 FAULT, not-in-remote) are only evaluated while this is TRUE and the startup grace period has elapsed. With the machine off the safety logic keeps STO low and the FC302 legitimately reports FAULT, and the feedback PDOs are not yet valid, which must not latch here.";
+
+/* ======================================================================
+ * Speed inputs
+ * ====================================================================== */
+
+pin in float speed_cmd = 0
+    "Commanded spindle speed in RPM, signed (+ = CW/M3, - = CCW/M4). Passed through to the drive while twitch is FALSE.";
+
+pin in float twitch_speed = 30.0
+    "Twitch jog speed in RPM (magnitude). The sign alternates with the CW/CCW phase.";
+
+pin in float twitch_cw_time = 0.8
+    "Duration of the clockwise twitch phase in seconds.";
+
+pin in float twitch_ccw_time = 0.8
+    "Duration of the counter-clockwise twitch phase in seconds.";
+
+/* ======================================================================
+ * Feedback inputs from the FC302 (lcec pin types, all s32 / u32)
+ * ====================================================================== */
+
+pin in u32 statusword = 0
+    "CiA402 status word. Connect to lcec.<m>.FC302.srv-cia-statusword.";
+
+pin in s32 feedback_rpm = 0
+    "Actual spindle speed in RPM. Connect to lcec.<m>.FC302.Infos-RO-PDO.feedback-rpm.";
+
+pin in s32 torque_pct = 0
+    "Actual torque, high resolution percent. Connect to lcec.<m>.FC302.Infos-RO-PDO.torque-pct-highres. Used for the optional overload guard.";
+
+pin in s32 ctrl_card_temp = 0
+    "Control card temperature in degC. Connect to lcec.<m>.FC302.Infos-RO-PDO.ctrl-card-temp.";
+
+pin in s32 heatsink_temp = 0
+    "Power stage heatsink temperature in degC. Connect to lcec.<m>.FC302.Infos-RO.heatsink-temp.";
+
+pin in s32 motor_temp = 0
+    "Motor temperature in degC from the KTY sensor. Connect to lcec.<m>.FC302.Infos-RO.kty-temperature.";
+
+/* ======================================================================
+ * Outputs to the drive
+ * ====================================================================== */
+
+pin out u32 controlword = 0
+    "CiA402 control word. Connect to lcec.<m>.FC302.srv-cia-controlword (replaces cia402.0.controlword).";
+
+pin out s32 speed_out = 0
+    "Speed setpoint in RPM, signed. Connect directly to lcec.<m>.FC302.srv-target-vl (s32, no conversion needed).";
+
+/* ======================================================================
+ * Status outputs
+ * ====================================================================== */
+
+pin out bit drive_ready = 0
+    "TRUE while the drive is in CiA402 state SWITCHED ON or OPERATION ENABLED, i.e. ready or running.";
+
+pin out bit drive_active = 0
+    "TRUE while the drive is in CiA402 state OPERATION ENABLED, i.e. the power stage is actually driving the motor.";
+
+pin out bit drive_fault = 0
+    "TRUE while the drive itself reports the CiA402 FAULT state. Reported as status at all times; only turned into fault 6 while the machine is on.";
+
+pin out bit drive_remote = 0
+    "TRUE while the drive reports remote operation (status word bit 9), i.e. it accepts the control word from the fieldbus.";
+
+pin out bit at_speed = 0
+    "Target reached, taken straight from status word bit 10. This is the drive's own judgement using its internal tolerance window, so no speed comparison is done here.";
+
+pin out bit spindle_stopped = 0
+    "TRUE once the absolute feedback speed has stayed below stopped-rpm for longer than stopped-delay-s. Held TRUE while twitch is asserted and for twitch-settle-time-s afterwards, so the gearbox is not blocked by the jog it asked for itself, nor by the coast-down that follows it.";
+
+pin out bit twitch_active = 0
+    "TRUE while the power stage is running because of twitch rather than activate.";
+
+pin out bit twitch_cw = 0
+    "Status: the clockwise twitch phase is currently active.";
+
+pin out bit twitch_ccw = 0
+    "Status: the counter-clockwise twitch phase is currently active.";
+
+pin out bit error = 0
+    "TRUE while a fault is latched. Clear with fault-reset.";
+
+pin out s32 fault_code = 0
+    "Active fault code, 0 = no fault. See the component header for the code table.";
+
+pin out bit health_ok = 0
+    "Healthy flag for the central fault handler: TRUE = no latched fault, FALSE = fault. Wire to a faultlatch.N.monitor input (which expects HIGH = OK). Lamps and acknowledge are handled centrally by the fault handler, not by this component.";
+
+/* ======================================================================
+ * Parameters
+ * ====================================================================== */
+
+param rw float rpm_settle_time_s = 5.0
+    "Time in seconds the drive may report target-not-reached (status word bit 10 clear) while a speed is commanded, before fault 1 is raised. Must cover the drive ramp.";
+
+param rw float stopped_rpm = 10.0
+    "Absolute feedback speed in RPM below which the spindle counts as standing still.";
+
+param rw float stopped_delay_s = 2.0
+    "Time in seconds the feedback speed must stay below stopped-rpm before spindle-stopped goes TRUE.";
+
+param rw float twitch_settle_time_s = 3.0
+    "Time in seconds after twitch drops during which spindle-stopped is still held TRUE, covering the coast-down of the spindle. Set to 0 to report the coast-down honestly, which will make the gearbox wait for it before the next shift.";
+
+param rw float torque_limit_pct = 0.0
+    "Optional overload guard: absolute torque-pct above this value for longer than torque-limit-time-s raises fault 2. Set to 0 to disable until the scaling of torque-pct-highres is known.";
+
+param rw float torque_limit_time_s = 1.0
+    "Time in seconds the torque may stay above torque-limit-pct before fault 2 is raised.";
+
+param rw float ctrl_card_temp_max = 75.0
+    "Control card temperature limit in degC, fault 3 above this value.";
+
+param rw float heatsink_temp_max = 80.0
+    "Heatsink temperature limit in degC, fault 4 above this value.";
+
+param rw float motor_temp_max = 120.0
+    "Motor (KTY) temperature limit in degC, fault 5 above this value.";
+
+param rw float fault_eval_delay_s = 2.0
+    "Grace period in seconds after machine-on before drive-side faults (3 to 7) are evaluated, so that STO release, the drive acknowledging it and the first valid feedback values do not raise a spurious fault.";
+
+param rw bit auto_fault_reset = 1
+    "When TRUE, a single CiA402 fault reset is sent to the drive on the rising edge of machine-on, and any latched fault in this component is cleared. This clears the FAULT state the FC302 entered while STO was low, so the first M3 after switching on works without pressing the acknowledge button. Set to 0 to require a manual fault-reset instead.";
+
+/* ======================================================================
+ * Component options
+ * ====================================================================== */
+function _;
+option singleton yes;
+
+;;
+
+#include <rtapi_math.h>
+
+/* ======================================================================
+ * CiA402 status word decoding
+ *
+ * Statusword bits: 0 ready-to-switch-on, 1 switched-on, 2 operation-enabled,
+ * 3 fault, 4 voltage-enabled, 5 quick-stop, 6 switch-on-disabled.
+ *
+ * The states are decoded from INDIVIDUAL BITS, not from exact masked state
+ * values.  The FC302 does not use the textbook encoding: in SWITCHED ON it
+ * reports 0x0232 (bit1 set, bit0 CLEARED) instead of the canonical 0x0023
+ * (bit0 and bit1 both set).  An exact comparison therefore never matched, the
+ * state machine fell through to its default branch and oscillated forever
+ * between SHUTDOWN (0x06) and SWITCH ON (0x07), with the status word flipping
+ * between 0x0231 and 0x0232.  Bit tests, evaluated from the highest state
+ * downwards, are tolerant of that.
+ * ====================================================================== */
+#define CIA_SB_READY            0x0001      /* ready to switch on  */
+#define CIA_SB_SWITCHED_ON      0x0002      /* switched on         */
+#define CIA_SB_OP_ENABLED       0x0004      /* operation enabled   */
+#define CIA_SB_FAULT            0x0008      /* fault               */
+#define CIA_SB_SWITCHON_DISABLE 0x0040      /* switch on disabled  */
+#define CIA_SB_REMOTE           0x0200      /* bit  9: fieldbus control */
+#define CIA_SB_TARGET_REACHED   0x0400      /* bit 10: target reached   */
+
+/* CiA402 control word commands.
+ *
+ * In VELOCITY MODE (vl, opmode 2) the control word carries mode specific bits
+ * that drive the ramp function generator:
+ *   bit4 rfg-enable, bit5 rfg-unfreeze, bit6 rfg-use-ref
+ * Without them the ramp generator stays disabled and the drive ignores the
+ * velocity reference, so the motor would not turn even in OPERATION ENABLED.
+ * They are therefore sent together with the Enable Operation command. */
+#define CIA_VL_RFG_BITS         0x0070      /* rfg enable | unfreeze | use ref */
+
+#define CIA_CMD_DISABLE_VOLTAGE 0x0000
+#define CIA_CMD_SHUTDOWN        0x0006      /* -> READY TO SWITCH ON  */
+#define CIA_CMD_SWITCH_ON       0x0007      /* -> SWITCHED ON         */
+#define CIA_CMD_ENABLE_OP       (0x000f | CIA_VL_RFG_BITS)  /* -> OPERATION ENABLED, ramp running */
+#define CIA_CMD_FAULT_RESET     0x0080      /* rising edge of bit 7   */
+
+/* ======================================================================
+ * Persistent state
+ * ====================================================================== */
+static long  g_settle_timer  = 0;    /* ns outside the speed window        */
+static long  g_torque_timer  = 0;    /* ns above the torque limit          */
+static long  g_stopped_timer = 0;    /* ns below the standstill threshold  */
+static long  g_twitch_timer  = 0;    /* ns in the current twitch phase     */
+static long  g_twitch_hold   = 0;    /* ns of spindle-stopped hold left    */
+static bool  g_twitch_cw     = true; /* current twitch phase               */
+static bool  g_twitch_run    = false;/* twitch was running last cycle      */
+static bool  g_last_reset    = false;/* fault-reset edge detection         */
+static bool  g_reset_pending = false;/* fault reset must be sent to drive  */
+static bool  g_last_machine  = false;/* machine-on edge detection          */
+static long  g_machine_timer = 0;    /* ns since machine-on went TRUE      */
+
+/* ======================================================================
+ * Helpers
+ *
+ * NOTE: every helper that touches a pin or param macro must receive
+ * __comp_inst, because halcompile expands those macros to
+ * (*__comp_inst->name) and that symbol only exists inside FUNCTION() bodies.
+ * ====================================================================== */
+
+/* Latch a fault: record the code, log it once, and stop driving the spindle. */
+static void raise_fault(struct __comp_state *__comp_inst, int code,
+                        const char *msg)
+{
+    if (error)
+        return;                     /* keep the first (root cause) fault */
+
+    rtapi_print_msg(RTAPI_MSG_ERR,
+        "fc302_spindle: FAULT %d - %s\n", code, msg);
+    fault_code = code;
+    error      = true;
+}
+
+/* Round a float RPM value to the s32 the FC302 expects. */
+static int rpm_to_s32(float rpm)
+{
+    return (int)(rpm >= 0.0f ? (rpm + 0.5f) : (rpm - 0.5f));
+}
+
+/* Drive the CiA402 state machine one step and emit the control word.
+ *
+ * want_operation is TRUE when the power stage shall be active.  The drive is
+ * walked up the state chain one transition per cycle, which is how the CiA402
+ * handshake is meant to work: each command is acknowledged by a new status. */
+static void cia402_step(struct __comp_state *__comp_inst, bool want_operation)
+{
+    unsigned sw = (unsigned)statusword;
+
+    /* Bit-wise decode - see the note at the status word defines above. */
+    bool in_fault    = (sw & CIA_SB_FAULT)            != 0;
+    bool so_disabled = (sw & CIA_SB_SWITCHON_DISABLE) != 0;
+    bool op_enabled  = (sw & CIA_SB_OP_ENABLED)       != 0;
+    bool switched_on = (sw & CIA_SB_SWITCHED_ON)      != 0;
+    bool ready       = (sw & CIA_SB_READY)            != 0;
+
+    drive_fault  = in_fault;
+    drive_ready  = switched_on || op_enabled;
+    drive_active = op_enabled;
+    drive_remote = (sw & CIA_SB_REMOTE)         != 0;
+    at_speed     = (sw & CIA_SB_TARGET_REACHED) != 0;
+
+    if (in_fault)
+    {
+        /* Only a rising edge of bit 7 resets, so toggle back to 0 in between. */
+        if (g_reset_pending)
+        {
+            controlword     = CIA_CMD_FAULT_RESET;
+            g_reset_pending = false;
+        }
+        else
+        {
+            controlword = CIA_CMD_DISABLE_VOLTAGE;
+        }
+        return;
+    }
+
+    if (!enable)
+    {
+        controlword = CIA_CMD_DISABLE_VOLTAGE;
+        return;
+    }
+
+    /* Evaluate from the HIGHEST state downwards: a drive that also keeps the
+     * lower bits set while switched on / operational must not be mistaken for
+     * the lower state, otherwise the state machine would never climb. */
+    if (so_disabled)
+    {
+        controlword = CIA_CMD_SHUTDOWN;         /* -> ready to switch on */
+    }
+    else if (op_enabled || switched_on)
+    {
+        /* This is the two-stage decision: stay at SWITCHED ON (power stage
+         * off) until operation is actually wanted. */
+        controlword = want_operation ? CIA_CMD_ENABLE_OP : CIA_CMD_SWITCH_ON;
+    }
+    else if (ready)
+    {
+        controlword = CIA_CMD_SWITCH_ON;        /* -> switched on        */
+    }
+    else
+    {
+        /* NOT READY TO SWITCH ON or anything unexpected: ask for shutdown. */
+        controlword = CIA_CMD_SHUTDOWN;
+    }
+}
+
+/* Generate the twitch setpoint and keep the phase timer.
+ * Returns the signed RPM value for the current twitch phase. */
+static float twitch_step(struct __comp_state *__comp_inst, long period)
+{
+    long cw_ns  = (long)(twitch_cw_time  * 1e9);
+    long ccw_ns = (long)(twitch_ccw_time * 1e9);
+
+    if (cw_ns  < 1000000L) cw_ns  = 1000000L;   /* clamp to >= 1 ms */
+    if (ccw_ns < 1000000L) ccw_ns = 1000000L;
+
+    if (!g_twitch_run)
+    {
+        /* Entering twitch mode: always start with the CW phase. */
+        g_twitch_run   = true;
+        g_twitch_cw    = true;
+        g_twitch_timer = 0;
+    }
+    else
+    {
+        g_twitch_timer += period;
+        if (g_twitch_cw)
+        {
+            if (g_twitch_timer >= cw_ns)
+            {
+                g_twitch_cw    = false;
+                g_twitch_timer = 0;
+            }
+        }
+        else
+        {
+            if (g_twitch_timer >= ccw_ns)
+            {
+                g_twitch_cw    = true;
+                g_twitch_timer = 0;
+            }
+        }
+    }
+
+    twitch_cw  = g_twitch_cw;
+    twitch_ccw = !g_twitch_cw;
+
+    return g_twitch_cw ? (float)fabs(twitch_speed)
+                       : -(float)fabs(twitch_speed);
+}
+
+/* Standstill detection from the REAL feedback speed.
+ *
+ * While the gearbox is twitching, the spindle turns because the gearbox asked
+ * for it, and it keeps coasting for a few seconds after the last jog.  During
+ * that whole window spindle-stopped is held TRUE, otherwise the gearbox would
+ * block its own next shift waiting for a standstill it just prevented. */
+static void update_spindle_stopped(struct __comp_state *__comp_inst,
+                                   long period)
+{
+    float fb_abs   = (float)fabs((double)feedback_rpm);
+    long  delay_ns = (long)(stopped_delay_s * 1e9);
+    long  hold_ns  = (long)(twitch_settle_time_s * 1e9);
+
+    if (hold_ns < 0)
+        hold_ns = 0;
+
+    if (twitch)
+    {
+        g_twitch_hold = hold_ns;
+    }
+    else if (g_twitch_hold > 0)
+    {
+        g_twitch_hold -= period;
+        if (g_twitch_hold < 0)
+            g_twitch_hold = 0;
+    }
+
+    if (twitch || g_twitch_hold > 0)
+    {
+        /* Keep the standstill timer primed so that spindle-stopped does not
+         * drop out for one cycle when the hold expires while the spindle has
+         * already come to rest. */
+        g_stopped_timer = delay_ns;
+        spindle_stopped = true;
+        return;
+    }
+
+    if (fb_abs < stopped_rpm)
+    {
+        if (g_stopped_timer < delay_ns)
+            g_stopped_timer += period;
+
+        if (g_stopped_timer >= delay_ns)
+            spindle_stopped = true;
+    }
+    else
+    {
+        g_stopped_timer = 0;
+        spindle_stopped = false;
+    }
+}
+
+/* Temperature limits.  These are compared directly; the heatsink and motor
+ * values arrive over SDO and therefore update slowly, which is fine for a
+ * thermal guard.
+ *
+ * A reading of exactly 0 degC is treated as "no valid measurement yet" rather
+ * than as a real temperature.  Before the EtherCAT bus reaches OP the PDOs
+ * read 0, and the caller only invokes this once the machine is on and the
+ * grace period has elapsed, so a genuine 0 degC control card is not a case
+ * worth guarding against. */
+static void check_temperatures(struct __comp_state *__comp_inst)
+{
+    if (ctrl_card_temp != 0 && (float)ctrl_card_temp > ctrl_card_temp_max)
+        raise_fault(__comp_inst, 3, "control card over temperature");
+    else if (heatsink_temp != 0 && (float)heatsink_temp > heatsink_temp_max)
+        raise_fault(__comp_inst, 4, "heatsink / power stage over temperature");
+    else if (motor_temp != 0 && (float)motor_temp > motor_temp_max)
+        raise_fault(__comp_inst, 5, "motor (KTY) over temperature");
+}
+
+/* Speed and torque supervision.  Only meaningful while the power stage is
+ * active, a non-zero speed is commanded and we are not twitching. */
+static void check_load(struct __comp_state *__comp_inst, long period,
+                       float setpoint)
+{
+    float sp_abs = (float)fabs(setpoint);
+
+    /* ---- torque / overload guard (fast) ---- */
+    if (torque_limit_pct > 0.0f && drive_active)
+    {
+        long tq_ns = (long)(torque_limit_time_s * 1e9);
+        if ((float)fabs((double)torque_pct) > torque_limit_pct)
+        {
+            g_torque_timer += period;
+            if (g_torque_timer >= tq_ns)
+                raise_fault(__comp_inst, 2,
+                            "torque limit exceeded (overload / blocked drivetrain)");
+        }
+        else
+        {
+            g_torque_timer = 0;
+        }
+    }
+    else
+    {
+        g_torque_timer = 0;
+    }
+
+    /* ---- target-reached guard ----
+     * The drive itself signals "target reached" on status word bit 10 using
+     * its own tolerance window, so no speed arithmetic is done here.  If it
+     * keeps reporting not-reached while a speed is commanded, the drivetrain
+     * is blocked or slipping - that is the 7 A at 200 rpm case.
+     *
+     * Skipped while twitching (the spindle deliberately reverses) and while no
+     * speed is commanded (a 0 setpoint with the spindle still turning is a
+     * normal coast-down, not a fault). */
+    if (!drive_active || twitch || sp_abs < 1.0f)
+    {
+        g_settle_timer = 0;
+        return;
+    }
+
+    {
+        long settle_ns = (long)(rpm_settle_time_s * 1e9);
+
+        if (!at_speed)
+        {
+            g_settle_timer += period;
+            if (g_settle_timer >= settle_ns)
+                raise_fault(__comp_inst, 1,
+                            "target speed not reached within settle time (blocked or slipping)");
+        }
+        else
+        {
+            g_settle_timer = 0;
+        }
+    }
+}
+
+/* ======================================================================
+ * Main function
+ * ====================================================================== */
+FUNCTION(_)
+{
+    float setpoint = 0.0f;
+
+    /* ---- fault reset (rising edge) ---- */
+    if (fault_reset && !g_last_reset)
+    {
+        if (error)
+        {
+            rtapi_print_msg(RTAPI_MSG_INFO,
+                "fc302_spindle: fault %d cleared\n", fault_code);
+        }
+        error           = false;
+        fault_code      = 0;
+        g_settle_timer  = 0;
+        g_torque_timer  = 0;
+        g_reset_pending = true;     /* also reset the drive if it is faulted */
+    }
+    g_last_reset = fault_reset;
+
+    /* ---- machine-on edge and startup grace period ----
+     * While the machine is off the safety logic holds STO low and the FC302
+     * legitimately sits in CiA402 FAULT, and the feedback PDOs are not valid
+     * yet.  Latching either as a fault would leave a stale fault standing
+     * after switching on, so ALL drive-side faults (3 to 7) are evaluated only
+     * once the machine is on AND the grace period has elapsed.
+     * On the rising edge we optionally clear our own latch and send one fault
+     * reset to the drive, so the FAULT it entered during STO-low goes away
+     * without a manual acknowledge. */
+    if (machine_on && !g_last_machine)
+    {
+        g_machine_timer = 0;
+        if (auto_fault_reset)
+        {
+            error           = false;
+            fault_code      = 0;
+            g_settle_timer  = 0;
+            g_torque_timer  = 0;
+            g_reset_pending = true;
+        }
+    }
+    g_last_machine = machine_on;
+
+    if (!machine_on)
+    {
+        g_machine_timer = 0;
+    }
+    else
+    {
+        long grace_ns = (long)(fault_eval_delay_s * 1e9);
+        if (g_machine_timer < grace_ns)
+            g_machine_timer += period;
+    }
+
+    /* ---- standstill detection runs always ---- */
+    update_spindle_stopped(__comp_inst, period);
+
+    /* ---- drive-side supervision, only once the machine is up ---- */
+    {
+        long grace_ns = (long)(fault_eval_delay_s * 1e9);
+        bool eval_drive = machine_on && (g_machine_timer >= grace_ns);
+
+        if (eval_drive)
+        {
+            check_temperatures(__comp_inst);
+
+            if (drive_fault)
+                raise_fault(__comp_inst, 6, "drive reported CiA402 FAULT state");
+            else if (!drive_remote)
+                raise_fault(__comp_inst, 7,
+                            "drive not in remote mode (control word not accepted from fieldbus)");
+        }
+    }
+
+    /* ---- decide whether the power stage may run ----
+     * Twitching needs the power stage just as much as a normal speed request
+     * does, and it happens exactly when no MDI request is pending, so it
+     * activates the drive on its own.  "enable" remains the hard release.
+     * A latched fault drops the drive back to SWITCHED ON: mains stay applied
+     * so the drive can be reset quickly, but the motor is no longer driven. */
+    {
+        bool want_twitch    = twitch && enable && !error;
+        bool want_operation = enable && (activate || twitch) && !error;
+
+        twitch_active = want_twitch;
+
+        cia402_step(__comp_inst, want_operation);
+
+        /* ---- speed setpoint ---- */
+        if (!want_operation)
+        {
+            setpoint      = 0.0f;
+            g_twitch_run  = false;
+            twitch_cw     = false;
+            twitch_ccw    = false;
+        }
+        else if (twitch)
+        {
+            /* twitch wins over speed-cmd, so a stale MDI setpoint cannot
+             * spin the spindle up during a gear shift */
+            setpoint = twitch_step(__comp_inst, period);
+        }
+        else
+        {
+            g_twitch_run = false;
+            twitch_cw    = false;
+            twitch_ccw   = false;
+            setpoint     = speed_cmd;
+        }
+    }
+
+    speed_out = rpm_to_s32(setpoint);
+
+    /* ---- load supervision uses the setpoint we just emitted ---- */
+    check_load(__comp_inst, period, setpoint);
+
+    /* ---- report health to the central fault handler ----
+     * at_speed is already set from status word bit 10 in cia402_step().
+     * Lamps, latching, acknowledge and the acknowledgeability judgement live
+     * in the fault handler; this component only reports whether it is healthy.
+     * The handler's faultlatch expects HIGH = OK, so health_ok is the inverse
+     * of the latched error. */
+    health_ok = !error;
+}

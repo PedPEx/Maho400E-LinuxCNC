@@ -1,0 +1,940 @@
+/*
+ * LinuxCNC component for the MAHO MH400E original gearbox.
+ *
+ * Drop-in replacement for the original "mh400e_gearbox" component by
+ * Sergey 'Jin' Bostandzhyan.  The original drove the machine's relay board
+ * (via a MESA 7i84).  That relay board no longer exists on this machine:
+ *
+ *   cam switches   -> Beckhoff EL1819-1   (12 inputs, din-0 .. din-11)
+ *   shaft motors   -> Beckhoff EL7332-0   (ch1 = backgear, ch2 = midrange)
+ *                     Beckhoff EL7332-1   (ch1 = input stage)
+ *   spindle        -> Danfoss FC302 via the fc302_spindle component
+ *
+ * The EL7332 channels are commanded with a signed velocity (-1.0 .. +1.0,
+ * PWM duty) plus a separate enable bit, so direction is expressed by the
+ * sign of the velocity instead of a shared "reverse direction" relay.
+ *
+ * Backward compatibility
+ * ----------------------
+ * All pins of the original component are still present and still behave the
+ * same way, so existing HAL files, GladeVCP panels and the simulator keep
+ * working.  The relay-style bit outputs (motor-lowspeed, reducer-motor,
+ * midrange-motor, input-stage-motor, reverse-direction, start-gear-shift,
+ * twitch-cw, twitch-ccw) are driven in parallel with the new EL7332 pins.
+ *
+ * External twitching
+ * ------------------
+ * Twitching (jogging the spindle back and forth so the dog clutches can
+ * mesh) used to be done with two relay outputs.  With the FC302 the spindle
+ * component owns that motion, so this component can instead raise a single
+ * request bit and let fc302_spindle perform the alternating jog:
+ *
+ *   external-twitch-enable = 1 (default) -> "twitch-request" is raised for
+ *       the duration of the gear shift, "twitch-cw"/"twitch-ccw" stay low.
+ *   external-twitch-enable = 0           -> the original alternating
+ *       "twitch-cw"/"twitch-ccw" pattern is produced, "twitch-request"
+ *       stays low.
+ *
+ * Direction convention
+ * --------------------
+ * Verified on the machine: a POSITIVE velocity command moves a shaft
+ * towards its "right" cam switch, a NEGATIVE command towards its "left"
+ * cam switch.  If the wiring of a machine is mirrored, set the
+ * "invert-direction" parameter to 1.  Even with the wrong setting the
+ * component cannot damage the gearbox: reaching an end position that is not
+ * the target is detected, the motor is stopped and the move is retried in
+ * the opposite direction.
+ *
+ * Copyright (C) 2018 Sergey 'Jin' Bostandzhyan <jin@mediatomb.cc>
+ * Copyright (C) 2026 MH400E LinuxCNC retrofit
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+component mh400e_gearbox_el7332 "MAHO MH400E original gearbox control (EL1819 cam switches, EL7332 shaft motors)";
+author "MH400E LinuxCNC retrofit, based on work by Sergey 'Jin' Bostandzhyan";
+license "GPL";
+
+/* ------------------------------------------------------------------ */
+/* speed interface                                                     */
+/* ------------------------------------------------------------------ */
+
+pin in  float spindle_speed_in_abs = 0 "Requested spindle speed in rpm, always positive regardless of direction. Connect to spindle.0.speed-out-abs.";
+pin out float spindle_speed_out    = 0 "Spindle speed in rpm that the currently engaged gear provides. 0 means neutral or an undefined shaft position.";
+
+/* ------------------------------------------------------------------ */
+/* cam switches, EL1819-1                                              */
+/* ------------------------------------------------------------------ */
+
+pin in bit reducer_left             "Backgear left, 11S2, EL1819-1 din-1.";
+pin in bit reducer_right            "Backgear right, 11S1, EL1819-1 din-0.";
+pin in bit reducer_center           "Backgear center, 11S3, EL1819-1 din-2.";
+pin in bit reducer_left_center      "Backgear left-center, 11S5, EL1819-1 din-3.";
+
+pin in bit middle_left              "Midrange left, 11S7, EL1819-1 din-5.";
+pin in bit middle_right             "Midrange right, 11S6, EL1819-1 din-4.";
+pin in bit middle_center            "Midrange center, 11S8, EL1819-1 din-6.";
+pin in bit middle_left_center       "Midrange left-center, 11S10, EL1819-1 din-7.";
+
+pin in bit input_left               "Input stage left, 11S12, EL1819-1 din-9.";
+pin in bit input_right              "Input stage right, 11S11, EL1819-1 din-8.";
+pin in bit input_center             "Input stage center, 11S13, EL1819-1 din-10.";
+pin in bit input_left_center        "Input stage left-center, 11S15, EL1819-1 din-11.";
+
+/* ------------------------------------------------------------------ */
+/* spindle handshake                                                   */
+/* ------------------------------------------------------------------ */
+
+pin in  bit machine_on        = 1  "Machine is switched on (F2). While FALSE the component holds all motor and twitch outputs off, drops any running gear shift and starts no new one. The cam switches keep being read, so the engaged gear is still reported. Connect to the machine-is-on signal; left unconnected it defaults to TRUE and the component always runs.";
+
+pin in  bit spindle_stopped   = 0  "TRUE while the spindle stands still. Connect to fc302-spindle.spindle-stopped.";
+pin out bit stop_spindle      = 0  "Request to stop the spindle because a gear shift is pending.";
+pin out bit spindle_at_speed  = 0  "TRUE when no gear shift is pending and the spindle may run.";
+
+/* ------------------------------------------------------------------ */
+/* legacy relay-style outputs (kept for backward compatibility)        */
+/* ------------------------------------------------------------------ */
+
+pin out bit motor_lowspeed    = 0  "Legacy: TRUE while a shaft motor runs at reduced speed. Mirrors the reduced velocity command.";
+pin out bit reducer_motor     = 0  "Legacy: TRUE while the backgear shaft motor runs. Mirrors backgear-enable.";
+pin out bit midrange_motor    = 0  "Legacy: TRUE while the midrange shaft motor runs. Mirrors midrange-enable.";
+pin out bit input_stage_motor = 0  "Legacy: TRUE while the input stage shaft motor runs. Mirrors input-enable.";
+pin out bit reverse_direction = 0  "Legacy: TRUE while the running shaft motor is commanded towards its left cam switch.";
+pin out bit start_gear_shift  = 0  "Legacy: TRUE for the whole duration of a gear shift.";
+pin out bit twitch_cw         = 0  "Legacy twitch output, only driven when external-twitch-enable is FALSE.";
+pin out bit twitch_ccw        = 0  "Legacy twitch output, only driven when external-twitch-enable is FALSE.";
+
+/* ------------------------------------------------------------------ */
+/* EL7332 shaft motor outputs                                          */
+/* ------------------------------------------------------------------ */
+
+pin out float backgear_velocity = 0 "Backgear shaft motor duty, -1.0 .. +1.0. Connect to lcec.m0.EL7332-0.srv-1-velocity.";
+pin out bit   backgear_enable   = 0 "Backgear shaft motor enable. Connect to lcec.m0.EL7332-0.srv-1-enable.";
+
+pin out float midrange_velocity = 0 "Midrange shaft motor duty, -1.0 .. +1.0. Connect to lcec.m0.EL7332-0.srv-2-velocity.";
+pin out bit   midrange_enable   = 0 "Midrange shaft motor enable. Connect to lcec.m0.EL7332-0.srv-2-enable.";
+
+pin out float input_velocity    = 0 "Input stage shaft motor duty, -1.0 .. +1.0. Connect to lcec.m0.EL7332-1.srv-1-velocity.";
+pin out bit   input_enable      = 0 "Input stage shaft motor enable. Connect to lcec.m0.EL7332-1.srv-1-enable.";
+
+/* ------------------------------------------------------------------ */
+/* twitching                                                           */
+/* ------------------------------------------------------------------ */
+
+pin in  bit external_twitch_enable = 1 "TRUE: use twitch-request and let the spindle component do the jogging. FALSE: drive the legacy twitch-cw / twitch-ccw outputs.";
+pin out bit twitch_request         = 0 "Raised while the gearbox needs the spindle to be jogged. Connect to fc302-spindle.twitch.";
+
+/* ------------------------------------------------------------------ */
+/* status and diagnostics                                              */
+/* ------------------------------------------------------------------ */
+
+pin out bit shift_in_progress = 0 "TRUE while a gear shift is running.";
+pin out s32 target_rpm        = 0 "Gear speed in rpm the component is shifting to, 0 when idle.";
+pin out s32 current_rpm       = 0 "Gear speed in rpm of the currently engaged gear, same value as spindle-speed-out.";
+pin out s32 fault_code        = 0 "0 = no fault. See the component documentation for the fault codes.";
+pin out bit health_ok         = 1 "TRUE while the component is healthy. Connect to a faultlatch monitor input (HIGH = OK).";
+pin in  bit fault_reset       = 0 "Rising edge clears a latched fault.";
+
+pin out bit estop_out = 0 "Raised on a fatal gearbox fault when estop-on-fault is set.";
+pin in  bit estop_in  = 0 "Notifies the component that an emergency stop happened outside of it.";
+
+/* ------------------------------------------------------------------ */
+/* parameters                                                          */
+/* ------------------------------------------------------------------ */
+
+param rw float motor_velocity      = 1.0  "Shaft motor duty for normal travel, 0.0 .. 1.0.";
+param rw float motor_velocity_slow = 0.45 "Shaft motor duty used when approaching a center position, 0.0 .. 1.0.";
+param rw bit   invert_direction    = 0    "Set to 1 if a positive velocity command moves the shafts towards their left cam switch instead of the right one.";
+param rw float stage_timeout       = 25.0 "Seconds a single shaft may take to reach its target position before a fault is raised.";
+param rw float spindle_stop_timeout = 20.0 "Seconds to wait for the spindle to stop before a fault is raised. 0 disables the timeout.";
+param rw s32   max_retries         = 3    "How often a shaft move may be retried in the opposite direction after running into a wrong end position.";
+param rw float overrun_time        = 0.15 "Seconds a shaft motor keeps turning after the target cam switch has been reached, so the dog clutch seats completely. Applies to the left and right end positions only, never to the narrow center detent. 0 disables the overrun.";
+param rw float overrun_velocity    = 0.35 "Shaft motor duty during the overrun, 0.0 .. 1.0. Keep this well below motor-velocity so the shaft is only nudged into its detent.";
+param rw bit   estop_on_fault      = 0    "Set to 1 to raise estop-out on a fatal gearbox fault.";
+
+function _;
+
+option singleton yes;
+
+;;
+
+#include <rtapi_math.h>
+
+/* ------------------------------------------------------------------ */
+/* gear table                                                          */
+/* ------------------------------------------------------------------ */
+
+/* Each gear is described by a 12 bit mask built from three 4 bit shaft
+ * positions:  bits 0..3  backgear, bits 4..7 midrange, bits 8..11 input
+ * stage.  Within a nibble: bit0 = left, bit1 = right, bit2 = center,
+ * bit3 = left-center. */
+
+#define NUM_GEARS 19
+
+static const int g_gear_rpm[NUM_GEARS] = {
+    0, 80, 100, 125, 160, 200, 250, 315, 400, 500,
+    630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000
+};
+
+static const unsigned g_gear_mask[NUM_GEARS] = {
+    4, 1097, 2377, 585, 1177, 2457, 665, 1065, 2345, 553,
+    1090, 2370, 578, 1170, 2450, 658, 1058, 2338, 546
+};
+
+/* the only three valid detent positions of a shaft */
+#define POS_LEFT    9u   /* 1001: left + left-center */
+#define POS_CENTER  4u   /* 0100: center            */
+#define POS_RIGHT   2u   /* 0010: right             */
+
+#define IS_LEFT(m)         ((m) & 1u)
+#define IS_RIGHT(m)        (((m) >> 1) & 1u)
+#define IS_CENTER(m)       (((m) >> 2) & 1u)
+#define IS_LEFT_CENTER(m)  (((m) >> 3) & 1u)
+
+/* ------------------------------------------------------------------ */
+/* fault codes                                                         */
+/* ------------------------------------------------------------------ */
+
+#define FAULT_NONE              0
+#define FAULT_STAGE_TIMEOUT     1  /* shaft did not reach its target in time    */
+#define FAULT_RETRIES_EXCEEDED  2  /* shaft kept running into wrong end stops   */
+#define FAULT_SPINDLE_TIMEOUT   3  /* spindle did not come to a stop in time    */
+
+/* ------------------------------------------------------------------ */
+/* timing constants, nanoseconds                                       */
+/* ------------------------------------------------------------------ */
+
+#define T_SETTLE        100000000LL   /* 100 ms, let an output take effect      */
+#define T_POLL            5000000LL   /*   5 ms, cam switch poll interval       */
+#define T_TWITCH_ON     800000000LL   /* 800 ms, legacy twitch pulse length     */
+#define T_TWITCH_OFF    200000000LL   /* 200 ms, legacy twitch pause length     */
+
+/* ------------------------------------------------------------------ */
+/* state                                                               */
+/* ------------------------------------------------------------------ */
+
+typedef enum {
+    SHAFT_OFF = 0,   /* motor is off, direction not decided yet   */
+    SHAFT_RUN,       /* motor is running towards the target       */
+    SHAFT_OVERRUN,   /* target reached, seating the dog clutch    */
+    SHAFT_RESTART,   /* wrong end position hit, turn around       */
+    SHAFT_DONE       /* target position reached                   */
+} shaft_state_t;
+
+typedef struct {
+    const char   *name;
+    unsigned      current;   /* current 4 bit cam switch mask */
+    unsigned      target;    /* target 4 bit cam switch mask  */
+    shaft_state_t state;
+    int           dir;       /* +1 towards right, -1 towards left, 0 stopped */
+    int           retries;
+    long long     elapsed;   /* nanoseconds spent on this shaft */
+    long long     overrun;   /* nanoseconds of overrun still to go */
+} shaft_t;
+
+/* index 0 is shifted first, see the gear change flow chart */
+#define SHAFT_INPUT     0
+#define SHAFT_MIDRANGE  1
+#define SHAFT_BACKGEAR  2
+#define NUM_SHAFTS      3
+
+static shaft_t g_shaft[NUM_SHAFTS];
+
+typedef enum {
+    GB_IDLE = 0,
+    GB_WAIT_SPINDLE,   /* gear change pending, waiting for the spindle to stop */
+    GB_BEGIN,          /* start-gear-shift raised, settling                    */
+    GB_SHIFT,          /* working through the three shafts                     */
+    GB_FINISH,         /* everything reached, releasing the outputs            */
+    GB_FAULT           /* latched fault, everything off                        */
+} gb_state_t;
+
+static gb_state_t g_state       = GB_IDLE;
+static int        g_shaft_index = 0;
+static long long  g_delay       = 0;
+static long long  g_spindle_wait = 0;
+static int        g_target_gear = -1;
+
+static long long  g_twitch_timer = 0;
+static int        g_twitch_phase = 0;
+
+static bool g_last_estop       = false;
+static bool g_last_machine_on  = true;
+static bool g_last_fault_reset = false;
+static bool g_setup_done       = false;
+
+/* ------------------------------------------------------------------ */
+/* helpers                                                             */
+/* ------------------------------------------------------------------ */
+
+static unsigned build_mask(int left, int right, int center, int left_center)
+{
+    return (left        ? 1u : 0u)
+         | (right       ? 2u : 0u)
+         | (center      ? 4u : 0u)
+         | (left_center ? 8u : 0u);
+}
+
+static bool is_detent(unsigned mask)
+{
+    return (mask == POS_LEFT) || (mask == POS_CENTER) || (mask == POS_RIGHT);
+}
+
+/* Look up the gear that a full 12 bit mask represents, -1 if none. */
+static int gear_from_mask(unsigned mask)
+{
+    int i;
+    for (i = 0; i < NUM_GEARS; i++)
+    {
+        if (g_gear_mask[i] == mask)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/* Quantise a requested rpm to the nearest available gear.  Neutral (index 0)
+ * is never selected as a target, a shift into neutral is not something the
+ * machine ever needs to do automatically. */
+static int gear_from_rpm(double rpm)
+{
+    int i;
+    int best = 1;
+    double best_delta = 1e12;
+
+    for (i = 1; i < NUM_GEARS; i++)
+    {
+        double delta = fabs((double)g_gear_rpm[i] - rpm);
+        /* strict "<" keeps the lower gear when two are equally far away */
+        if (delta < best_delta)
+        {
+            best_delta = delta;
+            best = i;
+        }
+    }
+    return best;
+}
+
+/* Decide in which direction a shaft has to travel to reach "target".
+ * Returns +1 for "towards the right cam switch", -1 for "towards the left".
+ *
+ * Left and right targets are unambiguous.  For a center target the
+ * left-center cam tells us on which side of the center detent we currently
+ * are: it is asserted throughout the left half of the travel. */
+static int direction_to(unsigned current, unsigned target)
+{
+    if (target == POS_RIGHT)
+    {
+        return +1;
+    }
+    if (target == POS_LEFT)
+    {
+        return -1;
+    }
+
+    /* target == POS_CENTER */
+    if (IS_LEFT(current) || IS_LEFT_CENTER(current))
+    {
+        return +1;   /* we are left of center, travel right */
+    }
+    return -1;       /* we are at or right of center, travel left */
+}
+
+/* The end position a shaft runs into when it keeps travelling in "dir". */
+static unsigned end_position(int dir)
+{
+    return (dir > 0) ? POS_RIGHT : POS_LEFT;
+}
+
+static void motors_off(struct __comp_state *__comp_inst)
+{
+    input_velocity    = 0.0;
+    input_enable      = false;
+    input_stage_motor = false;
+
+    midrange_velocity = 0.0;
+    midrange_enable   = false;
+    midrange_motor    = false;
+
+    backgear_velocity = 0.0;
+    backgear_enable   = false;
+    reducer_motor     = false;
+
+    reverse_direction = false;
+    motor_lowspeed    = false;
+}
+
+/* Command one shaft motor.  Only ever one motor runs at a time. */
+static void motor_run(struct __comp_state *__comp_inst, int shaft, int dir,
+                      double duty)
+{
+    int    eff = invert_direction ? -dir : dir;
+    bool   slow;
+    double cmd;
+
+    if (duty < 0.0) duty = 0.0;
+    if (duty > 1.0) duty = 1.0;
+    slow = (duty < motor_velocity);
+
+    cmd = (eff > 0) ? duty : -duty;
+
+    motors_off(__comp_inst);
+
+    switch (shaft)
+    {
+        case SHAFT_INPUT:
+            input_velocity    = cmd;
+            input_enable      = true;
+            input_stage_motor = true;
+            break;
+        case SHAFT_MIDRANGE:
+            midrange_velocity = cmd;
+            midrange_enable   = true;
+            midrange_motor    = true;
+            break;
+        case SHAFT_BACKGEAR:
+            backgear_velocity = cmd;
+            backgear_enable   = true;
+            reducer_motor     = true;
+            break;
+        default:
+            return;
+    }
+
+    /* legacy mirror pins: "reverse" means "travelling towards the left" */
+    reverse_direction = (dir < 0);
+    motor_lowspeed    = slow;
+}
+
+static void twitch_stop(struct __comp_state *__comp_inst)
+{
+    twitch_cw      = false;
+    twitch_ccw     = false;
+    twitch_request = false;
+    g_twitch_timer = 0;
+    g_twitch_phase = 0;
+}
+
+static void twitch_run(struct __comp_state *__comp_inst, long period)
+{
+    if (external_twitch_enable)
+    {
+        /* the spindle component performs the alternating jog itself, we
+         * only have to ask for it */
+        twitch_cw      = false;
+        twitch_ccw     = false;
+        twitch_request = true;
+        return;
+    }
+
+    twitch_request = false;
+
+    g_twitch_timer -= period;
+    if (g_twitch_timer > 0)
+    {
+        return;
+    }
+
+    g_twitch_phase = (g_twitch_phase + 1) & 3;
+    switch (g_twitch_phase)
+    {
+        case 0:
+            twitch_cw = true;  twitch_ccw = false; g_twitch_timer = T_TWITCH_ON;
+            break;
+        case 1:
+            twitch_cw = false; twitch_ccw = false; g_twitch_timer = T_TWITCH_OFF;
+            break;
+        case 2:
+            twitch_cw = false; twitch_ccw = true;  g_twitch_timer = T_TWITCH_ON;
+            break;
+        default:
+            twitch_cw = false; twitch_ccw = false; g_twitch_timer = T_TWITCH_OFF;
+            break;
+    }
+}
+
+static void raise_fault(struct __comp_state *__comp_inst, int code,
+                        const char *text)
+{
+    if (fault_code != 0)
+    {
+        return;   /* keep the first fault */
+    }
+
+    fault_code = code;
+    health_ok  = false;
+    g_state    = GB_FAULT;
+
+    motors_off(__comp_inst);
+    twitch_stop(__comp_inst);
+    start_gear_shift  = false;
+    shift_in_progress = false;
+    spindle_at_speed  = false;
+    target_rpm        = 0;
+
+    if (estop_on_fault)
+    {
+        estop_out = true;
+    }
+
+    rtapi_print_msg(RTAPI_MSG_ERR, "mh400e_gearbox_el7332: fault %d: %s\n", code, text);
+}
+
+static void abort_shift(struct __comp_state *__comp_inst)
+{
+    int i;
+
+    motors_off(__comp_inst);
+    twitch_stop(__comp_inst);
+
+    start_gear_shift  = false;
+    shift_in_progress = false;
+    stop_spindle      = false;
+    target_rpm        = 0;
+
+    g_state        = GB_IDLE;
+    g_shaft_index  = 0;
+    g_delay        = 0;
+    g_spindle_wait = 0;
+    g_target_gear  = -1;
+
+    for (i = 0; i < NUM_SHAFTS; i++)
+    {
+        g_shaft[i].state   = SHAFT_OFF;
+        g_shaft[i].dir     = 0;
+        g_shaft[i].retries = 0;
+        g_shaft[i].elapsed = 0;
+        g_shaft[i].overrun = 0;
+    }
+}
+
+/* Run the currently selected shaft.  Returns TRUE when it has reached its
+ * target and the next shaft may be started. */
+static bool run_shaft(struct __comp_state *__comp_inst, long period, int index)
+{
+    shaft_t *s = &g_shaft[index];
+    long long timeout_ns;
+
+    if (s->state == SHAFT_DONE)
+    {
+        return true;
+    }
+
+    /* nothing to do for this shaft */
+    if ((s->state == SHAFT_OFF) && (s->current == s->target))
+    {
+        s->state = SHAFT_DONE;
+        return true;
+    }
+
+    /* per shaft timeout */
+    s->elapsed += period;
+    timeout_ns = (long long)(stage_timeout * 1e9);
+    if ((timeout_ns > 0) && (s->elapsed > timeout_ns))
+    {
+        rtapi_print_msg(RTAPI_MSG_ERR,
+                        "mh400e_gearbox_el7332: %s did not reach position 0x%x, "
+                        "still at 0x%x\n", s->name, s->target, s->current);
+        raise_fault(__comp_inst, FAULT_STAGE_TIMEOUT,
+                    "shaft did not reach its target position in time");
+        return false;
+    }
+
+    /* wait for a pending settle delay */
+    if (g_delay > 0)
+    {
+        g_delay -= period;
+        return false;
+    }
+
+    switch (s->state)
+    {
+        case SHAFT_OFF:
+            if (s->dir == 0)
+            {
+                if (!is_detent(s->current))
+                {
+                    /* The shaft is parked between two detents.  We still pick
+                     * the most plausible direction; should it turn out to be
+                     * the wrong one, the end position check below stops the
+                     * motor and the move is retried the other way round. */
+                    rtapi_print_msg(RTAPI_MSG_WARN,
+                                    "mh400e_gearbox_el7332: %s is between detents, "
+                                    "mask 0x%x\n", s->name, s->current);
+                }
+                s->dir = direction_to(s->current, s->target);
+            }
+
+            s->state = SHAFT_RUN;
+            /* energise direction first, then the motor, as the original
+             * relay logic did */
+            g_delay = T_SETTLE;
+            return false;
+
+        case SHAFT_RUN:
+            if (s->current == s->target)
+            {
+                /* The cam switch has closed, but the dog clutch is not
+                 * necessarily seated yet.  Keep nudging the shaft for a
+                 * short while at reduced duty.
+                 *
+                 * Only for the left and right positions.  Those are the ends
+                 * of the travel, where the mechanism itself limits how far
+                 * the shaft can go, so a short push simply seats it.  The
+                 * center detent is a narrow window in the middle of the
+                 * travel: overrunning there would push the shaft straight out
+                 * of the window again and the gear would no longer be
+                 * recognised as engaged. */
+                if (overrun_time > 0.0 && s->target != POS_CENTER)
+                {
+                    s->overrun = (long long)(overrun_time * 1e9);
+                    s->state   = SHAFT_OVERRUN;
+                    g_delay    = 0;
+                    return false;
+                }
+                motors_off(__comp_inst);
+                s->state = SHAFT_DONE;
+                g_delay  = T_SETTLE;
+                return true;
+            }
+
+            /* Gear protection: we arrived at an end position that is not
+             * where we wanted to go, so we are travelling the wrong way. */
+            if (is_detent(s->current) &&
+                (s->current == end_position(s->dir)) &&
+                (s->current != s->target))
+            {
+                motors_off(__comp_inst);
+                rtapi_print_msg(RTAPI_MSG_ERR,
+                                "mh400e_gearbox_el7332: %s reached end position "
+                                "0x%x instead of 0x%x, reversing\n",
+                                s->name, s->current, s->target);
+                s->state = SHAFT_RESTART;
+                g_delay  = T_SETTLE;
+                return false;
+            }
+
+            /* Approach a center position slowly so the shaft does not
+             * overshoot the narrow center detent. */
+            motor_run(__comp_inst, index, s->dir,
+                      (s->target == POS_CENTER) ? motor_velocity_slow
+                                                : motor_velocity);
+            g_delay = T_POLL;
+            return false;
+
+        case SHAFT_OVERRUN:
+            s->overrun -= period;
+            if (s->overrun <= 0)
+            {
+                motors_off(__comp_inst);
+                s->state = SHAFT_DONE;
+                g_delay  = T_SETTLE;
+                return true;
+            }
+            motor_run(__comp_inst, index, s->dir, overrun_velocity);
+            return false;
+
+        case SHAFT_RESTART:
+            s->retries++;
+            if (s->retries > max_retries)
+            {
+                raise_fault(__comp_inst, FAULT_RETRIES_EXCEEDED,
+                            "shaft could not be moved to its target position");
+                return false;
+            }
+            s->dir   = -s->dir;
+            s->state = SHAFT_OFF;
+            g_delay  = T_SETTLE;
+            return false;
+
+        default:
+            return true;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* one time setup                                                      */
+/* ------------------------------------------------------------------ */
+
+FUNCTION(setup)
+{
+    int i;
+
+    g_shaft[SHAFT_INPUT].name    = "input stage";
+    g_shaft[SHAFT_MIDRANGE].name = "midrange";
+    g_shaft[SHAFT_BACKGEAR].name = "backgear";
+
+    for (i = 0; i < NUM_SHAFTS; i++)
+    {
+        g_shaft[i].current = 0;
+        g_shaft[i].target  = 0;
+        g_shaft[i].state   = SHAFT_OFF;
+        g_shaft[i].dir     = 0;
+        g_shaft[i].retries = 0;
+        g_shaft[i].elapsed = 0;
+        g_shaft[i].overrun = 0;
+    }
+
+    g_last_estop       = estop_in;
+    g_last_fault_reset = fault_reset;
+}
+
+/* ------------------------------------------------------------------ */
+/* main                                                                */
+/* ------------------------------------------------------------------ */
+
+FUNCTION(_)
+{
+    unsigned mask12;
+    int      current_gear;
+    int      wanted_gear;
+    bool     reset_edge;
+
+    if (!g_setup_done)
+    {
+        setup(__comp_inst, period);
+        g_setup_done = true;
+    }
+
+    /* ---- read the cam switches ------------------------------------ */
+
+    g_shaft[SHAFT_INPUT].current =
+        build_mask(input_left, input_right, input_center, input_left_center);
+    g_shaft[SHAFT_MIDRANGE].current =
+        build_mask(middle_left, middle_right, middle_center, middle_left_center);
+    g_shaft[SHAFT_BACKGEAR].current =
+        build_mask(reducer_left, reducer_right, reducer_center,
+                   reducer_left_center);
+
+    mask12 = (g_shaft[SHAFT_INPUT].current    << 8)
+           | (g_shaft[SHAFT_MIDRANGE].current << 4)
+           |  g_shaft[SHAFT_BACKGEAR].current;
+
+    current_gear = gear_from_mask(mask12);
+    if (current_gear >= 0)
+    {
+        spindle_speed_out = (double)g_gear_rpm[current_gear];
+        current_rpm       = g_gear_rpm[current_gear];
+    }
+    else
+    {
+        /* in between two detents, report 0 rather than a stale value */
+        spindle_speed_out = 0.0;
+        current_rpm       = 0;
+    }
+
+    /* ---- external emergency stop ---------------------------------- */
+
+    if (estop_in)
+    {
+        if (!g_last_estop)
+        {
+            rtapi_print_msg(RTAPI_MSG_ERR,
+                            "mh400e_gearbox_el7332: emergency stop detected\n");
+            abort_shift(__comp_inst);
+            spindle_at_speed = false;
+            estop_out        = false;
+        }
+        g_last_estop = true;
+        return;
+    }
+    g_last_estop = false;
+
+    /* ---- fault acknowledge ---------------------------------------- */
+
+    reset_edge         = (fault_reset && !g_last_fault_reset);
+    g_last_fault_reset = fault_reset;
+
+    if (reset_edge && (fault_code != 0))
+    {
+        fault_code = 0;
+        health_ok  = true;
+        estop_out  = false;
+        abort_shift(__comp_inst);
+    }
+
+    if (g_state == GB_FAULT)
+    {
+        spindle_at_speed = false;
+        return;
+    }
+
+    /* ---- machine off ----------------------------------------------
+     * Nothing may move while the machine is off.  A shift that was running
+     * is dropped rather than paused: the shaft positions are read back from
+     * the cam switches anyway, so the next request simply starts over from
+     * wherever the gearbox now stands.  Reading the cam switches and
+     * reporting the engaged gear continues, which keeps the status panel
+     * alive with the machine off. */
+
+    if (!machine_on)
+    {
+        if (g_last_machine_on)
+        {
+            abort_shift(__comp_inst);
+        }
+        else
+        {
+            motors_off(__comp_inst);
+            twitch_stop(__comp_inst);
+        }
+        g_last_machine_on = false;
+        spindle_at_speed  = false;
+        return;
+    }
+    g_last_machine_on = true;
+
+    /* ---- idle: is a gear change required? -------------------------- */
+
+    if (g_state == GB_IDLE)
+    {
+        if (stop_spindle)
+        {
+            stop_spindle = false;
+        }
+
+        /* A speed request of zero is "spindle off", not "shift to neutral".
+         * Keep the gear that is currently engaged. */
+        if (spindle_speed_in_abs < 1.0)
+        {
+            spindle_at_speed = !spindle_stopped;
+            target_rpm       = 0;
+            return;
+        }
+
+        wanted_gear = gear_from_rpm(spindle_speed_in_abs);
+
+        if ((current_gear >= 0) && (wanted_gear == current_gear))
+        {
+            spindle_at_speed = !spindle_stopped;
+            target_rpm       = 0;
+            return;
+        }
+
+        /* a gear change is required */
+        g_target_gear     = wanted_gear;
+        target_rpm        = g_gear_rpm[wanted_gear];
+        spindle_at_speed  = false;
+        shift_in_progress = true;
+
+        g_shaft[SHAFT_BACKGEAR].target =  g_gear_mask[wanted_gear]        & 0xfu;
+        g_shaft[SHAFT_MIDRANGE].target = (g_gear_mask[wanted_gear] >> 4)  & 0xfu;
+        g_shaft[SHAFT_INPUT].target    = (g_gear_mask[wanted_gear] >> 8)  & 0xfu;
+
+        g_state        = GB_WAIT_SPINDLE;
+        g_spindle_wait = 0;
+        /* fall through into GB_WAIT_SPINDLE below */
+    }
+
+    /* ---- wait for the spindle to come to a stop -------------------- */
+
+    if (g_state == GB_WAIT_SPINDLE)
+    {
+        /* The operator withdrew the speed request, for example by switching
+         * the machine off and on again.  Drop the pending shift instead of
+         * waiting forever. */
+        if (spindle_speed_in_abs < 1.0)
+        {
+            abort_shift(__comp_inst);
+            return;
+        }
+
+        stop_spindle     = true;
+        spindle_at_speed = false;
+
+        if (!spindle_stopped)
+        {
+            g_spindle_wait += period;
+            if ((spindle_stop_timeout > 0.0) &&
+                (g_spindle_wait > (long long)(spindle_stop_timeout * 1e9)))
+            {
+                raise_fault(__comp_inst, FAULT_SPINDLE_TIMEOUT,
+                            "spindle did not come to a stop");
+            }
+            return;
+        }
+
+        /* spindle stands still, begin the shift */
+        start_gear_shift = true;
+        g_delay          = T_SETTLE;
+        g_shaft_index    = 0;
+        g_state          = GB_BEGIN;
+        return;
+    }
+
+    /* ---- settle after raising start-gear-shift --------------------- */
+
+    if (g_state == GB_BEGIN)
+    {
+        g_delay -= period;
+        if (g_delay > 0)
+        {
+            return;
+        }
+        g_delay = 0;
+        g_state = GB_SHIFT;
+        return;
+    }
+
+    /* ---- work through the three shafts ----------------------------- */
+
+    if (g_state == GB_SHIFT)
+    {
+        /* Note: "spindle-stopped" is deliberately not policed here.  During a
+         * gear shift the spindle is being twitched on purpose so the dog
+         * clutches can mesh, which makes the spindle turn. */
+        twitch_run(__comp_inst, period);
+
+        if (run_shaft(__comp_inst, period, g_shaft_index))
+        {
+            g_shaft_index++;
+            if (g_shaft_index >= NUM_SHAFTS)
+            {
+                g_state = GB_FINISH;
+            }
+        }
+        return;
+    }
+
+    /* ---- release everything ---------------------------------------- */
+
+    if (g_state == GB_FINISH)
+    {
+        motors_off(__comp_inst);
+        twitch_stop(__comp_inst);
+
+        start_gear_shift  = false;
+        shift_in_progress = false;
+        stop_spindle      = false;
+        target_rpm        = 0;
+
+        g_state       = GB_IDLE;
+        g_shaft_index = 0;
+        g_delay       = 0;
+        g_target_gear = -1;
+
+        {
+            int i;
+            for (i = 0; i < NUM_SHAFTS; i++)
+            {
+                g_shaft[i].state   = SHAFT_OFF;
+                g_shaft[i].dir     = 0;
+                g_shaft[i].retries = 0;
+                g_shaft[i].elapsed = 0;
+                g_shaft[i].overrun = 0;
+            }
+        }
+
+        spindle_at_speed = false;   /* the spindle still has to spin up */
+        return;
+    }
+}

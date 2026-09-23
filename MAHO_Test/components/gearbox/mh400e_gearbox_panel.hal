@@ -1,0 +1,92 @@
+# ---------------------------------------------------------------------------
+# MAHO MH400E gearbox status panel
+#
+# components/gearbox/mh400e_gearbox_panel.hal
+#
+# This file is NOT listed as a HALFILE.  It is handed to gladevcp with -H,
+# exactly like the FC302 status page, so the panel and its HAL connections
+# come up together and there is no race against POSTGUI_HALFILE.
+#
+# Switch the whole panel on and off by commenting out these lines in the INI:
+#
+#   [DISPLAY]
+#   EMBED_TAB_NAME    = Getriebe
+#   EMBED_TAB_COMMAND = gladevcp -c mh400e_gearbox_panel -x {XID} \
+#                       -u components/gearbox/mh400e_gearbox_panel.py \
+#                       -H components/gearbox/mh400e_gearbox_panel.hal \
+#                       components/gearbox/mh400e_gearbox_panel.ui
+#
+# Nothing else in the configuration refers to the panel, so commenting those
+# lines out is enough.  Make sure no leftover standalone "gladevcp -c
+# mh400e_gearbox_panel" is running, it would hold the component name and the
+# embedded tab could not create it.
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# gear status
+# ---------------------------------------------------------------------------
+
+net gb-current-rpm  => mh400e_gearbox_panel.current-rpm-in
+net gb-target-rpm   => mh400e_gearbox_panel.target-rpm-in
+net gb-fault-code   => mh400e_gearbox_panel.fault-code-in
+net gb-shifting     => mh400e_gearbox_panel.shift-active
+
+# gb-health is created in mh400e_gearbox.hal, we only add a sink
+net gb-health                                               => mh400e_gearbox_panel.health-ok
+
+# ---------------------------------------------------------------------------
+# cam switches
+# all signals below are created in mh400e_gearbox.hal, these are extra sinks
+# ---------------------------------------------------------------------------
+
+net gb-in-left      => mh400e_gearbox_panel.in-left
+net gb-in-center    => mh400e_gearbox_panel.in-center
+net gb-in-right     => mh400e_gearbox_panel.in-right
+net gb-in-lcenter   => mh400e_gearbox_panel.in-lcenter
+
+net gb-mid-left     => mh400e_gearbox_panel.mid-left
+net gb-mid-center   => mh400e_gearbox_panel.mid-center
+net gb-mid-right    => mh400e_gearbox_panel.mid-right
+net gb-mid-lcenter  => mh400e_gearbox_panel.mid-lcenter
+
+net gb-back-left    => mh400e_gearbox_panel.back-left
+net gb-back-center  => mh400e_gearbox_panel.back-center
+net gb-back-right   => mh400e_gearbox_panel.back-right
+net gb-back-lcenter => mh400e_gearbox_panel.back-lcenter
+
+# ---------------------------------------------------------------------------
+# shaft motors
+# ---------------------------------------------------------------------------
+
+net gb-in-vel       => mh400e_gearbox_panel.in-vel
+net gb-in-en        => mh400e_gearbox_panel.in-motor
+
+net gb-mid-vel      => mh400e_gearbox_panel.mid-vel
+net gb-mid-en       => mh400e_gearbox_panel.mid-motor
+
+net gb-back-vel     => mh400e_gearbox_panel.back-vel
+net gb-back-en      => mh400e_gearbox_panel.back-motor
+
+# ---------------------------------------------------------------------------
+# spindle interface
+# ---------------------------------------------------------------------------
+
+net fc302-spdl-stopped  => mh400e_gearbox_panel.spdl-stopped
+net gb-twitch-request   => mh400e_gearbox_panel.tw-request
+
+net gb-stop-spindle  => mh400e_gearbox_panel.spdl-stop-req
+net gb-at-speed      => mh400e_gearbox_panel.spdl-at-speed
+
+# external-twitch-enable is carried by the signal gb-ext-twitch, created in
+# mh400e_gearbox.hal, so this LED shows the real value of the component pin.
+net gb-ext-twitch   => mh400e_gearbox_panel.tw-external
+
+# ---------------------------------------------------------------------------
+# legacy relay-style outputs
+# ---------------------------------------------------------------------------
+
+net gb-lg-start     mh400e-gearbox-el7332.start-gear-shift  => mh400e_gearbox_panel.lg-start
+net gb-lg-reverse   mh400e-gearbox-el7332.reverse-direction => mh400e_gearbox_panel.lg-reverse
+net gb-lg-lowspeed  mh400e-gearbox-el7332.motor-lowspeed    => mh400e_gearbox_panel.lg-lowspeed
+net gb-lg-tw-cw     mh400e-gearbox-el7332.twitch-cw         => mh400e_gearbox_panel.lg-tw-cw
+net gb-lg-tw-ccw    mh400e-gearbox-el7332.twitch-ccw        => mh400e_gearbox_panel.lg-tw-ccw
