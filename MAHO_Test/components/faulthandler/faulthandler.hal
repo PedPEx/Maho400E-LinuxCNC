@@ -1,5 +1,5 @@
-loadrt faultlatch count=54
-loadrt and2 count=17
+loadrt faultlatch count=56
+loadrt and2 count=18
 
 addf faultlatch.0 servo-thread
 addf faultlatch.1 servo-thread
@@ -55,6 +55,8 @@ addf faultlatch.50 servo-thread
 addf faultlatch.51 servo-thread
 addf faultlatch.52 servo-thread
 addf faultlatch.53 servo-thread
+addf faultlatch.54 servo-thread
+addf faultlatch.55 servo-thread
 
 addf and2.0 servo-thread
 addf and2.1 servo-thread
@@ -73,6 +75,7 @@ addf and2.13 servo-thread
 addf and2.14 servo-thread
 addf and2.15 servo-thread
 addf and2.16 servo-thread
+addf and2.17 servo-thread
 
 ### Slaves Online AND in OP
 ## Slave 0
@@ -160,34 +163,41 @@ setp faultlatch.45.id 121
 net startup-gate faultlatch.45.inhibit
 #net gate-el2809 faultlatch.45.fault-interlock => faultlatch.15.inhibit
 ## Slave 12
+net el2024-oper      lcec.m0.EL2024.slave-oper     => and2.17.in0
+net el2024-online    lcec.m0.EL2024.slave-online   => and2.17.in1
+net el2024-ready     and2.17.out                   => faultlatch.55.monitor
+setp faultlatch.55.id 121
+net startup-gate faultlatch.55.inhibit
+#net gate-el2024 faultlatch.55.fault-interlock => faultlatch.15.inhibit
+## Slave 13
 net el4034-oper      lcec.m0.EL4034.slave-oper     => and2.12.in0
 net el4034-online    lcec.m0.EL4034.slave-online   => and2.12.in1
 net el4034-ready     and2.12.out                   => faultlatch.46.monitor
 setp faultlatch.46.id 122
 net startup-gate faultlatch.46.inhibit
 #net gate-el4034 faultlatch.46.fault-interlock => faultlatch.15.inhibit
-## Slave 13
+## Slave 14
 net el9110-Mot-oper    lcec.m0.EL9110-Mot.slave-oper   => and2.13.in0
 net el9110-Mot-online  lcec.m0.EL9110-Mot.slave-online => and2.13.in1
 net el9110-Mot-ready   and2.13.out                   => faultlatch.47.monitor
 setp faultlatch.47.id 123
 net startup-gate faultlatch.47.inhibit
 #net gate-el9110-Mot faultlatch.47.fault-interlock => faultlatch.15.inhibit
-## Slave 14
+## Slave 15
 net el7332-0-oper    lcec.m0.EL7332-0.slave-oper   => and2.14.in0
 net el7332-0-online  lcec.m0.EL7332-0.slave-online => and2.14.in1
 net el7332-0-ready   and2.14.out                   => faultlatch.48.monitor
 setp faultlatch.48.id 124
 net startup-gate faultlatch.48.inhibit
 #net gate-el7332-0 faultlatch.48.fault-interlock => faultlatch.15.inhibit
-## Slave 15
+## Slave 16
 net el7332-1-oper    lcec.m0.EL7332-1.slave-oper   => and2.15.in0
 net el7332-1-online  lcec.m0.EL7332-1.slave-online => and2.15.in1
 net el7332-1-ready   and2.15.out                   => faultlatch.49.monitor
 setp faultlatch.49.id 125
 net startup-gate faultlatch.49.inhibit
 #net gate-el7332-1 faultlatch.49.fault-interlock => faultlatch.15.inhibit
-## Slave 16
+## Slave 17
 net fc302-oper       lcec.m0.FC302.slave-oper      => and2.16.in0
 net fc302-online     lcec.m0.FC302.slave-online    => and2.16.in1
 net fc302-ready      and2.16.out                   => faultlatch.50.monitor
@@ -350,6 +360,11 @@ setp faultlatch.53.id 640
 net startup-gate faultlatch.53.inhibit
 #   monitor <= mh400e-spindle-master.health-ok   (wired in components/spindle/mh400e_spindle_master.hal)
 
+# ----- ID 641  [info]  Spindel gesperrt: Werkzeugwechsel laeuft  (faultlatch.54) -----
+setp faultlatch.54.id 641
+net startup-gate faultlatch.54.inhibit
+#   monitor <= mh400e-spindle-master.toolchange-ok   (wired in components/spindle/mh400e_spindle_master.hal)
+
 # ----- Acknowledge button to every instance (falling edge = ack) -----
 # NOTE: if the button reads HIGH when pressed, the falling edge is on
 #       RELEASE. Invert din-1 (or use the NC contact) for clear-on-press.
@@ -408,3 +423,5 @@ net ack-btn faultlatch.50.error-ack
 net ack-btn faultlatch.51.error-ack
 net ack-btn faultlatch.52.error-ack
 net ack-btn faultlatch.53.error-ack
+net ack-btn faultlatch.54.error-ack
+net ack-btn faultlatch.55.error-ack

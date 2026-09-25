@@ -99,6 +99,14 @@
     },
     {
       "position": 12,
+      "name": "EL2024 4K. Dig. Ausgang 24V, 2A",
+      "vendor": "0x2",
+      "product": "0x7e83052",
+      "revision": "0x130000",
+      "optional": false
+    },
+    {
+      "position": 13,
       "name": "EL4034 4K. Ana. Ausgang +/-10V, 12bit",
       "vendor": "0x2",
       "product": "0xfc23052",
@@ -106,19 +114,11 @@
       "optional": false
     },
     {
-      "position": 13,
+      "position": 14,
       "name": "EL9110 Einspeiseklemme mit LED (24V, Diagnose)",
       "vendor": "0x2",
       "product": "0x23963052",
       "revision": "0x120000",
-      "optional": false
-    },
-    {
-      "position": 14,
-      "name": "EL7332 2K. DC-Motor-Endstufe (24V, 1.5A)",
-      "vendor": "0x2",
-      "product": "0x1ca43052",
-      "revision": "0x180000",
       "optional": false
     },
     {
@@ -131,6 +131,14 @@
     },
     {
       "position": 16,
+      "name": "EL7332 2K. DC-Motor-Endstufe (24V, 1.5A)",
+      "vendor": "0x2",
+      "product": "0x1ca43052",
+      "revision": "0x180000",
+      "optional": false
+    },
+    {
+      "position": 17,
       "name": "FC-302 VLT\ufffd Automation Drive",
       "vendor": "0x200008d",
       "product": "0x64",

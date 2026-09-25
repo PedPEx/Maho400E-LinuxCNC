@@ -23,6 +23,13 @@
 #   fc302-spindle.twitch directly and that brings the power stage up on its
 #   own, without activate.
 #
+# CONTROLLED RAMP-DOWN BEFORE THE BRAKE (M5 and machine-off):
+#   The component no longer coasts on a normal stop.  It holds the drive in
+#   OPERATION ENABLED with a zero setpoint so the FC302 ramps the motor down
+#   over par 3-42, the brake resistor takes the energy and the FC302 closes the
+#   mechanical brake at standstill (par 2-21).  Only then is the power stage
+#   released.  See the "enable" wiring note below for the machine-off case.
+#
 # Remember: halcompile turns underscores into hyphens for HAL names, so the
 # module is loaded as fc302_spindle but addressed as fc302-spindle.
 # ============================================================================
@@ -56,23 +63,53 @@ net fc302-t-heatsink lcec.m0.FC302.Infos-RO.heatsink-temp          => fc302-spin
 net fc302-t-motor    lcec.m0.FC302.Infos-RO.kty-temperature        => fc302-spindle.motor-temp
 
 # ===========================================================================
-# Machine state and acknowledge
+# Machine state, hard release (enable) and acknowledge
 #
-# machine-on gates ALL drive-side faults (3..5 temperatures, 6 CiA402 FAULT,
-# 7 not remote).  With the machine off the safety logic holds STO low, the
-# FC302 sits in FAULT legitimately and the feedback PDOs are not valid yet -
-# none of that must latch here.  On the rising edge the component also sends
-# one fault reset to the drive (auto-fault-reset).
+# machine-on gates the run request and ALL drive-side faults (3..5
+# temperatures, 6 CiA402 FAULT, 7 not remote).  With the machine off the safety
+# logic holds STO low, the FC302 sits in FAULT legitimately and the feedback
+# PDOs are not valid yet - none of that must latch here.  On the rising edge
+# the component also sends one fault reset to the drive (auto-fault-reset).
 #
-# enable    -> drive up to SWITCHED ON, power stage still off
-# machine-on-> fault evaluation window
+#   machine-on -> run request + fault evaluation window
+#   enable     -> hard power release (STO permit): drive up to SWITCHED ON
+#
+# ---------------------------------------------------------------------------
+# enable = HARD RELEASE / STO PERMIT.  READ THIS - it decides machine-off:
+#
+#   For the controlled ramp-down to also work on machine-off (F2), the drive
+#   must stay electrically enabled through the ramp.  That means "enable" must
+#   come from a signal that is TRUE except on Not-Halt (the STO-OK / safe
+#   torque-on feedback from the TwinSAFE logic), NOT from machine-on.  On
+#   Not-Halt that signal drops, the component disables voltage at once and the
+#   hardwired brake closes immediately - which is exactly what a Not-Halt
+#   should do.
+#
+#   To sequence the machine-off / STO drop behind the ramp-down, gate the
+#   power-down on fc302-spindle.stopping being FALSE (and spindle-stopped
+#   TRUE) in the safety / shutdown logic.
+#
+#   COMMISSIONING DEFAULT below ties enable to machine-is-on.  With that,
+#   M5 ramps down correctly (machine stays on), but machine-off will COAST,
+#   because enable drops together with machine-on.  Replace the default line
+#   with your STO-OK signal to get the ramp-down on machine-off as well:
+#
+#       net safe-sto-ok  <your-twinsafe-sto-ok-pin>  => fc302-spindle.enable
+#
+#   and delete the "net machine-is-on => fc302-spindle.enable" line.
+# ---------------------------------------------------------------------------
 #
 # 'machine-is-on' is sourced by halui.machine.is-on in 3Axes_conf.hal and
-# 'ack-btn' by the acknowledge button, so all three lines are pure SINKS here
+# 'ack-btn' by the acknowledge button, so those lines are pure SINKS here
 # - do not add a source pin.
 # ===========================================================================
 net machine-is-on  => fc302-spindle.machine-on
+
+# Commissioning default: enable = machine-is-on (M5 ramps, machine-off coasts).
+# See the note above to switch this to your STO-OK signal for ramp-down on
+# machine-off too.
 net machine-is-on  => fc302-spindle.enable
+
 net ack-btn        => fc302-spindle.fault-reset
 
 # ===========================================================================
@@ -101,6 +138,12 @@ net fc302-at-speed     fc302-spindle.at-speed
 # with no writer, stays FALSE forever, and the gearbox runs into its
 # "spindle did not come to a stop" fault on every single gear change.
 net fc302-spdl-stopped fc302-spindle.spindle-stopped
+
+# Controlled ramp-down in progress (after M5 / machine-off, before the power
+# stage is released).  Exposed so the shutdown / safety logic can hold the
+# machine-off or STO drop until the spindle has come to a stop.  Left as a
+# pure source here; add sinks (e.g. a shutdown gate) where needed.
+net fc302-spdl-stopping fc302-spindle.stopping
 
 # Twitch phase, for the status panel.
 net fc302-tw-active    fc302-spindle.twitch-active
@@ -135,11 +178,24 @@ net fc302-spindle-health  fc302-spindle.health-ok  => faultlatch.51.monitor
 # ===========================================================================
 # Tuning (defaults shown as comments)
 # ===========================================================================
-setp fc302-spindle.rpm-settle-time-s      10.0
+setp fc302-spindle.rpm-settle-time-s      15.0
 # setp fc302-spindle.stopped-rpm           10.0
-# setp fc302-spindle.stopped-delay-s        2.0
+setp fc302-spindle.stopped-delay-s        0.5
 # setp fc302-spindle.fault-eval-delay-s     2.0
 # setp fc302-spindle.auto-fault-reset          1
+
+# ---- Controlled ramp-down before the brake ----
+# brake-rampdown = 1 (default): a normal stop keeps the drive in OPERATION
+# ENABLED with a zero setpoint so it ramps down over par 3-42, the resistor
+# takes the energy and the FC302 closes the brake at standstill (par 2-21).
+# Set the SOFTNESS of the ramp in the drive at par 3-42.  Set to 0 to restore
+# the old immediate coast stop.
+# setp fc302-spindle.brake-rampdown            1
+
+# Safety cap: release the power stage after this long even if standstill is not
+# reported (missing feedback / STO cut).  Must cover the ramp-down from top
+# speed set in par 3-42.
+setp fc302-spindle.stop-ramp-timeout-s   10.0
 
 # How long spindle-stopped keeps reporting standstill after twitch drops.
 # Must cover the coast-down, otherwise the gearbox waits for it before the
@@ -162,3 +218,5 @@ setp fc302-spindle.motor-temp-max       120.0
 setp fc302-spindle.twitch-speed     75.0
 setp fc302-spindle.twitch-cw-time    1
 setp fc302-spindle.twitch-ccw-time   1
+
+net spindle-stopped fc302-spindle.spindle-standstill

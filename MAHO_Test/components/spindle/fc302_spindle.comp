@@ -19,6 +19,9 @@
  *   - Supervision: commanded speed actually reached, drive/motor temperatures,
  *     optional torque (overload / blocked gearbox) limit
  *   - spindle-stopped generation from the REAL feedback speed
+ *   - Controlled ramp-down to standstill before the power stage is released on
+ *     a normal stop, so the mechanical brake never closes on a turning rotor
+ *     (see below)
  *
  * Why the drive state machine lives here:
  *   cia402.0 offers only .enable (-> OPERATION ENABLED).  Holding the drive at
@@ -36,9 +39,34 @@
  *   original relay based gearbox component.  The power stage therefore runs
  *   when the drive is enabled AND either activate OR twitch is asserted:
  *
- *       power stage = enable && (activate || twitch)
+ *       power stage = enable && machine-on && (activate || twitch)
  *
- *   "enable" stays the hard release: without machine-on (F2) nothing turns.
+ *   "enable" stays the hard release: without it (STO / Not-Halt) nothing turns.
+ *
+ * Controlled ramp-down to standstill (brake handling):
+ *   The FC302 switches its mechanical brake (relay on output 27) with its own
+ *   par 2-2x logic, which closes the brake at standstill (par 2-21) ONLY while
+ *   the drive is actively ramping the motor down.  A plain stop that jumps to
+ *   SWITCHED ON removes the output voltage, the motor coasts, and the brake
+ *   then closes on a still turning rotor while the brake resistor never
+ *   engages (no active ramp -> no regen -> chopper stays idle).
+ *
+ *   To avoid this, a normal stop (M5 drops activate, or machine-off drops
+ *   machine-on) does NOT release the power stage straight away.  The drive is
+ *   held in OPERATION ENABLED with a zero speed setpoint, so it ramps the
+ *   motor down over par 3-42, the brake resistor dissipates the energy and the
+ *   FC302 closes the brake at standstill (par 2-21).  Only once the REAL
+ *   feedback speed reports standstill, or stop-ramp-timeout-s expires, is the
+ *   power stage released to SWITCHED ON.  Set brake-rampdown to 0 to restore
+ *   the old immediate coast stop.
+ *
+ *   Ramp-down needs the drive to stay electrically enabled, i.e. "enable"
+ *   (STO permit) must remain TRUE through the ramp.  Wire "enable" to the
+ *   safety STO-OK signal (TRUE except on Not-Halt), NOT to machine-on, if the
+ *   ramp-down is also wanted on machine-off.  Not-Halt drops "enable", which
+ *   disables voltage at once (coast) and lets the hardwired brake close
+ *   immediately - exactly the intended emergency behaviour, and independent of
+ *   this component.
  *
  * spindle-stopped during twitching:
  *   The gearbox waits for spindle-stopped before it starts a shift, and the
@@ -47,6 +75,11 @@
  *   whole coast-down.  spindle-stopped therefore means "the spindle is not
  *   running under a speed command": it is held TRUE while twitch is asserted
  *   and for twitch-settle-time-s afterwards, and is honest at all other times.
+ *
+ *   spindle-standstill is the second, unconditioned answer: it reports the
+ *   real feedback speed at all times.  Anything that must not act on a moving
+ *   spindle - the tool clamp above all - uses that one.  The controlled
+ *   ramp-down below also ends on spindle-standstill, never on the held pin.
  *
  * Supervision rationale:
  *   With a gear not properly engaged the FC302 was observed pushing ~7 A at
@@ -81,14 +114,15 @@
  *   measurement yet" and never raises a fault.
  *
  * On any fault the speed setpoint is forced to 0 and the drive is dropped back
- * to SWITCHED ON (power stage off).  The fault latches until fault-reset.
+ * to SWITCHED ON (power stage off).  A fault does NOT ramp down; it is an
+ * abnormal stop.  The fault latches until fault-reset.
  *
  * Author: Patrick
  * License: GPL
  */
 
 component fc302_spindle
-    "MAHO MH400E spindle drive control for Danfoss FC302: CiA402 state machine, twitching, speed and thermal supervision";
+    "MAHO MH400E spindle drive control for Danfoss FC302: CiA402 state machine, twitching, speed and thermal supervision, controlled ramp-down before brake";
 author "Patrick";
 license "GPL";
 
@@ -97,19 +131,19 @@ license "GPL";
  * ====================================================================== */
 
 pin in bit enable = 0
-    "Bring the drive up to SWITCHED ON: mains applied, drive ready, power stage still OFF. FALSE disables voltage. This is the hard release for both activate and twitch.";
+    "Hard power release / STO permit: brings the drive up to SWITCHED ON (mains applied, power stage off). Must stay TRUE for a controlled ramp-down to be possible, and MUST drop on Not-Halt, where the drive disables voltage at once and the hardwired brake closes. Wire to the safety STO-OK (not-Not-Halt) signal for ramp-down on machine-off; tying it to machine-on makes machine-off coast instead.";
 
 pin in bit activate = 0
-    "Bring the drive to OPERATION ENABLED: power stage active and following the speed setpoint. Requires enable.";
+    "Bring the drive to OPERATION ENABLED: power stage active and following the speed setpoint. Requires enable and machine-on.";
 
 pin in bit twitch = 0
-    "Twitch mode for the gearbox. While TRUE the speed-cmd input is ignored and the spindle is jogged alternately CW/CCW at twitch-speed. Activates the power stage on its own (requires enable, but NOT activate), because a gear shift happens while no MDI speed request is pending.";
+    "Twitch mode for the gearbox. While TRUE the speed-cmd input is ignored and the spindle is jogged alternately CW/CCW at twitch-speed. Activates the power stage on its own (requires enable and machine-on, but NOT activate), because a gear shift happens while no MDI speed request is pending.";
 
 pin in bit fault_reset = 0
     "Rising edge clears a latched fault and, if the drive itself is in CiA402 FAULT state, issues a fault reset to it.";
 
 pin in bit machine_on = 0
-    "Machine is switched on (F2). Drive-side faults (temperatures, CiA402 FAULT, not-in-remote) are only evaluated while this is TRUE and the startup grace period has elapsed. With the machine off the safety logic keeps STO low and the FC302 legitimately reports FAULT, and the feedback PDOs are not yet valid, which must not latch here.";
+    "Machine is switched on (F2). Gates the run request and all drive-side faults (temperatures, CiA402 FAULT, not-in-remote), which are only evaluated while this is TRUE and the startup grace period has elapsed. When it drops while the spindle turns and enable is still present, a controlled ramp-down is performed before the power stage is released. With the machine off the safety logic keeps STO low and the FC302 legitimately reports FAULT, and the feedback PDOs are not yet valid, which must not latch here.";
 
 /* ======================================================================
  * Speed inputs
@@ -181,6 +215,12 @@ pin out bit at_speed = 0
 pin out bit spindle_stopped = 0
     "TRUE once the absolute feedback speed has stayed below stopped-rpm for longer than stopped-delay-s. Held TRUE while twitch is asserted and for twitch-settle-time-s afterwards, so the gearbox is not blocked by the jog it asked for itself, nor by the coast-down that follows it.";
 
+pin out bit spindle_standstill = 0
+    "Honest standstill: TRUE only while the absolute feedback speed has really stayed below stopped-rpm for longer than stopped-delay-s. Unlike spindle-stopped this is NOT held during twitching, so it stays FALSE whenever the spindle actually turns. Use this for anything that must not act on a moving spindle - the tool clamp above all.";
+
+pin out bit stopping = 0
+    "TRUE while the drive is doing a controlled ramp-down to standstill after a normal stop (M5 or machine-off), before the power stage is released. Use it to sequence a machine-off / STO drop behind the spindle standstill so the shutdown also waits for the ramp-down.";
+
 pin out bit twitch_active = 0
     "TRUE while the power stage is running because of twitch rather than activate.";
 
@@ -202,6 +242,12 @@ pin out bit health_ok = 0
 /* ======================================================================
  * Parameters
  * ====================================================================== */
+
+param rw bit brake_rampdown = 1
+    "When TRUE a normal stop keeps the drive in OPERATION ENABLED with a zero setpoint so it ramps the motor down (par 3-42), the brake resistor dissipates the energy and the FC302 closes the mechanical brake at standstill (par 2-21); the power stage is released only once the spindle stands still or stop-ramp-timeout-s expires. FALSE restores the immediate coast stop.";
+
+param rw float stop_ramp_timeout_s = 10.0
+    "Safety cap for the controlled ramp-down: if standstill is not reached within this time (e.g. missing feedback, STO cut) the power stage is released anyway. Must cover the longest ramp-down from top speed.";
 
 param rw float rpm_settle_time_s = 5.0
     "Time in seconds the drive may report target-not-reached (status word bit 10 clear) while a speed is commanded, before fault 1 is raised. Must cover the drive ramp.";
@@ -276,7 +322,9 @@ option singleton yes;
  *   bit4 rfg-enable, bit5 rfg-unfreeze, bit6 rfg-use-ref
  * Without them the ramp generator stays disabled and the drive ignores the
  * velocity reference, so the motor would not turn even in OPERATION ENABLED.
- * They are therefore sent together with the Enable Operation command. */
+ * They are therefore sent together with the Enable Operation command.  Keeping
+ * them set with a zero reference is exactly what lets the drive ramp down to
+ * standstill during the controlled stop. */
 #define CIA_VL_RFG_BITS         0x0070      /* rfg enable | unfreeze | use ref */
 
 #define CIA_CMD_DISABLE_VOLTAGE 0x0000
@@ -299,6 +347,9 @@ static bool  g_last_reset    = false;/* fault-reset edge detection         */
 static bool  g_reset_pending = false;/* fault reset must be sent to drive  */
 static bool  g_last_machine  = false;/* machine-on edge detection          */
 static long  g_machine_timer = 0;    /* ns since machine-on went TRUE      */
+static bool  g_stopping      = false;/* controlled ramp-down to standstill */
+static long  g_stop_timer    = 0;    /* ns spent in the ramp-down          */
+static bool  g_prev_op       = false;/* operation was requested last cycle */
 
 /* ======================================================================
  * Helpers
@@ -455,6 +506,20 @@ static void update_spindle_stopped(struct __comp_state *__comp_inst,
     if (hold_ns < 0)
         hold_ns = 0;
 
+    /* ---- the honest answer first, it is never held ---- */
+    if (fb_abs < stopped_rpm)
+    {
+        if (g_stopped_timer < delay_ns)
+            g_stopped_timer += period;
+        spindle_standstill = (g_stopped_timer >= delay_ns);
+    }
+    else
+    {
+        g_stopped_timer    = 0;
+        spindle_standstill = false;
+    }
+
+    /* ---- spindle-stopped adds the twitch hold on top ---- */
     if (twitch)
     {
         g_twitch_hold = hold_ns;
@@ -466,29 +531,7 @@ static void update_spindle_stopped(struct __comp_state *__comp_inst,
             g_twitch_hold = 0;
     }
 
-    if (twitch || g_twitch_hold > 0)
-    {
-        /* Keep the standstill timer primed so that spindle-stopped does not
-         * drop out for one cycle when the hold expires while the spindle has
-         * already come to rest. */
-        g_stopped_timer = delay_ns;
-        spindle_stopped = true;
-        return;
-    }
-
-    if (fb_abs < stopped_rpm)
-    {
-        if (g_stopped_timer < delay_ns)
-            g_stopped_timer += period;
-
-        if (g_stopped_timer >= delay_ns)
-            spindle_stopped = true;
-    }
-    else
-    {
-        g_stopped_timer = 0;
-        spindle_stopped = false;
-    }
+    spindle_stopped = spindle_standstill || twitch || (g_twitch_hold > 0);
 }
 
 /* Temperature limits.  These are compared directly; the heatsink and motor
@@ -546,7 +589,7 @@ static void check_load(struct __comp_state *__comp_inst, long period,
      *
      * Skipped while twitching (the spindle deliberately reverses) and while no
      * speed is commanded (a 0 setpoint with the spindle still turning is a
-     * normal coast-down, not a fault). */
+     * normal ramp-down / coast, not a fault). */
     if (!drive_active || twitch || sp_abs < 1.0f)
     {
         g_settle_timer = 0;
@@ -647,29 +690,70 @@ FUNCTION(_)
         }
     }
 
-    /* ---- decide whether the power stage may run ----
-     * Twitching needs the power stage just as much as a normal speed request
-     * does, and it happens exactly when no MDI request is pending, so it
-     * activates the drive on its own.  "enable" remains the hard release.
-     * A latched fault drops the drive back to SWITCHED ON: mains stay applied
-     * so the drive can be reset quickly, but the motor is no longer driven. */
+    /* ---- decide whether the power stage may run, with a controlled
+     *      ramp-down to standstill before the stage is released ----
+     *
+     * A normal stop (M5 drops activate, or machine-off drops machine-on) must
+     * not jump straight to SWITCHED ON: that removes the output voltage, the
+     * motor coasts, the FC302 closes its mechanical brake (output 27, par
+     * 2-2x) on a still turning rotor and the brake resistor never engages.
+     *
+     * Instead the drive is held in OPERATION ENABLED with a zero speed
+     * setpoint. It then ramps the motor down over par 3-42, the brake resistor
+     * dissipates the energy and the FC302 closes the brake at standstill (par
+     * 2-21). Only once the real feedback speed reports standstill, or
+     * stop-ramp-timeout-s expires, is the power stage released to SWITCHED ON.
+     *
+     * enable is the hard release (STO permit): it MUST stay TRUE for a ramp to
+     * be physically possible, and it MUST drop on Not-Halt. When it drops the
+     * drive goes to DISABLE_VOLTAGE at once (coast) and the hardwired brake
+     * closes immediately - the intended Not-Halt behaviour. Twitch is excluded
+     * from the ramp-down; its coast-down is covered by twitch-settle-time. A
+     * latched fault also releases without ramping. */
     {
-        bool want_twitch    = twitch && enable && !error;
-        bool want_operation = enable && (activate || twitch) && !error;
+        bool run_req    = enable && machine_on && activate && !error;
+        bool twitch_req = enable && machine_on && twitch   && !error;
+        bool op_requested = run_req || twitch_req;
 
-        twitch_active = want_twitch;
+        if (op_requested)
+        {
+            g_stopping   = false;
+            g_stop_timer = 0;
+        }
+        else if (brake_rampdown && enable && !error && !twitch &&
+                 drive_active && !spindle_standstill &&
+                 (g_prev_op || g_stopping))
+        {
+            long to_ns = (long)(stop_ramp_timeout_s * 1e9);
+            g_stop_timer += period;
+            g_stopping = (g_stop_timer < to_ns);
+        }
+        else
+        {
+            g_stopping   = false;
+            g_stop_timer = 0;
+        }
+        g_prev_op = op_requested;
+
+        bool want_operation = op_requested || g_stopping;
+
+        twitch_active = twitch_req;
+        stopping      = g_stopping;
 
         cia402_step(__comp_inst, want_operation);
 
-        /* ---- speed setpoint ---- */
-        if (!want_operation)
+        /* ---- speed setpoint ----
+         * Keyed off op_requested, NOT want_operation, so the ramp-down phase
+         * (want_operation TRUE, op_requested FALSE) emits a 0 setpoint and the
+         * drive ramps down instead of holding the last commanded speed. */
+        if (!op_requested)
         {
             setpoint      = 0.0f;
             g_twitch_run  = false;
             twitch_cw     = false;
             twitch_ccw    = false;
         }
-        else if (twitch)
+        else if (twitch_req)
         {
             /* twitch wins over speed-cmd, so a stale MDI setpoint cannot
              * spin the spindle up during a gear shift */

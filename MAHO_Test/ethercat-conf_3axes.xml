@@ -109,18 +109,19 @@
 			</syncManager>
 		</slave>
 		<slave idx="11" type="EL2809" name="EL2809"/>
-		<slave idx="12" type="EL4034" name="EL4034">
+		<slave idx="12" type="EL2024" name="EL2024"/>
+		<slave idx="13" type="EL4034" name="EL4034">
 			<!-- EL4034: DC per Beckhoff ESI (OpMode "DC") — SYNC0 on cycle start, SYNC1 +100us -->
 			<dcConf assignActivate="700" sync0Cycle="*1" sync0Shift="0" sync1Cycle="100000" sync1Shift="0"/>
 		</slave>
-		<slave idx="13" type="generic" vid="0x00000002" pid="0x23963052" name="EL9110-Mot">
+		<slave idx="14" type="generic" vid="0x00000002" pid="0x23963052" name="EL9110-Mot">
 			<syncManager idx="0" dir="in">
 				<pdo idx="1a00">
 					<pdoEntry idx="6000" subIdx="01" bitLen="1" halPin="PowerOk" halType="bit"/>
 				</pdo>
 			</syncManager>
 		</slave>
-		<slave idx="14" type="EL7332" name="EL7332-0">
+		<slave idx="15" type="EL7332" name="EL7332-0">
 			<!-- ================= Channel 1 ================= -->
 			<modParam name="ch1_enable"               value="true"/>       <!-- gated with HAL enable pin       -->
 			<modParam name="ch1_mode"                 value="velocity"/>   <!-- velocity | chopper (8022:01)    -->
@@ -172,7 +173,7 @@
 			<modParam name="warning_temp"             value="80"/>         <!-- °C   (F80F:04)                  -->
 			<modParam name="switchoff_temp"           value="100"/>        <!-- °C   (F80F:05)                  -->
 		</slave>
-		<slave idx="15" type="EL7332" name="EL7332-1">
+		<slave idx="16" type="EL7332" name="EL7332-1">
 			<!-- ================= Channel 1 ================= -->
 			<modParam name="ch1_enable"               value="true"/>       <!-- gated with HAL enable pin       -->
 			<modParam name="ch1_mode"                 value="velocity"/>   <!-- velocity | chopper (8022:01)    -->
@@ -224,7 +225,7 @@
 			<modParam name="warning_temp"             value="80"/>         <!-- °C   (F80F:04)                  -->
 			<modParam name="switchoff_temp"           value="100"/>        <!-- °C   (F80F:05)                  -->
 		</slave>
-		<slave idx="16" type="FC302" name="FC302">
+		<slave idx="17" type="FC302" name="FC302">
 			<!--<modParam name="accelDeltaSpeed"  value="5000"/>
 			<modParam name="accelDeltaTime"   value="2000"/>
 			<modParam name="decelDeltaSpeed"  value="5000"/>

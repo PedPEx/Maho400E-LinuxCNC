@@ -97,6 +97,15 @@ pin in bit machine_on = 1
 pin in bit fault_reset = 0
     "Rising edge clears a latched fault of this component.";
 
+pin in bit toolchange_active = 0
+    "A tool change is in progress. Connect to mh400e-toolchange.0.change-active, which is high from the M6 request (or the first button press on a manual change) until the tool sits in the taper again. While this is TRUE the spindle is not started and a running spindle is stopped.";
+
+pin out bit blocked_by_toolchange = 0
+    "TRUE while a spindle run request is being refused because a tool change is in progress. Goes back to FALSE as soon as the request is withdrawn or the tool change finishes.";
+
+pin out bit toolchange_ok = 1
+    "Inverse of blocked-by-toolchange, HIGH = OK, ready for a faultlatch.N.monitor input. Feeding it to the fault handler is what puts the message 'spindle blocked, tool change in progress' in front of the operator.";
+
 pin out bit at_speed = 0
     "TRUE only while the spindle actually runs at the requested speed: drive active, drive reporting target reached, no gear change in progress. Connect to spindle.0.at-speed.";
 
@@ -333,6 +342,21 @@ FUNCTION(_)
     double sign     = (req < 0.0) ? -1.0 : 1.0;
     bool   want_run = spindle_on && (req_abs >= 1.0);
     int    engaged_index;
+
+    /* A tool change locks the spindle out.  The refusal is reported rather
+     * than latched as a fault: it is a normal operating condition, not a
+     * defect, and it clears by itself once the change is finished.
+     *
+     * The test deliberately uses spindle-on alone, NOT want_run.  If the
+     * same tool change signal is also wired to spindle.0.inhibit, motion
+     * forces the commanded speed to zero, want_run would be false and the
+     * message would never appear - even though the operator clearly asked
+     * for the spindle. */
+    blocked_by_toolchange = spindle_on && toolchange_active;
+    toolchange_ok         = !blocked_by_toolchange;
+
+    if (toolchange_active)
+        want_run = false;
 
     engaged_gear  = gear_current_rpm;
     engaged_index = gear_index_of(gear_current_rpm);

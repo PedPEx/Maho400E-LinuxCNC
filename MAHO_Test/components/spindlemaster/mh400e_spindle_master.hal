@@ -132,3 +132,12 @@ net fc302-fb-rpm       => mh400e-spindle-master.drive-feedback-rpm
 # ---------------------------------------------------------------------------
 
 net sm-health mh400e-spindle-master.health-ok => faultlatch.53.monitor
+
+# Tool changer interlock, two stages:
+#   spindle.0.inhibit  = hard block, motion stops commanding a speed at all
+#   toolchange-active  = the reason, so the operator gets a message
+net tc-active mh400e-toolchange.0.change-active => mh400e-spindle-master.toolchange-active
+net tc-active                                   => spindle.0.inhibit
+
+# HIGH = OK, straight into the fault handler, no not-gate in between.
+net sm-tc-ok  mh400e-spindle-master.toolchange-ok => faultlatch.54.monitor

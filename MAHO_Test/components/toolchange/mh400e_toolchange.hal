@@ -1,0 +1,132 @@
+# ---------------------------------------------------------------------------
+# mh400e_toolchange.hal
+#
+# Manual tool clamping for the MAHO MH400E retrofit.
+#
+#   Valve  (release)  lcec.m0.EL2024.dout-0
+#   Lamp   (button)   lcec.m0.EL2809.dout-15
+#   Button (release)  lcec.m0.EL1819-1.din-15
+#
+# Build:
+#   halcompile --install mh400e_toolchange.comp
+#   chmod +x components/toolchange/mh400e_toolset.py
+#
+# Include from the main HAL file after ethercat.hal:
+#   source mh400e_toolchange.hal
+# ---------------------------------------------------------------------------
+
+loadrt mh400e_toolchange
+
+# Userspace helper. Started with an explicit interpreter and path, relative to
+# the config directory (LinuxCNC runs with the config directory as cwd).
+# -Wn waits for the HAL component name 'mh400e-toolset', which differs from the
+# file name - plain -W would wait for 'mh400e_toolset' and never return.
+loadusr -Wn mh400e-toolset python3 ./components/toolchange/mh400e_toolset.py
+
+# Execute after the EtherCAT inputs have been read and before motion, so the
+# iocontrol handshake is served in the same servo cycle.
+addf mh400e-toolchange.0 servo-thread
+
+# ---------------------------------------------------------------------------
+# Tuning
+#
+# blink-wait      period of the slow blink while waiting for the opening press
+# flash-on        length of one flash of the double flash pattern
+# flash-period    repetition period of the double flash pattern
+# clamp-time      drawbar pull-in time before the change is reported complete
+# timeout         waiting time before an info message is emitted
+# manual-tool-number  tool number written when a change is started at the button
+# ---------------------------------------------------------------------------
+setp mh400e-toolchange.0.blink-wait 1.0
+setp mh400e-toolchange.0.flash-on 0.12
+setp mh400e-toolchange.0.flash-period 1.2
+setp mh400e-toolchange.0.clamp-time 1.5
+setp mh400e-toolchange.0.timeout 60.0
+setp mh400e-toolchange.0.button-debounce 0.03
+setp mh400e-toolchange.0.require-spindle-stopped 1
+setp mh400e-toolchange.0.manual-tool-number 0
+setp mh400e-toolchange.0.pause-on-change 1
+setp mh400e-toolchange.0.pause-pulse 0.2
+
+# ---------------------------------------------------------------------------
+# Field I/O
+# ---------------------------------------------------------------------------
+net tc-button      lcec.m0.EL1819-1.din-15   mh400e-toolchange.0.button
+net tc-lamp        mh400e-toolchange.0.lamp  lcec.m0.EL2809.dout-15
+net tc-valve       mh400e-toolchange.0.valve lcec.m0.EL2024.dout-0
+
+# ---------------------------------------------------------------------------
+# Gating
+#
+# machine-is-on and spindle-stopped already exist in the main configuration
+# (halui.machine.is-on, gearbox/spindle logic). If the signal names differ in
+# your setup, adapt the two 'net' lines below instead of creating new signals.
+# ---------------------------------------------------------------------------
+net machine-is-on     => mh400e-toolchange.0.enable
+net spindle-stopped   => mh400e-toolchange.0.spindle-stopped
+
+# ---------------------------------------------------------------------------
+# iocontrol handshake
+#
+# The MH400E has no tool carousel, so tool-prepare is looped back immediately;
+# the physical change is handled entirely by the component.
+# ---------------------------------------------------------------------------
+net tc-prepare     iocontrol.0.tool-prepare   iocontrol.0.tool-prepared
+net tc-change      iocontrol.0.tool-change    mh400e-toolchange.0.tool-change
+net tc-changed     mh400e-toolchange.0.tool-changed  iocontrol.0.tool-changed
+net tc-tool-number iocontrol.0.tool-number    mh400e-toolchange.0.tool-number
+
+# ---------------------------------------------------------------------------
+# Tool number handling through the userspace helper
+#
+#   req-comp    set the current tool to 0 when a change is started at the button
+#   req-manual  operator sets the tool that was actually inserted (GUI)
+# ---------------------------------------------------------------------------
+net tc-settool-req mh400e-toolchange.0.set-tool-request mh400e-toolset.req-comp
+net tc-settool-num mh400e-toolchange.0.set-tool-number  mh400e-toolset.number-comp
+net tc-settool-ack mh400e-toolset.ack   mh400e-toolchange.0.set-tool-ack
+
+# ---------------------------------------------------------------------------
+# Program pause
+#
+# The component pulses program-pause when a change starts. halui evaluates the
+# rising edge, the program then stays paused beyond the end of the change and
+# only continues when the operator presses Resume - the spindle cannot restart
+# on its own while somebody is still at the tool.
+#
+# Requires halui in the INI:
+#   [HAL]
+#   HALUI = halui
+# ---------------------------------------------------------------------------
+net tc-pause mh400e-toolchange.0.program-pause => halui.program.pause
+
+# ---------------------------------------------------------------------------
+# Operator messages
+#
+# The helper derives the notifications shown in the GUI from these three pins.
+# They carry no command function - unlinking them only silences the messages.
+# ---------------------------------------------------------------------------
+net tc-active        mh400e-toolchange.0.change-active => mh400e-toolset.change-active
+net tc-state         mh400e-toolchange.0.state         => mh400e-toolset.state
+net tc-manual        mh400e-toolchange.0.manual-change => mh400e-toolset.manual-change
+
+# GladeVCP: spin button for the tool number, push button to apply it.
+# Uncomment once the widgets exist in the panel.
+#net tc-manual-num  mh400e-panel.tool-number-f  mh400e-toolset.number-manual
+#net tc-manual-set  mh400e-panel.tool-set       mh400e-toolset.req-manual
+
+# ---------------------------------------------------------------------------
+# Status / message layer
+#
+# The timeout pins are active-high fault conditions; faultlatch expects
+# 'monitor' to be HIGH = ok, so they are inverted before being fed in.
+# Adapt the instance numbers and message ids to the existing fault matrix.
+# ---------------------------------------------------------------------------
+#net tc-timeout-open  mh400e-toolchange.0.timeout-open  not.tc0.in
+#net tc-timeout-open- not.tc0.out                       faultlatch.10.monitor
+#net tc-timeout-close mh400e-toolchange.0.timeout-close not.tc1.in
+#net tc-timeout-close- not.tc1.out                      faultlatch.11.monitor
+
+# Panel LEDs / status signals
+# tc-active, tc-state and tc-manual are already created above and can simply
+# be extended with further readers, e.g. GladeVCP LEDs.
