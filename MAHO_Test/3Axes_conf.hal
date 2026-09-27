@@ -1,15 +1,79 @@
 #########################################
-# Axis X / Joint 0
-# Drive board 1 / slot 1 → EL4034 aout-0 / EL5021-x
-# OUTPUT_SCALE=+10, ENCODER_SCALE handled by bec-enc-x.scale
-# Homing: EL5021 Latch-C via bec_enc_homing component (two-pass)
-# enableCReset=0 must be set in ethercat-conf_3axes.xml!
+# Hardware limit switches (EK1914 standard inputs)
 #
-# INI requirements for two-pass C-latch homing:
+# One input per axis, both travel ends combined (N/C chain):
+#   lcec.m0.EK1914.din-0 = X    din-1 = Y    din-2 = Z
+#   din TRUE  = chain closed, axis within travel
+#   din FALSE = a limit switch is actuated (or wire break)
+#
+# The switches also drop the Indramat 3TRM2 controller/pulse release in
+# hardware. The HAL copy below only lets LinuxCNC react in a controlled way:
+# abort homing (home_do_moving_checks) and flag "on limit" outside homing.
+#
+# Since both ends share one input, the same signal feeds pos- and
+# neg-lim-sw-in. LinuxCNC then cannot tell which end was hit; that is
+# acceptable here because the drive release is removed in hardware anyway.
+#
+# Limit bypass (key switch in the control cabinet):
+#   N/O contact 1 bridges the limit chain for the Indramat release only.
+#   N/O contact 2 -> lcec.m0.EL1859.din-2 (TRUE = bypass active).
+# While the bypass is active, the limit signals are masked towards
+# LinuxCNC so the machine can be switched on and the axis jogged off the
+# limit switch. Because both travel ends share one input, LinuxCNC cannot
+# block the direction towards the actuated switch: the operator must jog
+# away from it.
+#
+# N/O wiring for contact 2 is intentional: a wire break reads as "bypass
+# NOT active", so limit monitoring in LinuxCNC stays in force.
+#
+# If 'not' or 'and2' are already loaded elsewhere, merge these names into
+# the existing loadrt lines instead (a second loadrt of the same module
+# fails).
+#########################################
+
+loadrt not  names=not-lim-x,not-lim-y,not-lim-z
+loadrt and2 count=21
+
+addf not-lim-x      servo-thread
+addf not-lim-y      servo-thread
+addf not-lim-z      servo-thread
+addf and2.18        servo-thread
+addf and2.19        servo-thread
+addf and2.20        servo-thread
+
+# Limit chain state (TRUE = within travel) -> "on limit"
+net x-lim-ok   lcec.m0.EK1914.din-0  => not-lim-x.in
+net y-lim-ok   lcec.m0.EK1914.din-1  => not-lim-y.in
+net z-lim-ok   lcec.m0.EK1914.din-2  => not-lim-z.in
+
+net x-lim-raw  not-lim-x.out => and2.18.in0
+net y-lim-raw  not-lim-y.out => and2.19.in0
+net z-lim-raw  not-lim-z.out => and2.20.in0
+
+# Bypass key switch: din-2 TRUE = "Automatik" (bypass NOT active),
+# FALSE = "Manuell" (bypass active). Gate enabled while din-2 is TRUE.
+net lim-bypass-off  lcec.m0.EL1859.din-2  => and2.18.in1 and2.19.in1 and2.20.in1
+
+# Masked limit signals -> motion (same signal for both ends)
+net x-on-limit and2.18.out => joint.0.pos-lim-sw-in joint.0.neg-lim-sw-in
+net y-on-limit and2.19.out => joint.1.pos-lim-sw-in joint.1.neg-lim-sw-in
+net z-on-limit and2.20.out => joint.2.pos-lim-sw-in joint.2.neg-lim-sw-in
+
+#########################################
+# Axis X / Joint 0
+# EL4034 aout-0 / EL5021-x
+# Drive direction: [JOINT_0]OUTPUT_SCALE, encoder direction and
+# resolution: [JOINT_0]ENCODER_SCALE (applied in bec-enc-x.scale)
+#
+# Homing: EL5021 latch C via bec_enc_homing, single index pass.
+# There is no home switch; LinuxCNC runs index-only homing.
+# enableCReset must be 0 for the EL5021 in ethercat-conf_3axes.xml.
+#
+# INI requirements:
 #   HOME_USE_INDEX              = YES
 #   HOME_INDEX_NO_ENCODER_RESET = YES
-#   HOME_SEARCH_VEL             = -2.5   (fast, determines first-pass direction)
-#   HOME_LATCH_VEL              = -1.0   (slow, same sign → second pass same dir)
+#   HOME_SEARCH_VEL             = 0.0     (index-only homing)
+#   HOME_LATCH_VEL              = +/-1.0  (sign = direction towards the mark)
 #########################################
 
 setp pid.x.Pgain                    [JOINT_0]P
@@ -26,45 +90,34 @@ setp pid.x.error-previous-target    true
 # Analog output scale (drive direction)
 setp lcec.m0.EL4034.aout-0-scale    [JOINT_0]OUTPUT_SCALE
 
-# enc.pos-scale is no longer used here: position scaling is done inside
-# bec-enc-x via the 'scale' parameter. The lcec driver still reads counter
-# and latch values as raw UINT32 and passes them to the component.
+# Position scaling is done inside bec-enc-x, not via enc.pos-scale.
+# LS403, 20 um pitch, EL5021 10-bit interpolation:
+#   50 periods/mm * 1024 = 51200 counts/mm
+# Sign sets direction (negative = counts opposite to axis travel).
+setp bec-enc-x.scale                [JOINT_0]ENCODER_SCALE
 
-# --- bec_enc_homing parameters ---
-# scale: counts per machine unit (mm).
-# For Heidenhain LS403 (20 µm pitch) without interpolation: 1/0.000020 = 50000.
-# VERIFY by jogging a known distance and checking bec-enc-x.counts delta.
-# Sign controls direction: negative = encoder counts opposite to axis travel.
-# This replaces the former ENCODER_SCALE on enc.pos-scale.
-setp bec-enc-x.scale             [JOINT_0]ENCODER_SCALE
-
-# Do NOT preset the terminal counter during homing: the preset takes
-# effect one or more PDO cycles after the HAL-side bookkeeping, which
-# produces a feedback discontinuity and an immediate following error.
-setp bec-enc-x.reset-on-home     0
-
-# Arm pulse width in servo cycles. 2 cycles @ 1 kHz = 2 ms, sufficient for EL5021.
-setp bec-enc-x.latch-arm-cycles  2
-
-# --- Encoder terminal → bec_enc_homing ---
+# --- Encoder terminal -> bec_enc_homing ---
 net x-raw-cnt      lcec.m0.EL5021-x.enc.counter-value  =>  bec-enc-x.raw-count
 net x-latch-val    lcec.m0.EL5021-x.enc.latch-value     =>  bec-enc-x.latch-value
 net x-latch-valid  lcec.m0.EL5021-x.enc.latch-c-valid   =>  bec-enc-x.latch-c-valid
 
-# --- bec_enc_homing → encoder terminal ---
+# --- bec_enc_homing -> encoder terminal ---
+# set-counter / set-counter-value are held at 0 by the component; the nets
+# are kept so the terminal inputs stay at a defined value.
 net x-latch-arm    bec-enc-x.enable-latch-c             =>  lcec.m0.EL5021-x.enc.enable-latch-c
 net x-cnt-set      bec-enc-x.set-counter                =>  lcec.m0.EL5021-x.enc.set-counter
 net x-cnt-setval   bec-enc-x.set-counter-value          =>  lcec.m0.EL5021-x.enc.set-counter-value
 
-# --- bec_enc_homing → LinuxCNC motion ---
-# position replaces the former lcec.m0.EL5021-x.enc.pos feedback path
+# --- bec_enc_homing -> LinuxCNC motion ---
 net x-pos-fb       bec-enc-x.position                   =>  pid.x.feedback  joint.0.motor-pos-fb
 
-# Bidirectional index-enable: motion sets TRUE to start homing,
-# component clears to FALSE after second latch (homing complete).
-net x-index-enable joint.0.index-enable                <=>  bec-enc-x.index-enable
+# Bidirectional index-enable: motion sets TRUE to start the index search,
+# the component clears it on the accepted latch. pid.x.index-enable
+# suppresses the FF1/FF2/D derivative spike caused by the pos_cmd reset
+# that motion performs in HOME_SET_INDEX_POSITION.
+net x-index-enable joint.0.index-enable                <=>  bec-enc-x.index-enable  pid.x.index-enable
 
-# --- motion → PID → drive ---
+# --- motion -> PID -> drive ---
 net x-enable       joint.0.amp-enable-out               =>  pid.x.enable  lcec.m0.EL4034.aout-0-enable
 net x-pos-cmd      joint.0.motor-pos-cmd                =>  pid.x.command
 net x-output       pid.x.output                         =>  lcec.m0.EL4034.aout-0-value
@@ -72,10 +125,10 @@ net x-output       pid.x.output                         =>  lcec.m0.EL4034.aout-
 
 #########################################
 # Axis Y / Joint 1
-# Drive board 2 / slot 1 → EL4034 aout-2 / EL5021-y
-# OUTPUT_SCALE=-10 (inverted), ENCODER_SCALE handled by bec-enc-y.scale
-# Homing: EL5021 Latch-C via bec_enc_homing component (two-pass)
-# enableCReset=0 must be set in ethercat-conf_3axes.xml!
+# EL4034 aout-1 / EL5021-y
+# Drive direction: [JOINT_1]OUTPUT_SCALE, encoder: [JOINT_1]ENCODER_SCALE
+# Homing: EL5021 latch C via bec_enc_homing, single index pass
+# (INI requirements as for X). enableCReset must be 0.
 #########################################
 
 setp pid.y.Pgain                    [JOINT_1]P
@@ -89,11 +142,9 @@ setp pid.y.deadband                 [JOINT_1]DEADBAND
 setp pid.y.maxoutput                [JOINT_1]MAX_OUTPUT
 setp pid.y.error-previous-target    true
 
-setp lcec.m0.EL4034.aout-2-scale    [JOINT_1]OUTPUT_SCALE
+setp lcec.m0.EL4034.aout-1-scale    [JOINT_1]OUTPUT_SCALE
 
-setp bec-enc-y.scale             [JOINT_1]ENCODER_SCALE
-setp bec-enc-y.reset-on-home     0
-setp bec-enc-y.latch-arm-cycles  2
+setp bec-enc-y.scale                [JOINT_1]ENCODER_SCALE
 
 net y-raw-cnt      lcec.m0.EL5021-y.enc.counter-value  =>  bec-enc-y.raw-count
 net y-latch-val    lcec.m0.EL5021-y.enc.latch-value     =>  bec-enc-y.latch-value
@@ -104,20 +155,20 @@ net y-cnt-set      bec-enc-y.set-counter                =>  lcec.m0.EL5021-y.enc
 net y-cnt-setval   bec-enc-y.set-counter-value          =>  lcec.m0.EL5021-y.enc.set-counter-value
 
 net y-pos-fb       bec-enc-y.position                   =>  pid.y.feedback  joint.1.motor-pos-fb
-net y-index-enable joint.1.index-enable                <=>  bec-enc-y.index-enable
+net y-index-enable joint.1.index-enable                <=>  bec-enc-y.index-enable  pid.y.index-enable
 
-net y-enable       joint.1.amp-enable-out               =>  pid.y.enable  lcec.m0.EL4034.aout-2-enable
+net y-enable       joint.1.amp-enable-out               =>  pid.y.enable  lcec.m0.EL4034.aout-1-enable
 net y-pos-cmd      joint.1.motor-pos-cmd                =>  pid.y.command
-net y-output       pid.y.output                         =>  lcec.m0.EL4034.aout-2-value
+net y-output       pid.y.output                         =>  lcec.m0.EL4034.aout-1-value
 
 
 #########################################
 # Axis Z / Joint 2
-# Drive board 1 / slot 2 → EL4034 aout-1 / EL5021-z
-# OUTPUT_SCALE=+10, ENCODER_SCALE handled by bec-enc-z.scale
-# HOME_SEQUENCE=0 → Z is always homed FIRST
-# Homing: EL5021 Latch-C via bec_enc_homing component (two-pass)
-# enableCReset=0 must be set in ethercat-conf_3axes.xml!
+# EL4034 aout-2 / EL5021-z
+# Drive direction: [JOINT_2]OUTPUT_SCALE, encoder: [JOINT_2]ENCODER_SCALE
+# HOME_SEQUENCE=0 -> Z is homed first in normal operation
+# Homing: EL5021 latch C via bec_enc_homing, single index pass
+# (INI requirements as for X). enableCReset must be 0.
 #########################################
 
 setp pid.z.Pgain                    [JOINT_2]P
@@ -131,11 +182,9 @@ setp pid.z.deadband                 [JOINT_2]DEADBAND
 setp pid.z.maxoutput                [JOINT_2]MAX_OUTPUT
 setp pid.z.error-previous-target    true
 
-setp lcec.m0.EL4034.aout-1-scale    [JOINT_2]OUTPUT_SCALE
+setp lcec.m0.EL4034.aout-2-scale    [JOINT_2]OUTPUT_SCALE
 
-setp bec-enc-z.scale             [JOINT_2]ENCODER_SCALE
-setp bec-enc-z.reset-on-home     0
-setp bec-enc-z.latch-arm-cycles  2
+setp bec-enc-z.scale                [JOINT_2]ENCODER_SCALE
 
 net z-raw-cnt      lcec.m0.EL5021-z.enc.counter-value  =>  bec-enc-z.raw-count
 net z-latch-val    lcec.m0.EL5021-z.enc.latch-value     =>  bec-enc-z.latch-value
@@ -146,14 +195,14 @@ net z-cnt-set      bec-enc-z.set-counter                =>  lcec.m0.EL5021-z.enc
 net z-cnt-setval   bec-enc-z.set-counter-value          =>  lcec.m0.EL5021-z.enc.set-counter-value
 
 net z-pos-fb       bec-enc-z.position                   =>  pid.z.feedback  joint.2.motor-pos-fb
-net z-index-enable joint.2.index-enable                <=>  bec-enc-z.index-enable
+net z-index-enable joint.2.index-enable                <=>  bec-enc-z.index-enable  pid.z.index-enable
 
-net z-enable       joint.2.amp-enable-out               =>  pid.z.enable  lcec.m0.EL4034.aout-1-enable
+net z-enable       joint.2.amp-enable-out               =>  pid.z.enable  lcec.m0.EL4034.aout-2-enable
 net z-pos-cmd      joint.2.motor-pos-cmd                =>  pid.z.command
-net z-output       pid.z.output                         =>  lcec.m0.EL4034.aout-1-value
+net z-output       pid.z.output                         =>  lcec.m0.EL4034.aout-2-value
 
 #########################################
-#Costum HAL
+# Custom HAL
 #########################################
 # enable SafetyPLC
 setp lcec.m0.EL1918.run 1
@@ -164,4 +213,4 @@ net ack-btn  lcec.m0.EL1918.err-ack
 net cond-201    => iocontrol.0.emc-enable-in
 net on-button  lcec.m0.EL1859.din-0 => halui.machine.on
 net on-button                       => halui.estop.reset
-net machine-is-on  halui.machine.is-on => lcec.m0.EL1859.dout-0 lcec.m0.EL2809.dout-0 lcec.m0.EL2809.dout-1 lcec.m0.EL2809.dout-3 
+net machine-is-on  halui.machine.is-on => lcec.m0.EL1859.dout-0 lcec.m0.EL2809.dout-0 lcec.m0.EL2809.dout-1 lcec.m0.EL2809.dout-3

@@ -37,7 +37,7 @@ addf mh400e-gearbox-el7332 servo-thread
 # output stick permanently, because that is derived from
 # "current duty < motor-velocity".
 setp mh400e-gearbox-el7332.motor-velocity        1.0
-setp mh400e-gearbox-el7332.motor-velocity-slow   0.45
+setp mh400e-gearbox-el7332.motor-velocity-slow   1.0
 
 # Overrun: keep nudging the shaft after its cam switch has closed so the dog
 # clutch seats fully.  Applies to the LEFT and RIGHT end positions only, never

@@ -73,7 +73,7 @@
       		<modParam name="enableCReset"          value="false"/>
 			<!-- 8000:0E  Reverse counting direction (BIT).
 			Prefer inverting via enc.pos-scale sign in HAL instead.          -->
-			<modParam name="reversionOfRotation"   value="false"/>
+			<modParam name="reversionOfRotation"   value="true"/>
 			<!-- 8001:01  Enable frequency error detection (BIT). factory ON       -->
 			<modParam name="enableFrequencyError"  value="true"/>
 			<!-- 8001:02  Enable amplitude error detection (BIT). factory ON       -->

@@ -15,7 +15,10 @@
       "vendor": "0x2",
       "product": "0x77e3052",
       "revision": "0x100000",
-      "optional": false
+      "optional": false,
+      "safety_plc": true,
+      "safety_crc": "0x684e",
+      "safety_crc_sdo": { "index": "0xf980", "subindex": "0x03", "size": 2}
     },
     {
       "position": 2,

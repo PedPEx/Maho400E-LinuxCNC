@@ -15,6 +15,7 @@
 
 [DISPLAY]
 DISPLAY = axis
+USER_COMMAND_FILE = axis_custom.py
 MAX_LINEAR_VELOCITY = 41.667
 DEFAULT_LINEAR_VELOCITY = 16.667
 MAX_FEED_OVERRIDE = 1.5
@@ -97,7 +98,7 @@ FF2          = 0.0021
 DEADBAND     = 0.0
 MAX_OUTPUT   = 10.0
 
-OUTPUT_SCALE  =  10.0
+OUTPUT_SCALE  =  -10.0
 # Negative: X encoder counts opposite to axis travel direction
 ENCODER_SCALE = 51200.0
 
@@ -154,7 +155,7 @@ FF2          = 0.0015
 DEADBAND     = 0.0
 MAX_OUTPUT   = 10.0
 
-OUTPUT_SCALE  = -10.0
+OUTPUT_SCALE  = 10.0
 ENCODER_SCALE = -51200.0
 
 FERROR       = 0.5
@@ -206,7 +207,7 @@ FF2          = 0.0020
 DEADBAND     = 0.0
 MAX_OUTPUT   = 10.0
 
-OUTPUT_SCALE  =  -10.0
+OUTPUT_SCALE  =  10.0
 ENCODER_SCALE = 51200.0
 
 FERROR       = 2.0

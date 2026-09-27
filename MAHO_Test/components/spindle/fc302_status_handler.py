@@ -150,7 +150,7 @@ class HandlerClass:
             "Infos-RO-PDO.speed-rpm": {"type": hal.HAL_S32, "lbl": "lbl_pdo_speed", "unit": "RPM"},
             "Infos-RO-PDO.feedback-rpm": {"type": hal.HAL_S32, "lbl": "lbl_pdo_feedback", "unit": "RPM"},
             "Infos-RO-PDO.power-kw": {"type": hal.HAL_S32, "lbl": "lbl_pdo_power", "unit": "kW", "div": 100.0},
-            "Infos-RO-PDO.torque-nm": {"type": hal.HAL_S32, "lbl": "lbl_pdo_torque", "unit": "Nm"},
+            "Infos-RO-PDO.torque-nm": {"type": hal.HAL_S32, "lbl": "lbl_pdo_torque", "unit": "Nm", "div": 10.0},
             "Infos-RO-PDO.torque-pct-highres": {"type": hal.HAL_S32, "lbl": "lbl_pdo_torque_pct", "unit": "%", "div": 10.0},
             "Infos-RO-PDO.brake-energy-avg": {"type": hal.HAL_S32, "lbl": "lbl_pdo_brake", "unit": "kW"},
             "Infos-RO-PDO.dc-link-voltage": {"type": hal.HAL_U32, "lbl": "lbl_pdo_dc_link", "unit": "V"},

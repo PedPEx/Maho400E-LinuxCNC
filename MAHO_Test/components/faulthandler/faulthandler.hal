@@ -1,5 +1,5 @@
 loadrt faultlatch count=56
-loadrt and2 count=18
+#loadrt and2 count=21
 
 addf faultlatch.0 servo-thread
 addf faultlatch.1 servo-thread
@@ -237,15 +237,15 @@ setp faultlatch.5.id 203
 
 # ----- ID 251  [alarm]  Endschalter X  (faultlatch.6) -----
 setp faultlatch.6.id 251
-net cond-251  lcec.m0.EK1914.din-0  => faultlatch.6.monitor
+net x-lim-ok  => faultlatch.6.monitor
 
 # ----- ID 252  [alarm]  Endschalter Y  (faultlatch.7) -----
 setp faultlatch.7.id 252
-net cond-252  lcec.m0.EK1914.din-1  => faultlatch.7.monitor
+net y-lim-ok  => faultlatch.7.monitor
 
 # ----- ID 253  [alarm]  Endschalter Z  (faultlatch.8) -----
 setp faultlatch.8.id 253
-net cond-253  lcec.m0.EK1914.din-2  => faultlatch.8.monitor
+net z-lim-ok  => faultlatch.8.monitor
 
 # ----- ID 254  [alarm]  NotHalt Bedienpult betaetigt  (faultlatch.9) -----
 setp faultlatch.9.id 254
@@ -314,12 +314,12 @@ net cond-609  lcec.m0.EL1819-0.din-9  => faultlatch.24.monitor
 # ----- ID 610  [info]  Hydraulikpumpe: Druck erreicht  (faultlatch.25) -----
 setp faultlatch.25.id 610
 setp faultlatch.25.auto-clear-s 5
-net cond-610  lcec.m0.EL1819-0.din-10  => faultlatch.25.monitor
+net cond-610  lcec.m0.EL1819-0.din-10-not  => faultlatch.25.monitor
 
 # ----- ID 611  [info]  Hydraulikpumpe: Pumpe laeuft  (faultlatch.26) -----
 setp faultlatch.26.id 611
 setp faultlatch.26.auto-clear-s 5
-net cond-611  lcec.m0.EL1819-0.din-10-not  => faultlatch.26.monitor
+net cond-611  lcec.m0.EL1819-0.din-10  => faultlatch.26.monitor
 
 # ----- ID 612  [alarm]  Uebertemperatur DC Achsmotoren  (faultlatch.27) -----
 setp faultlatch.27.id 612
@@ -343,7 +343,7 @@ setp faultlatch.31.id 616
 
 # ----- ID 617  [alarm]  Indramatfreigabe Manuell  (faultlatch.32) -----
 setp faultlatch.32.id 617
-net cond-617  lcec.m0.EL1859.din-2  => faultlatch.32.monitor
+net lim-bypass-off => faultlatch.32.monitor
 
 # ----- ID 620  [alarm]  FC302 Spindel: Fehler  (faultlatch.51) -----
 setp faultlatch.51.id 620
